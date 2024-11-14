@@ -3,7 +3,7 @@
 var bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { SECRET_Key } = process.env;
-const operatorModel = require('../../models/adminModel')
+const operatorModel = require('../../models/operatorModel')
 const adminRegisterModel = require('../../models/adminModel');
 
 
@@ -36,10 +36,10 @@ exports.adminRegister = async (req, res, next) => {
                 data: insertAdminuser,
             };
         }
-        return res.status(404).json({
+        return {
             success: false,
             data: []
-        });
+        };
     } catch (error) {
         console.log(error);
     }
@@ -62,10 +62,10 @@ exports.login = async (req, res, next) => {
 
         const isPasswordMatch = await bcrypt.compare(req.body.password, findData[0].password);
         if (!isPasswordMatch) {
-            return res.status(401).json({
+            return {
                 status: false,
                 message: "Incorrect Password"
-            })
+            }
         }
 
         const auth_key = jwt.sign({ _id: findData[0]._id }, SECRET_Key, { expiresIn: "24h" });
@@ -87,11 +87,11 @@ exports.login = async (req, res, next) => {
 
 exports.operatorsList = async (req, res, next) => {
     try {
-        let page = req.query.page ||1;
+        let page = req.query.page || 1;
         let pagesize = req.query.pagesize || 10;
         let search_value = req.query.search || "";
-        var conditions; 
-        
+        var conditions;
+
         if (search_value) {
             conditions = _.assign(conditions, { $or: [{ "fullName": { $regex: new RegExp(search_value, "gi") } }] });
         }
@@ -99,30 +99,32 @@ exports.operatorsList = async (req, res, next) => {
             .sort({ fullName: 1 })
             .skip((page - 1) * pagesize).
             limit(pagesize);
-        if(operatorsData.length == 0 ){
+        if (operatorsData.length == 0) {
 
-            return res.status(404).json({
+            return {
                 success: false,
-                message:"No Data Found",
-                
-            });
+                message: "No Data Found",
+
+            };
+        } else {
+
+            return {
+                success: true,
+                data: operatorsData
+            };
         }
-        return res.status(200).json({
-            success: true,
-            data:operatorsData
-        });
     } catch (error) {
         console.log(error);
     }
 };
 
-exports.updateOperator = async(req,res,next)=>{
+exports.updateOperator = async (req, res, next) => {
     try {
-        const updateData = await operatorModel.findOneAndUpdate({status:false},{new:true})
-        return res.status(200).json({
+        const updateData = await operatorModel.findOneAndUpdate({ status: false }, { new: true })
+        return {
             success: true,
-            data:updateData
-        });
+            data: updateData
+        };
     } catch (error) {
         console.log(error);
     }
