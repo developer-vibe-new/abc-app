@@ -26,6 +26,15 @@ router.post('/login', validate(userVal.login), responseHandler(controllers.login
 router.post('/adminRegister',adminController.registerAdmin);
 router.post('/adminlogin', adminController.login);
 router.post('/state-create',auth, stateController.createState);
+router.post('/update-state',auth, stateController.updateState);
+router.post('/delete-State/:id',auth, stateController.deleteState);
+router.get('/view-state',auth, stateController.viewState);
+router.post('/create-city',auth, stateController.createCity);
+router.post('/update-city',auth, stateController.updateCity);
+router.post('/delete-city/:id',auth, stateController.deleteCity);
+router.get('/view-city',auth, stateController.viewCity);
+router.get('/operators',auth, adminController.operators);
+router.get('/operatorsUpdate',auth, adminController.operatorsUpdate);
 
 // Export the router for use in the main application
 module.exports = router;

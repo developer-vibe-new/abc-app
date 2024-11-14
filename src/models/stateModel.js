@@ -22,7 +22,8 @@ var stateSchema = new Schema({
 	toObject: {
 		getters: true,
 		virtuals: true
-	}
+	},
+	versionKey:false
 });
 
 
