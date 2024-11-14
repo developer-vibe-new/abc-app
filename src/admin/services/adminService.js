@@ -3,8 +3,8 @@
 var bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { SECRET_Key } = process.env;
-const operatorModel = require('../../models/registerModel')
-const adminRegisterModel = require('../../models/registerModel');
+const operatorModel = require('../../models/adminModel')
+const adminRegisterModel = require('../../models/adminModel');
 
 
 
