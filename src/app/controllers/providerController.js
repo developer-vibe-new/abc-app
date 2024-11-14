@@ -24,3 +24,15 @@ exports.loginOperatorController = async (req) => {
         };
     }
 }
+
+exports.addDriverController = async (req) => {
+    try {
+        return await service.addDriver(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}

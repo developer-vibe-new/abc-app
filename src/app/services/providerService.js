@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { statusCode, resMessage } = require('../../config/default.json');
 const Opertor = require('../../models/operatorModel');
+const Provider = require('../../models/providerModel');
 
 exports.registerOperator = async (req) => {
     try {
@@ -28,12 +29,12 @@ exports.registerOperator = async (req) => {
     }
 }
 
-    exports.loginOperator = async (req) => {
-        try {
-            const { phone } = req.body;
-            if(!phone) {
-                return { 
-                    statusCode: statusCode.BAD_REQUEST,
+        exports.loginOperator = async (req) => {
+            try {
+                const { phone } = req.body;
+                if(!phone) {
+                    return { 
+                        statusCode: statusCode.BAD_REQUEST,
                     success: false,
                     message: resMessage.Required_Data
                 };    
@@ -59,6 +60,31 @@ exports.registerOperator = async (req) => {
                 statusCode: statusCode.NOT_FOUND,
                 success: false,
                 message: resMessage.Operator_Not_Exist
+            }
+        } catch (error) {
+            return {
+                success: false,
+                message: resMessage.Internal_Server_Error,
+                error: error.message || "Internal Server Error",
+            }
+        }
+    }
+
+    exports.addDriver = async (req) => {
+        try {
+            const { name, mobile, email, type } = req.body;
+            if(!name || !mobile || !email || !type) {
+                return { 
+                    statusCode: statusCode.BAD_REQUEST,
+                    success: false,
+                    message: resMessage.Required_Data
+                };
+            }
+            await Provider.create({ name, mobile, email, type });
+            return {
+                statusCode: statusCode.OK,
+                success: true,
+                message: resMessage.Data_Created_Successfully
             }
         } catch (error) {
             return {
