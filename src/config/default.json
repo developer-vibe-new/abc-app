@@ -13,6 +13,7 @@
         "saltRounds": 10
     },
     "resMessage": {
+        "Required_Data": "All fields are required",
         "REJECTION_REASON": "Please mention rejection reason",
         "Data_Not_Found": "Data not found",
         "Team_Not_Found": "Team not found",
