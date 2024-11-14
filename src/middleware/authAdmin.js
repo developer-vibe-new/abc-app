@@ -22,8 +22,8 @@ exports.auth = async (req, res, next) => {
             });
         }
 
-        req._id = decoded._id; // Store user ID in request for access in subsequent middleware/routes
-        next(); // Proceed to the next middleware or route handler
+        req._id = decoded._id; 
+        next(); 
 
     } catch (error) {
         console.error(error);

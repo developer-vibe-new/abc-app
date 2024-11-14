@@ -1,0 +1,104 @@
+const driverModel = require('../../models/providerModel');
+const { statusCode, resMessage } = require('../../config/default.json');
+const mongoose = require('mongoose');
+
+exports.driverCreate = async (req, res, next) => {
+    try {
+        const { name, mobile, email, type } = req.body;
+        if (!name || !mobile || !email || !type) {
+            return {
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Required_Data
+            };
+        }
+        const createdData = await driverModel.create({ name, mobile, email, type });
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Created_Successfully
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        }
+    }
+};
+
+exports.driverView = async (req, res, next) => {
+    try {
+        var page = req.query.page || 1;
+        let pagesize = req.query.pagesize || 10;
+
+        let search_value = req.query.search || "";
+        var conditions;
+
+        if (search_value) {
+            conditions = _.assign(conditions, { $or: [{ "name": { $regex: new RegExp(search_value, "gi") } }] });
+        }
+
+        const viewAllData = await driverModel.find(conditions)
+            .sort({ name: 1 })
+            .skip((page - 1) * pagesize).
+            limit(pagesize);
+
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Created_Successfully,
+            data: viewAllData
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        }
+    }
+};
+
+exports.driverUpdate = async (req, res, next) => {
+    try {
+        const body = req.body
+        // const image = req.file
+        const updateData = await driverModel.findByIdAndUpdate({ _id:new mongoose.Types.ObjectId( req.params.id) }, body, { new: true });
+        if (updateData) {
+            return {
+                success: true,
+                message: resMessage.Data_Created_Successfully,
+                data: updateData
+            }
+        } else {
+            return {
+                success: false,
+                message: "Error No Data Updated",
+            }
+        }
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+exports.driverDelete = async(req,res,next)=>{
+    try {
+        const deleteData = await driverModel.findByIdAndDelete({ _id:new mongoose.Types.ObjectId( req.params.id) });
+        if (deleteData) {
+            return {
+                success: true,
+                message: resMessage.Data_Deleted_Successfully,
+                data: deleteData
+            }
+        } else {
+            return {
+                success: false,
+                message: "Error No Data Deleted",
+            }
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
