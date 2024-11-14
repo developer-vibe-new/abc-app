@@ -1,9 +1,21 @@
 const service = require('../services/providerService');
 const { statusCode } = require('../../config/default.json');
 
-exports.registerOperatorController = async (req, res) => {
+exports.registerOperatorController = async (req) => {
     try {
-        return await service.registerOperator(req, res);
+        return await service.registerOperator(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}
+
+exports.loginOperatorController = async (req) => {
+    try {
+        return await service.loginOperator(req);
     } catch (error) {
         return {
             statusCode: statusCode.BAD_REQUEST,

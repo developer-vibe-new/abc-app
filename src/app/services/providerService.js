@@ -1,7 +1,8 @@
+const jwt = require('jsonwebtoken');
 const { statusCode, resMessage } = require('../../config/default.json');
 const Opertor = require('../../models/operatorModel');
 
-exports.registerOperator = async (req, res) => {
+exports.registerOperator = async (req) => {
     try {
         const { fullName, phone, city } = req.body;
         if(!fullName || !phone || !city) {
@@ -13,16 +14,57 @@ exports.registerOperator = async (req, res) => {
         }
         const operatorData = await Opertor.create({fullName, phone, city,});
         return {
+            statusCode: statusCode.OK,
             success: true,
-            message: 'Operator registered successfully.',
+            message: resMessage.Data_Created_Successfully,
             data: operatorData
         }
     } catch (error) {
-        console.log("Error in Service: ", error)
         return {
             success: false,
-            message: 'Failed to register operator.',
+            message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",
         }
     }
 }
+
+    exports.loginOperator = async (req) => {
+        try {
+            const { phone } = req.body;
+            if(!phone) {
+                return { 
+                    statusCode: statusCode.BAD_REQUEST,
+                    success: false,
+                    message: resMessage.Required_Data
+                };    
+            }
+            const operatorData = await Opertor.findOne({phone, status: true});
+            if(operatorData) {
+                const token = jwt.sign({
+                    id: operatorData._id
+                },
+                process.env.SECRET_KEY,
+                {
+                    expiresIn: '1h'
+                }
+            );
+                return {
+                    statusCode: statusCode.OK,
+                    success: true,
+                    message: resMessage.Operator_Login_Success,
+                    token
+                }
+            }
+            return {
+                statusCode: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.Operator_Not_Exist
+            }
+        } catch (error) {
+            return {
+                success: false,
+                message: resMessage.Internal_Server_Error,
+                error: error.message || "Internal Server Error",
+            }
+        }
+    }
