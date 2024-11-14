@@ -120,7 +120,7 @@ exports.operatorsList = async (req, res, next) => {
 
 exports.updateOperator = async (req, res, next) => {
     try {
-        const updateData = await operatorModel.findOneAndUpdate({ status: false }, { new: true })
+        const updateData = await operatorModel.findByIdAndUpdate({_id:req.params.id},{ status: false }, { new: true })
         return {
             success: true,
             data: updateData
