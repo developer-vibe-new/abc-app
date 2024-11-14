@@ -7,7 +7,7 @@ const validate = require('../../helpers/validate');
 const userVal = require('../../validators/admin/userVal');
 const stateController = require('../../admin/controllers/stateController');
 const {auth} = require('../../middleware/authAdmin');
-const driverController = require('../../admin/controllers/driverController')
+
 // const auth = require('../../middleware/adminAuth');
 // const { upload } = require('../../helpers/multer');
 
@@ -35,7 +35,7 @@ router.post('/delete-city/:id',auth, stateController.deleteCity);
 router.get('/view-city',auth, stateController.viewCity);
 router.get('/operators',auth, adminController.operators);
 router.post('/operatorsUpdate/:id',auth, adminController.operatorsUpdate);
-router.post('/create-driver',auth,driverController.createDriver);
+
 
 // Export the router for use in the main application
 module.exports = router;
