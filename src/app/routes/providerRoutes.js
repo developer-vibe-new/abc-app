@@ -1,7 +1,6 @@
 const express = require('express');
 const responseHandler = require('../../helpers/responseHandler');
 const controller = require('../controllers/providerController');
-const { verifyToken } = require('../../middleware/auth');
 
 const router = express.Router();
 

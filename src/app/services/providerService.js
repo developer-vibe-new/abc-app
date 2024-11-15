@@ -72,15 +72,15 @@ exports.registerOperator = async (req) => {
 
     exports.addDriver = async (req) => {
         try {
-            const { name, mobile, email, type } = req.body;
-            if(!name || !mobile || !email || !type) {
+            const driver = req.body;
+            if(!driver.name || !driver.mobile || !driver.email || !driver.type) {
                 return { 
                     statusCode: statusCode.BAD_REQUEST,
                     success: false,
                     message: resMessage.Required_Data
                 };
             }
-            await Provider.create({ name, mobile, email, type });
+            await Provider.create(driver);
             return {
                 statusCode: statusCode.OK,
                 success: true,
