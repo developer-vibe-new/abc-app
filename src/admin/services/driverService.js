@@ -5,18 +5,23 @@ const mongoose = require('mongoose');
 exports.driverCreate = async (req, res, next) => {
     try {
         const { name, mobile, email, type } = req.body;
-        if (!name || !mobile || !email || !type) {
+        // console.log(req.file,"wwwwwwwwwwwwwwwwwwwwww")
+        const image = req.file.filename
+        // console.log(image,"uuuuuuuuuuuuu")
+        if (!name || !mobile || !email || !type || !image) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Required_Data
             };
         }
-        const createdData = await driverModel.create({ name, mobile, email, type });
+        const createdData = await driverModel.create({
+             name:name, mobile:mobile, email:email, type:type, image:image });
+             console.log(createdData,"createdData")
         return {
-            statusCode: statusCode.OK,
             success: true,
-            message: resMessage.Data_Created_Successfully
+            message: resMessage.Data_Created_Successfully,
+            data:createdData
         }
     } catch (error) {
         console.log(error);
@@ -64,8 +69,8 @@ exports.driverView = async (req, res, next) => {
 exports.driverUpdate = async (req, res, next) => {
     try {
         const body = req.body
-        // const image = req.file
-        const updateData = await driverModel.findByIdAndUpdate({ _id:new mongoose.Types.ObjectId( req.params.id) }, body, { new: true });
+        const image = req.file.filename
+        const updateData = await driverModel.findByIdAndUpdate({ _id:new mongoose.Types.ObjectId( req.params.id) }, {body,image}, { new: true });
         if (updateData) {
             return {
                 success: true,
