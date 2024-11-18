@@ -25,6 +25,18 @@ exports.loginOperatorController = async (req) => {
     }
 }
 
+exports.verifyOtpController = async (req) => {
+    try {
+        return await service.verifyOtp(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}
+
 exports.addDriverController = async (req) => {
     try {
         return await service.addDriver(req);

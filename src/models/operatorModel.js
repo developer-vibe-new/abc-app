@@ -20,6 +20,12 @@ const operatorSchema = new mongoose.Schema({
     status: {
         type: Boolean,
         default: false
+    },
+    otp: {
+        type: Number
+    },
+    token: {
+        type: String
     }
 }, { timestamps: true, versionKey: false });
 
