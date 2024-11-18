@@ -44,10 +44,8 @@ exports.editRental = async(req,res,next)=>{
 exports.addRental = async(req,res,next)=>{
     try {
         
-
-        
         const createRental = await rentalModel.create({
-
+            packages:req.body
         })
         if(createRental){
             return {

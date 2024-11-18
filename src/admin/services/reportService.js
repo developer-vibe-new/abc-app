@@ -1,4 +1,5 @@
 const rideModel = require('../../models/ride');
+const transactionModel= require('../../models/transactionsModel');
 const moment = require('moment');
 
 exports.allData = async (req, res, next) => {
@@ -75,3 +76,11 @@ exports.allData = async (req, res, next) => {
         console.log(error)
     }
 };
+
+exports.reportSales = async(req,res,next)=>{
+    try {
+        
+    } catch (error) {
+        console.log(error);
+    }
+}

@@ -6,9 +6,10 @@ exports.viewRideReport = async(req,res,next)=>{
         return res.status(200).json(Object.assign({success:data.success},data))
     } catch (error) {
         console.error("Error in viewRideReport:", error);
-        return res.status(500).json({
+        return {
+            statusCode: statusCode.BAD_REQUEST,
             success: false,
-            message: "An internal server error occurred.",
-        });
+            message: error.message
+        };
     }
 }

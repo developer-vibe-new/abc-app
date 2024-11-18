@@ -77,11 +77,9 @@ var TransactionSchema = new Schema({
 	time: {
 		accepted: {
 			type: Date,
-			get: MODALFUNC.string_ts,
-			set: MODALFUNC.ts_string
+			
 		},cancelled: {
 			type: Date,
-			get: MODALFUNC.string_ts
 		},
 	}
 }, {
@@ -101,24 +99,24 @@ var TransactionSchema = new Schema({
 });
 
 
-TransactionSchema.path('created').get(MODALFUNC.string_ts);
-TransactionSchema.path('updated').get(MODALFUNC.string_ts);
+// TransactionSchema.path('created').get(MODALFUNC.string_ts);
+// TransactionSchema.path('updated').get(MODALFUNC.string_ts);
 
 
-TransactionSchema.pre('save', function(next) {
+// TransactionSchema.pre('save', function(next) {
 
-	var transaction = this;
-	Sequence.getNext("transaction", function(err, seqObj) {
-		if (err) {
-			if (err) return next(err);
-		} else {
-			var str = "" + seqObj.seq
-			var pad = "00000"
-			transaction.transaction_no = pad.substring(0, pad.length - str.length) + str;
-			next();
-		}
-	});
-});
+// 	var transaction = this;
+// 	Sequence.getNext("transaction", function(err, seqObj) {
+// 		if (err) {
+// 			if (err) return next(err);
+// 		} else {
+// 			var str = "" + seqObj.seq
+// 			var pad = "00000"
+// 			transaction.transaction_no = pad.substring(0, pad.length - str.length) + str;
+// 			next();
+// 		}
+// 	});
+// });
 
 
 //make this available to our users in Node applications

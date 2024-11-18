@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 var rentalSchema = new Schema({
     packages: {
-        type: Object
+        type: Schema.Types.Mixed
     },
 
 }, {

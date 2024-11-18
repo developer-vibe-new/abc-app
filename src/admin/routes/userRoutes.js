@@ -54,7 +54,7 @@ router.get('/userRideingDetails/:id',auth, userManController.userRideingDetails)
 
 router.get('/rental-list',auth, rentalController.rentalListData);
 router.post('/rental-edit-data/:id',auth, rentalController.rentalEditData);
-router.post('/createRental',auth, rentalController.createRental); // need to check this route
+router.post('/createRental',auth, rentalController.createRental); 
 router.get('/view-vehicle',auth, vehicleController.viewVehicle);
 router.get('/vehicle-typeList',auth, vehicleController.vehicleTypeList);
 router.post('/create-vehicle',auth, vehicleController.createVehicle);

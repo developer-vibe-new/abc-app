@@ -27,6 +27,11 @@ exports.viewDriver = async (req, res, next) => {
 
     } catch (error) {
         console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
     }
 };
 
@@ -44,6 +49,11 @@ exports.updateDriver = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
     }
 };
 exports.deleteDriver = async (req, res, next) => {
@@ -60,6 +70,11 @@ exports.deleteDriver = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
     }
 };
 

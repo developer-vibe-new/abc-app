@@ -1,6 +1,6 @@
 
 const services = require('../services/adminService');
-
+const { statusCode } = require('../../config/default.json');
 
 exports.registerAdmin = async(req,res,next)=>{
     try {
@@ -11,6 +11,11 @@ exports.registerAdmin = async(req,res,next)=>{
 
     } catch (error) {
         console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
     }
 };
 
@@ -22,6 +27,11 @@ exports.login = async(req,res,next)=>{
         .json(Object.assign({ status: loginData.success}, loginData))
     } catch (error) {
         console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
     }
 };
 
@@ -37,7 +47,12 @@ exports.operators = async(req,res,next)=>{
         .status(404)
         .json(Object.assign({status: operatorData.success}))
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
     }
 };
 exports.operatorsUpdate = async(req,res,next)=>{
@@ -50,5 +65,10 @@ exports.operatorsUpdate = async(req,res,next)=>{
         }
     } catch (error) {
         console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
     }
 }

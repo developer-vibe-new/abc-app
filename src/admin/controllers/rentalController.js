@@ -7,6 +7,11 @@ exports.rentalListData = async(req,res,next)=>{
         return res.status(200).json(Object.assign({status:data.success}, data));
     } catch (error) {
         console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
     }
 };
 exports.rentalEditData = async(req,res,next)=>{
@@ -15,6 +20,11 @@ exports.rentalEditData = async(req,res,next)=>{
         return res.status(200).json(Object.assign({status:data.success},data))
     } catch (error) {
         console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
     }
 };
 exports.createRental =  async(req,res,next)=>{
@@ -27,5 +37,10 @@ exports.createRental =  async(req,res,next)=>{
         }
     } catch (error) {
         console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
     }
 }
