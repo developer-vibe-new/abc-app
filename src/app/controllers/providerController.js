@@ -60,3 +60,15 @@ exports.updateDriverStatusController = async (req) => {
         };
     }
 }
+
+exports.driverBlockListController = async () => {
+    try {
+        return await service.driverBlockList();
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}

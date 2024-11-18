@@ -141,7 +141,7 @@ exports.addDriver = async (req) => {
 exports.updateDriverStatus = async (req) => {
     try {
         const { id } = req.params;
-        const provider = await Provider.findById(id);
+        const provider = await Provider.findOne({ _id: id, type: "operator" });
         if (!provider) {
             return {
                 status: statusCode.BAD_REQUEST, 
@@ -157,6 +157,31 @@ exports.updateDriverStatus = async (req) => {
             success: true,
             message: resMessage.Status_Updated_Successfully,
             data: provider
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        }
+    }
+}
+
+exports.driverBlockList = async () => {
+    try {
+        const blocked = await Provider.find({ type: "operator", status: "blocked" });
+        if(!blocked) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data: blocked
         }
     } catch (error) {
         return {
