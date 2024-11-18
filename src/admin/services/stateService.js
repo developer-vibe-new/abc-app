@@ -24,6 +24,10 @@ exports.stateCreate = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
+        return {
+            success:false,
+            message:"An error occured while creating State "
+        }
     }
 };
 
@@ -40,6 +44,10 @@ exports.stateUpdate = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
+        return {
+            success:false,
+            message:"An error occured while Updateing state"
+        }
     }
 };
 
@@ -57,7 +65,11 @@ exports.stateDelete = async (req, res, next) => {
             }
         }
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        return {
+            success: false,
+            message:"An error occured while deleting state"
+        }
     }
 };
 
@@ -74,7 +86,7 @@ exports.stateView = async (req, res, next) => {
         }
 
         const allData = await State.find(conditions)
-            .sort({state:1})
+            .sort({state:-1})
             .skip((page - 1) * pagesize).
             limit(pagesize);
         if (allData) {
@@ -85,6 +97,10 @@ exports.stateView = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
+        return {
+            success:false,
+            message:"An error occured while fetching State Data "
+        }
     }
 };
 
@@ -114,6 +130,10 @@ exports.cityCreate = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
+        return {
+            success:false,
+            message:"An error occured while creating city data"
+        }
     }
 };
 
@@ -130,6 +150,10 @@ exports.cityUpdate = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
+        return {
+            success:false,
+            message:"An error occured while Upadeting city data"
+        }
     }
 };
 
@@ -144,7 +168,11 @@ exports.cityDelete = async (req, res, next) => {
             }
         }
     } catch (error) {
-
+        console.log(error);
+        return {
+            success:false,
+            message:"An error occured while deleting city data"
+        }
     }
 };
 exports.cityView = async (req, res, next) => {
@@ -172,5 +200,9 @@ exports.cityView = async (req, res, next) => {
         }
     } catch (error) {
         console.log(error);
+        return {
+            success:false,
+            message:"An error occured while fetching city data"
+        }
     }
 };

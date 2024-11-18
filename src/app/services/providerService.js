@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { statusCode, resMessage } = require('../../config/default.json');
-const Opertor = require('../../models/operatorModel');
+const Operator = require('../../models/operatorModel');
 const Provider = require('../../models/providerModel');
 
 exports.registerOperator = async (req) => {
@@ -13,7 +13,7 @@ exports.registerOperator = async (req) => {
                 message: resMessage.Required_Data
             };
         }
-        const operatorData = await Opertor.create({fullName, phone, city,});
+        const operatorData = await Operator.create({fullName, phone, city,});
         return {
             statusCode: statusCode.OK,
             success: true,
@@ -29,68 +29,111 @@ exports.registerOperator = async (req) => {
     }
 }
 
-        exports.loginOperator = async (req) => {
-            try {
-                const { phone } = req.body;
-                if(!phone) {
-                    return { 
-                        statusCode: statusCode.BAD_REQUEST,
-                    success: false,
-                    message: resMessage.Required_Data
-                };    
+exports.loginOperator = async (req) => {
+    try {
+        const { phone } = req.body;
+        if(!phone) {
+            return { 
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Required_Data
+            };    
+        }
+        const operatorData = await Operator.findOne({phone, status: true});
+        if(operatorData) {
+            operatorData.otp = 1234
+            await operatorData.save();
+            return {
+                statusCode: statusCode.OK,
+                success: true,
+                message: resMessage.Otp_Send_Success
             }
-            const operatorData = await Opertor.findOne({phone, status: true});
-            if(operatorData) {
-                const token = jwt.sign({
-                    id: operatorData._id
-                },
-                process.env.SECRET_KEY,
-                {
-                    expiresIn: '1h'
-                }
-            );
-                return {
-                    statusCode: statusCode.OK,
-                    success: true,
-                    message: resMessage.Operator_Login_Success,
-                    token
-                }
-            }
+        }
+        return {
+            statusCode: statusCode.NOT_FOUND,
+            success: false,
+            message: resMessage.Operator_Not_Exist
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        }
+    }
+}
+
+exports.verifyOtp = async (req) => {
+    try {
+        const { phone, otp } = req.body;
+        if(!phone) {
+            return { 
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Required_Data
+            };
+        }
+        const operatorData = await Operator.findOne({ phone });
+        if(!operatorData) {
             return {
                 statusCode: statusCode.NOT_FOUND,
                 success: false,
                 message: resMessage.Operator_Not_Exist
             }
-        } catch (error) {
-            return {
-                success: false,
-                message: resMessage.Internal_Server_Error,
-                error: error.message || "Internal Server Error",
-            }
         }
-    }
-
-    exports.addDriver = async (req) => {
-        try {
-            const driver = req.body;
-            if(!driver.name || !driver.mobile || !driver.email || !driver.type) {
-                return { 
-                    statusCode: statusCode.BAD_REQUEST,
-                    success: false,
-                    message: resMessage.Required_Data
-                };
+        const token = jwt.sign({
+                id: operatorData._id
+            },
+            process.env.SECRET_KEY,
+            {
+                expiresIn: '1h'
             }
-            await Provider.create(driver);
+        );
+        if(operatorData.otp === otp) {
+            operatorData.token = token;
+            operatorData.otp = null;
+            await operatorData.save();
             return {
                 statusCode: statusCode.OK,
                 success: true,
-                message: resMessage.Data_Created_Successfully
-            }
-        } catch (error) {
-            return {
-                success: false,
-                message: resMessage.Internal_Server_Error,
-                error: error.message || "Internal Server Error",
+                message: resMessage.Otp_Verify_Successfully
             }
         }
+        return {
+            statusCode: statusCode.NOT_FOUND,
+            success: false,
+            message: resMessage.Otp_Verify_Failed
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        }
     }
+}
+
+exports.addDriver = async (req) => {
+    try {
+        const driver = req.body;
+        if(!driver.name || !driver.mobile || !driver.email || !driver.type) {
+            return { 
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Required_Data
+            };
+        }
+        await Provider.create(driver);
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Created_Successfully
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        }
+    }
+}

@@ -20,7 +20,11 @@ exports.createState = async(req,res,next)=>{
         }
 
     } catch (error) {
-        console.log(error);
+        console.error("Error in createState:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An internal server error occurred.",
+        });
     }
 };
 
@@ -35,7 +39,11 @@ exports.updateState =async(req,res,next)=>{
             .json(Object.assign({status:updatedData.success}))
         }
     } catch (error) {
-        console.log(error);
+        console.error("Error in updateState:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An internal server error occurred.",
+        });
     }
 };
 
@@ -46,7 +54,11 @@ exports.deleteState = async(req,res,next)=>{
             return res.status(200).json(Object.assign({ status: deleteData.success},{message:deleteData.message},deleteData ))
         } 
     } catch (error) {
-        console.log(error);
+        console.error("Error in deleteState:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An internal server error occurred.",
+        });
     }
 };
 
@@ -57,7 +69,11 @@ exports.viewState = async(req,res,next)=>{
             return res.status(200).json(Object.assign({ status: ViewData.success},ViewData ))
         } 
     } catch (error) {
-        console.log(error);
+        console.error("Error in viewState:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An internal server error occurred.",
+        });
     }
 };
 
@@ -70,7 +86,11 @@ exports.createCity = async(req,res,next)=>{
             return res.status(400).json(Object.assign({status:cityData.success},cityData))
         }
     } catch (error) {
-        console.log(error);
+        console.error("Error in createCity:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An internal server error occurred.",
+        });
     }
 };
 
@@ -81,7 +101,11 @@ exports.updateCity = async(req,res,next)=>{
             return res.status(200).json(Object.assign({status:cityData.success},cityData))
         }
     } catch (error) {
-        console.log(error);
+        console.error("Error in updateCity:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An internal server error occurred.",
+        });
     }
 };
 
@@ -92,7 +116,11 @@ exports.deleteCity = async(req,res,next)=>{
             return res.status(200).json(Object.assign({status:cityData.success},{message:cityData.message}))
         }
     } catch (error) {
-        console.log(error);
+        console.error("Error in deleteCity:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An internal server error occurred.",
+        });
     }
 };
 
@@ -103,6 +131,10 @@ exports.viewCity = async(req,res,next)=>{
             return res.status(200).json(Object.assign({ status: ViewData.success},ViewData ))
         } 
     } catch (error) {
-        console.log(error);
+        console.error("Error in viewCity:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An internal server error occurred.",
+        });
     }
 };
