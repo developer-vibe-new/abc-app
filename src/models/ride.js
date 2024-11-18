@@ -15,7 +15,7 @@ const Schema = mongoose.Schema;
 // const User = require('../models/users.js');
 // const Provider = require('../models/providerModel.js');
 
-var RideSchema = new Schema({
+var RideSchema = new mongoose.Schema({
 
 	basic: {
 		ride_type: {
@@ -558,4 +558,4 @@ var RideSchema = new Schema({
 // });
 
 //make this available to our users in Node applications
-module.exports.Ride = mongoose.model('Ride', RideSchema);
+module.exports = mongoose.model('Ride', RideSchema);

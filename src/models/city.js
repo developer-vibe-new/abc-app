@@ -61,4 +61,4 @@ var CitySchema = new Schema({
 
 
 //make this available to our users in Node applications
-module.exports.City = mongoose.model('City', CitySchema);
+module.exports = mongoose.model('City', CitySchema);

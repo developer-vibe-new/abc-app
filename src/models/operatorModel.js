@@ -29,4 +29,4 @@ const operatorSchema = new mongoose.Schema({
     }
 }, { timestamps: true, versionKey: false });
 
-module.exports.operatorModel = mongoose.model('operator', operatorSchema);
+module.exports = mongoose.model('operator', operatorSchema);

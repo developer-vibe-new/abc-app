@@ -47,4 +47,4 @@ const taxiTypeSchema = new mongoose.Schema({
     },
 }, { timestamps: true, versionKey: false });
 
-module.exports.taxiTypeModel = mongoose.model("taxi_type", taxiTypeSchema);
+module.exports = mongoose.model("taxi_type", taxiTypeSchema);

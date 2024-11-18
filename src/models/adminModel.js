@@ -133,4 +133,4 @@ adminRegisterSchema.pre('save', function(next) {
 	});
 });
 
-module.exports.Admin = mongoose.model('Admin', adminRegisterSchema);
+module.exports = mongoose.model('Admin', adminRegisterSchema);

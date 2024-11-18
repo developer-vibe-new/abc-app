@@ -59,14 +59,13 @@ exports.showVehicleType = async(req,res,next)=>{
 
 exports.addVehicle = async(req,res,next)=>{
     try {
-        console.log(req.body,"bbbbbbbb")
+        // console.log(req.body,"bbbbbbbb")
         const createData = await vehicleModel.create({
             type:req.body.type,
             title:req.body.title,
             make:req.body.make,
             model:req.body.model
         });
-        console.log(createData,"createData")
         if(createData){
             return {
                 success:true,

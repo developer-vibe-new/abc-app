@@ -30,4 +30,4 @@ var stateSchema = new Schema({
 
 
 //make this available to our users in Node applications
-module.exports.State = mongoose.model('State', stateSchema);
+module.exports = mongoose.model('State', stateSchema);

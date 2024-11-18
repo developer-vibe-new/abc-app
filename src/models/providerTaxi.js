@@ -96,4 +96,4 @@ var ProviderTaxiSchema = new Schema({
 });
 
 //make this available to our users in Node applications
-module.exports.ProviderTaxi = mongoose.model('ProviderTaxi', ProviderTaxiSchema, 'provider_taxies');
+module.exports = mongoose.model('ProviderTaxi', ProviderTaxiSchema, 'provider_taxies');

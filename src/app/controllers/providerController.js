@@ -48,3 +48,27 @@ exports.addDriverController = async (req) => {
         };
     }
 }
+
+exports.updateDriverStatusController = async (req) => {
+    try {
+        return await service.updateDriverStatus(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}
+
+exports.driverBlockListController = async () => {
+    try {
+        return await service.driverBlockList();
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}

@@ -54,4 +54,4 @@ var CarSchema = new Schema({
 // });
 
 //make this available to our users in Node applications
-module.exports.Car = mongoose.model('Car', CarSchema);
+module.exports = mongoose.model('Car', CarSchema);

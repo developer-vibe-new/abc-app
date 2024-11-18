@@ -170,8 +170,12 @@ const providerSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
+	status: {
+		type: String,
+		default: "Unblock"
+	}
 }, { timestamps: true, versionKey: false });
 
-module.exports.provideModel = mongoose.model('provider', providerSchema);
+module.exports = mongoose.model('provider', providerSchema);
 
 // module.exports = provideModel;
