@@ -79,16 +79,23 @@ exports.stateView = async (req, res, next) => {
         let pagesize = req.query.pagesize || 10;
 
         let search_value = req.query.search || "";
-        var conditions; 
+        var conditions= [] 
 
-        if (search_value) {
-            conditions = _.assign(conditions, { $or: [{ "state": { $regex: new RegExp(search_value, "gi") } }] });
-        }
-
-        const allData = await State.find(conditions)
-            .sort({state:-1})
-            .skip((page - 1) * pagesize).
-            limit(pagesize);
+       
+        if(search_value){
+            conditions.push({
+             $match:{
+                state:{ $regex: search_value, $options: "i"}
+             }
+            })
+         }
+         conditions.push(
+             { $sort: { state: -1 } }, 
+             { $skip: (page - 1) * pagesize }, 
+             { $limit: pagesize } 
+         );
+        const allData = await State.aggregate(conditions)
+            
         if (allData) {
             return {
                 success: true,
@@ -181,16 +188,24 @@ exports.cityView = async (req, res, next) => {
         let pagesize = req.query.pagesize || 10;
 
         let search_value = req.query.search || "";
-        var conditions; 
+        var conditions =[]; 
         
-        if (search_value) {
-            conditions = _.assign(conditions, { $or: [{ "name": { $regex: new RegExp(search_value, "gi") } }] });
-        }
-
-        const allData = await City.find(conditions)
-            .sort({name:1})
-            .skip((page - 1) * pagesize).
-            limit(pagesize);
+        if(search_value){
+            conditions.push({
+             $match:{
+                name:{ $regex: search_value, $options: "i"}
+             }
+            })
+         }
+         conditions.push(
+             { $sort: { name: 1 } }, 
+             { $skip: (page - 1) * pagesize }, 
+             { $limit: pagesize } 
+         );
+        const allData = await City.aggregate(conditions)
+            // .sort({name:1})
+            // .skip((page - 1) * pagesize).
+            // limit(pagesize);
 
         if (allData) {
             return {

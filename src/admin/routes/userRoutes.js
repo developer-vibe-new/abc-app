@@ -13,6 +13,7 @@ const taxiTypeController = require('../controllers/taxiTypeController');
 const userManController = require('../controllers/userManController')
 const rentalController = require('../controllers/rentalController');
 const vehicleController = require('../controllers/vehicleController');
+const reportController = require('../controllers/reportsController');
 // const auth = require('../../middleware/adminAuth');
 // const { upload } = require('../../helpers/multer');
 
@@ -55,5 +56,9 @@ router.get('/rental-list',auth, rentalController.rentalListData);
 router.post('/rental-edit-data/:id',auth, rentalController.rentalEditData);
 router.post('/createRental',auth, rentalController.createRental); // need to check this route
 router.get('/view-vehicle',auth, vehicleController.viewVehicle);
+router.get('/vehicle-typeList',auth, vehicleController.vehicleTypeList);
+router.post('/create-vehicle',auth, vehicleController.createVehicle);
+router.get('/viewRideReport', auth, reportController.viewRideReport);
+
 // Export the router for use in the main application
 module.exports = router;

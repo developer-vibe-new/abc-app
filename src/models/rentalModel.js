@@ -11,4 +11,4 @@ var rentalSchema = new Schema({
     timestamps: { createdAt: 'created', updatedAt: 'updated' },
 });
 
-module.exports = mongoose.model('rental', rentalSchema);
+module.exports.rental = mongoose.model('rental', rentalSchema);

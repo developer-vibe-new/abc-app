@@ -39,17 +39,23 @@ exports.driverView = async (req, res, next) => {
         let pagesize = req.query.pagesize || 10;
 
         let search_value = req.query.search || "";
-        var conditions;
+        var conditions=[];
 
         if (search_value) {
-            conditions = _.assign(conditions, { $or: [{ "name": { $regex: new RegExp(search_value, "gi") } }] });
+            conditions.push({
+                $match:{
+                    name:{ $regex: search_value, $options: "i"}
+                }
+            })
         }
-
-        const viewAllData = await driverModel.find(conditions)
-            .sort({ name: 1 })
-            .skip((page - 1) * pagesize).
-            limit(pagesize);
-
+      
+        conditions.push(
+            { $sort: { name: 1 } },
+            { $skip: (page - 1) * pagesize }, 
+            { $limit: pagesize } 
+        );
+        const viewAllData = await driverModel.aggregate(conditions)
+            
         return {
             statusCode: statusCode.OK,
             success: true,

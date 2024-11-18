@@ -1,4 +1,6 @@
 const vehicleModel = require('../../models/cars');
+const taxiTypeModel = require('../../models/taxiTypeModel');
+
 
 
 exports.vehicleList = async(req,res,next)=>{
@@ -32,9 +34,57 @@ exports.vehicleList = async(req,res,next)=>{
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({
+        return {
             success: false,
             message: "An error occurred while fetching vehicles Data."
+        };
+    }
+};
+
+exports.showVehicleType = async(req,res,next)=>{
+    try {
+        const vehicleTypeList = await taxiTypeModel.find({},{title:1,_id:1});
+        return {
+            success:true,
+            typeList:vehicleTypeList
+        } 
+    } catch (error) {
+        console.log(error);
+        return {
+            success: false,
+            message: "An error occurred while fetching vehicle type  Data."
+        };
+    }
+}
+
+exports.addVehicle = async(req,res,next)=>{
+    try {
+        console.log(req.body,"bbbbbbbb")
+        const createData = await vehicleModel.create({
+            type:req.body.type,
+            title:req.body.title,
+            make:req.body.make,
+            model:req.body.model
         });
+        console.log(createData,"createData")
+        if(createData){
+            return {
+                success:true,
+                message:"Vehicle Created Successfully",
+                // data:createData
+            }
+        } else {
+            return {
+                success:false,
+                message:"Vehicle Not Created",
+                // data:createData
+            }
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            success: false,
+            message: "An error occurred while creating vehicles Data."
+        };
     }
 };
