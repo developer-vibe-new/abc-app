@@ -48,3 +48,15 @@ exports.addDriverController = async (req) => {
         };
     }
 }
+
+exports.updateDriverStatusController = async (req) => {
+    try {
+        return await service.updateDriverStatus(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}

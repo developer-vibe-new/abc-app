@@ -13,6 +13,9 @@
         "saltRounds": 10
     },
     "resMessage": {
+        "Provider_Not_Found": "Provider_Not_Found",
+        "Status_Updated_Successfully": "Status_Updated_Successfully",
+        "Invalid_Status": "Invalid_Status",
         "Internal_Server_Error": "Internal_Server_Error",
         "Required_Data": "All fields are required",
         "REJECTION_REASON": "Please mention rejection reason",

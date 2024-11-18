@@ -137,3 +137,32 @@ exports.addDriver = async (req) => {
         }
     }
 }
+
+exports.updateDriverStatus = async (req) => {
+    try {
+        const { id } = req.params;
+        const provider = await Provider.findById(id);
+        if (!provider) {
+            return {
+                status: statusCode.BAD_REQUEST, 
+                success: false, 
+                message: resMessage.Provider_Not_Found
+            }
+        }
+        const status = provider.status === "unblocked" ? "blocked" : "unblocked";
+        provider.status = status;
+        await provider.save();
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Status_Updated_Successfully,
+            data: provider
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        }
+    }
+}
