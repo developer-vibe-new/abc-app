@@ -69,15 +69,14 @@ exports.login = async (req) => {
         }
 
         const auth_key = jwt.sign({ _id: findData[0]._id }, SECRET_Key, { expiresIn: "24h" });
-        const data = await adminRegisterModel.updateOne(
+        await adminRegisterModel.updateOne(
             { email: req.body.email },
             { verification_token: auth_key }
         );
-        console.log(data, "ooooooooooooooo");
         return {
             status: true,
             message: "User login Successfully",
-            data: []
+            data: { auth_key: auth_key }
         };
     } catch (error) {
         console.log(error);
@@ -125,7 +124,7 @@ exports.operatorsList = async (req) => {
 
 exports.updateOperator = async (req) => {
     try {
-        const updateData = await operatorModel.findByIdAndUpdate({ _id: req.params.id }, { status: false }, { new: true });
+        const updateData = await operatorModel.findByIdAndUpdate({ _id: req.params._id }, { status: false }, { new: true });
         return {
             success: true,
             data: updateData

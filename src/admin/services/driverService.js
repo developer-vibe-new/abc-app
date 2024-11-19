@@ -74,7 +74,7 @@ exports.driverUpdate = async (req) => {
     try {
         const body = req.body;
         const image = req.file.filename;
-        const updateData = await driverModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.params.id) }, { body, image }, { new: true });
+        const updateData = await driverModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.params._id) }, { body, image }, { new: true });
         if (updateData) {
             return {
                 success: true,
@@ -94,7 +94,7 @@ exports.driverUpdate = async (req) => {
 
 exports.driverDelete = async (req) => {
     try {
-        const deleteData = await driverModel.findByIdAndDelete({ _id: new mongoose.Types.ObjectId(req.params.id) });
+        const deleteData = await driverModel.findByIdAndDelete({ _id: new mongoose.Types.ObjectId(req.params._id) });
         if (deleteData) {
             return {
                 success: true,

@@ -31,7 +31,6 @@ exports.editRental = async (req) => {
     try {
         const body = req.body;
         const editRentalData = await rentalModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true });
-        console.log(editRentalData, "editRentalData");
         return {
             success: true,
             data: editRentalData

@@ -24,7 +24,7 @@ exports.userListData = async () => {
 
 exports.updateUserStatus = async (req) => {
     try {
-        const updateData = await userModel.findByIdAndUpdate({ _id: req.body.id }, { is_active: false }, { new: true });
+        const updateData = await userModel.findByIdAndUpdate({ _id: req.body._id }, { is_active: false }, { new: true });
         if (updateData) {
             return {
                 success: true,

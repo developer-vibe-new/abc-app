@@ -39,7 +39,7 @@ exports.updateTaxiTypeList = async (req) => {
     try {
         const body = req.body;
         const image = req.file.filename;
-        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, { body, image }, { new: true });
+        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params._id }, { body, image }, { new: true });
 
         if (editData) {
             return {
@@ -60,7 +60,7 @@ exports.updateTaxiTypeList = async (req) => {
 
 exports.updateTaxiStatus = async (req) => {
     try {
-        const updateData = await taxiTypeModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.body.id) }, { is_active: false }, { new: true });
+        const updateData = await taxiTypeModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.body._id) }, { is_active: false }, { new: true });
         if (updateData) {
             return {
                 success: true,
