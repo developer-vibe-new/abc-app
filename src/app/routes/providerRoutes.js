@@ -11,6 +11,7 @@ router.post('/verifyOtpOperator' , responseHandler(controller.verifyOtpControlle
 router.post('/addDriver', responseHandler(controller.addDriverController));
 router.get('/driverList', responseHandler(controller.driverListController));
 router.post('/updateDriverStatus/:id', responseHandler(controller.updateDriverStatusController));
-router.get('/driverBlockList', responseHandler(controller.driverBlockListController))
+router.get('/driverBlockList', responseHandler(controller.driverBlockListController));
+router.post('/driverOnlineStatus/:id', responseHandler(controller.driverOnlineStatusController));
 
 module.exports = router;

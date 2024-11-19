@@ -210,6 +210,41 @@ exports.driverList = async () => {
         }
     }
     catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        }
+    }
+}
 
+exports.driverOninerStatus = async (req) => {
+    try {
+        const { id } = req.params;
+        const driverData = await Provider.findOne({ _id: id, type: "operator" });
+        if(!driverData) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        const onlineStatus = driverData.is_online === true ? false : true;
+        driverData.is_online = onlineStatus;
+        await driverData.save();
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Status_Updated_Successfully,
+            data: driverData
+        }
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || 'Internal Server Error'
+        }
     }
 }

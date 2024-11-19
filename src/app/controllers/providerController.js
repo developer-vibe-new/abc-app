@@ -84,3 +84,15 @@ exports.driverListController = async () => {
         };
     }
 }
+
+exports.driverOnlineStatusController = async (req) => {
+    try {
+        return await service.driverOninerStatus(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
