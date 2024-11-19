@@ -872,6 +872,96 @@
           }
         }
       }
+    },
+    "/user/updateDriver": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/updateDriver",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data; boundary=--------------------------121221477525815088947257"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter name",
+            "required": false,
+            "example": "ishmeetnodejs"
+          },
+          {
+            "name": "type",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter type",
+            "required": false,
+            "example": "operator"
+          },
+          {
+            "name": "id",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter id",
+            "required": false,
+            "example": "673acf4b460436797df7c98e"
+          },
+          {
+            "name": "email",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter email",
+            "required": false,
+            "example": ""
+          },
+          {
+            "name": "typeName",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter typeName",
+            "required": false,
+            "example": "admin"
+          },
+          {
+            "name": "image",
+            "in": "formData",
+            "type": "file",
+            "description": "please enter image",
+            "required": false,
+            "example": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/updateDriverResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -1497,6 +1587,11 @@
           "description": "true",
           "example": true
         },
+        "message": {
+          "type": "string",
+          "description": "Data fetch successfully",
+          "example": "Data fetch successfully"
+        },
         "data": {
           "type": "object",
           "description": "Successfully Data",
@@ -1532,6 +1627,60 @@
           "type": "string",
           "description": "Data deleted successfully",
           "example": "Data deleted successfully"
+        }
+      }
+    },
+    "updateDriverResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data updated successfully",
+          "example": "Data updated successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673acf4b460436797df7c98e",
+            "name": "ishmeetnodejs",
+            "city_id": null,
+            "type": "operator",
+            "email": "",
+            "mobile": "",
+            "balance": 0,
+            "pending_balance": 0,
+            "fcm_token": "",
+            "is_active": true,
+            "ridereceive": true,
+            "profile_status": "registered",
+            "email_verified": false,
+            "is_notify": true,
+            "is_online": false,
+            "is_outstation": true,
+            "in_ride": false,
+            "goToHome": false,
+            "total_earnings": 100,
+            "total_rides": 0,
+            "pending_amount": 0,
+            "device_id": "",
+            "kycStatus": 0,
+            "vehicleStatus": 0,
+            "stripe_verified": false,
+            "is_delete": false,
+            "stripe_charges_enabled": false,
+            "status": "blocked",
+            "documents": [],
+            "bank_data": [],
+            "createdAt": "2024-11-18T05:23:23.127Z",
+            "updatedAt": "2024-11-19T11:58:49.040Z",
+            "image": "1732017529007.jpg"
+          }
         }
       }
     }

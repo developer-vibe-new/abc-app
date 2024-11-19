@@ -1,4 +1,4 @@
-const services = require('../services/taxiTypeSercice');
+const services = require('../services/taxiTypeService');
 
 exports.viewTaxiType = async (req) => {
     try {

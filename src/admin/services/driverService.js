@@ -70,23 +70,24 @@ exports.driverView = async (req) => {
     }
 };
 
-exports.driverUpdate = async (req) => {
+exports.driverUpdate = async ({ body, file }) => {
     try {
-        const body = req.body;
-        const image = req.file.filename;
-        const updateData = await driverModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.params.id) }, { body, image }, { new: true });
-        if (updateData) {
-            return {
-                success: true,
-                message: resMessage.Data_Updated_Successfully,
-                data: updateData
-            };
-        } else {
+        // console.log(req.params, "jjjjjjjjj");
+        // const body = req.body;
+        body.image = file.filename;
+        const updateData = await driverModel.findByIdAndUpdate(body.id, body, { new: true });
+        if (!updateData) {
             return {
                 success: false,
                 message: "Error No Data Updated",
             };
         }
+
+        return {
+            success: true,
+            message: resMessage.Data_Updated_Successfully,
+            data: updateData
+        };
     } catch (error) {
         console.log(error);
         return {

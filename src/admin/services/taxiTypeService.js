@@ -1,5 +1,6 @@
 const taxiTypeModel = require('../../models/taxiTypeModel');
 const mongoose = require('mongoose');
+const { statusCode, resMessage } = require('../../config/default.json');
 
 exports.taxiTypeList = async (req) => {
     try {
@@ -11,7 +12,7 @@ exports.taxiTypeList = async (req) => {
         if (search_value) {
             conditions.push({
                 $match: {
-                    state: { $regex: search_value, $options: "i" }
+                    title: { $regex: search_value, $options: "i" }
                 }
             });
         }
@@ -24,18 +25,20 @@ exports.taxiTypeList = async (req) => {
         // .sort({ title: 1 })
         // .skip((page - 1) * pagesize).
         // limit(pagesize);
-        if (findTaxi.length == 0) {
-            return {
-                success: false,
-                message: "No Data Found",
+        // if (findTaxi.length == 0) {
+        //     return {
+        //         success: false,
+        //         message: "No Data Found",
 
-            };
-        } else {
-            return {
-                success: true,
-                data: findTaxi
-            };
-        }
+        //     };
+        // } else {
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data: findTaxi
+        };
+        // }
     } catch (error) {
         console.log(error);
     }
