@@ -2,10 +2,11 @@ const driverModel = require('../../models/providerModel');
 const { statusCode, resMessage } = require('../../config/default.json');
 const mongoose = require('mongoose');
 
+
 exports.driverCreate = async (req) => {
     try {
         const { name, mobile, email, type } = req.body;
-        const image = req.file.filename;
+        const image = `${req.body.typeName}/${req.file.filename}`;
         if (!name || !mobile || !email || !type || !image) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
@@ -48,6 +49,18 @@ exports.driverView = async (req) => {
             });
         }
 
+        conditions.push({
+            $addFields:
+            {
+                image: {
+                    $concat: [
+                        "http://192.168.0.18:6161/",
+                        "$image"
+                    ]
+                }
+
+            }
+        });
         conditions.push(
             { $sort: { name: 1 } },
             { $skip: (page - 1) * pagesize },

@@ -410,7 +410,7 @@
           "application/json"
         ],
         "consumes": [
-          "multipart/form-data; boundary=--------------------------040290958260065773740826"
+          "multipart/form-data; boundary=--------------------------537828218937131168782014"
         ],
         "security": [
           {
@@ -431,15 +431,7 @@
             "type": "string",
             "description": "please enter name",
             "required": false,
-            "example": "simran"
-          },
-          {
-            "name": "mobile",
-            "in": "formData",
-            "type": "string",
-            "description": "please enter mobile",
-            "required": false,
-            "example": "3423464435"
+            "example": "rishika"
           },
           {
             "name": "email",
@@ -447,15 +439,15 @@
             "type": "string",
             "description": "please enter email",
             "required": false,
-            "example": "simran@gamail.com"
+            "example": "rishika@gmail.com"
           },
           {
-            "name": "typeName",
+            "name": "mobile",
             "in": "formData",
             "type": "string",
-            "description": "please enter typeName",
+            "description": "please enter mobile",
             "required": false,
-            "example": "driver"
+            "example": "9753264374"
           },
           {
             "name": "type",
@@ -464,6 +456,14 @@
             "description": "please enter type",
             "required": false,
             "example": "main"
+          },
+          {
+            "name": "typeName",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter typeName",
+            "required": false,
+            "example": "driver"
           }
         ],
         "responses": {
@@ -1341,14 +1341,14 @@
           "type": "object",
           "description": "Successfully Data",
           "example": {
-            "name": "simran",
+            "name": "rishika",
             "city_id": null,
             "type": "main",
-            "email": "simran@gamail.com",
-            "mobile": "3423464435",
+            "email": "rishika@gmail.com",
+            "mobile": "9753264374",
             "balance": 0,
             "pending_balance": 0,
-            "image": "1731998173833.jpg",
+            "image": "driver/1732018987407.jpg",
             "fcm_token": "",
             "is_active": true,
             "ridereceive": true,
@@ -1369,11 +1369,11 @@
             "is_delete": false,
             "stripe_charges_enabled": false,
             "status": "Unblock",
-            "_id": "673c31dd6e5a2c7d14466353",
+            "_id": "673c832bf81c6e10129ff017",
             "documents": [],
             "bank_data": [],
-            "createdAt": "2024-11-19T06:36:13.894Z",
-            "updatedAt": "2024-11-19T06:36:13.894Z"
+            "createdAt": "2024-11-19T12:23:07.417Z",
+            "updatedAt": "2024-11-19T12:23:07.417Z"
           }
         }
       }
@@ -1392,11 +1392,11 @@
           "example": [
             {
               "_id": "673acf4b460436797df7c98e",
-              "name": "Ishmeet Singh",
+              "name": "ishmeetnodejs",
               "city_id": null,
               "type": "operator",
-              "email": "ishmeet18.img@gmail.com",
-              "mobile": "9588829240",
+              "email": "",
+              "mobile": "",
               "balance": 0,
               "pending_balance": 0,
               "fcm_token": "",
@@ -1422,8 +1422,8 @@
               "documents": [],
               "bank_data": [],
               "createdAt": "2024-11-18T05:23:23.127Z",
-              "updatedAt": "2024-11-19T06:10:42.609Z",
-              "image": "1731996642472.jpg"
+              "updatedAt": "2024-11-19T11:58:49.040Z",
+              "image": "http://192.168.0.18:6161/$image"
             }
           ]
         }
@@ -1459,8 +1459,8 @@
         },
         "token": {
           "type": "string",
-          "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM0ODg2MjA3MmI4MWMyYjgxMDE5MDMiLCJpYXQiOjE3MzIwMTU2MTUsImV4cCI6MTczMjEwMjAxNX0.tnnGTevoJGYNH6RTtzGzAw1mqddVe2qGg4N7zcfEAxY",
-          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM0ODg2MjA3MmI4MWMyYjgxMDE5MDMiLCJpYXQiOjE3MzIwMTU2MTUsImV4cCI6MTczMjEwMjAxNX0.tnnGTevoJGYNH6RTtzGzAw1mqddVe2qGg4N7zcfEAxY"
+          "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM0ODg2MjA3MmI4MWMyYjgxMDE5MDMiLCJpYXQiOjE3MzIwMTgyOTksImV4cCI6MTczMjEwNDY5OX0.pSUBzbn0Y7w1tm0G4ui83FXWD2ByIL-rZ1Q6tWMZmlQ",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM0ODg2MjA3MmI4MWMyYjgxMDE5MDMiLCJpYXQiOjE3MzIwMTgyOTksImV4cCI6MTczMjEwNDY5OX0.pSUBzbn0Y7w1tm0G4ui83FXWD2ByIL-rZ1Q6tWMZmlQ"
         }
       }
     },
