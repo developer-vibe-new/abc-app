@@ -5,8 +5,11 @@ const fs = require('fs');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const folderName = req.body.typeName;
+        if (!folderName) {
+            return cb(new Error('typeName is required in the request body'));
+        }
         const dir = path.join(__dirname, '../../public', folderName);
-        if(!fs.existsSync(dir)) {
+        if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
         cb(null, dir);

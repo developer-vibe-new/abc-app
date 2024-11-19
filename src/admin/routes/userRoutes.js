@@ -1,21 +1,21 @@
 const express = require('express');
 const router = express.Router();
+// const { validate } = require('express-validation');
 const responseHandler = require('../../helpers/responseHandler');
 const controllers = require('../../admin/controllers/userController');
 const adminController = require('../../admin/controllers/adminController');
 const validate = require('../../helpers/validate');
 const userVal = require('../../validators/admin/userVal');
-const uploads = require('../../middleware/multer');
+const { upload } = require('../../helpers/multer');
 const stateController = require('../../admin/controllers/stateController');
-const {auth} = require('../../middleware/authAdmin');
+const { auth } = require('../../middleware/authAdmin');
 const driverController = require('../../admin/controllers/driverController');
 const taxiTypeController = require('../controllers/taxiTypeController');
-const userManController = require('../controllers/userManController')
+const userManController = require('../controllers/userManController');
 const rentalController = require('../controllers/rentalController');
 const vehicleController = require('../controllers/vehicleController');
-// const auth = require('../../middleware/adminAuth');
-// const { upload } = require('../../helpers/multer');
-
+const reportController = require('../controllers/reportsController');
+// const validation = require('../../validators/admin/userVal');
 
 router.get('/index', async (req, res) => {
     res.send('admin routes working properly ❤');
@@ -28,32 +28,36 @@ router.post('/login', validate(userVal.login), responseHandler(controllers.login
  * adminRegister
  */
 
-router.post('/adminRegister',adminController.registerAdmin);
-router.post('/adminlogin', adminController.login);
-router.post('/state-create',auth, stateController.createState);
-router.post('/update-state',auth, stateController.updateState);
-router.post('/delete-State/:id',auth, stateController.deleteState);
-router.get('/view-state',auth, stateController.viewState);
-router.post('/create-city',auth, stateController.createCity);
-router.post('/update-city',auth, stateController.updateCity);
-router.post('/delete-city/:id',auth, stateController.deleteCity);
-router.get('/view-city',auth, stateController.viewCity);
-router.get('/operators',auth, adminController.operators);
-router.post('/operatorsUpdate/:id',auth, adminController.operatorsUpdate);
-router.post('/createDriver',auth,uploads.single('image') ,driverController.createDriver);
-router.get('/view-driver',auth,driverController.viewDriver);
-router.post('/update-driver/:id',auth,uploads.single('image') , driverController.updateDriver);
-router.post('/delete-driver/:id',auth, driverController.deleteDriver);
-router.get('/view-taxiType',auth,taxiTypeController.viewTaxiType);
-router.post('/update-taxiType/:id',auth,uploads.single('image'), taxiTypeController.updateTaxiType);
-router.post('/update-taxistatus',auth, taxiTypeController.updateTaxiStatus);
-router.get('/user-list',auth, userManController.userListing);
-router.post('/updateStatusUser',auth, userManController.updateStatusUser);
-router.get('/userRideingDetails/:id',auth, userManController.userRideingDetails);
+router.post('/adminRegister', adminController.registerAdmin);
+router.post('/adminlogin', responseHandler(adminController.login));
+router.post('/stateCreate', auth, responseHandler(stateController.createState));
+router.post('/updateState', auth, responseHandler(stateController.updateState));
+router.post('/deleteState/:_id', auth, responseHandler(stateController.deleteState));
+router.get('/viewState', auth, responseHandler(stateController.viewState));
+router.post('/createCity', auth, responseHandler(stateController.createCity));
+router.post('/updateCity', auth, responseHandler(stateController.updateCity));
+router.post('/deleteCity/:_id', auth, responseHandler(stateController.deleteCity));
+router.get('/viewCity', auth, responseHandler(stateController.viewCity));
+router.get('/operators', auth, responseHandler(adminController.operators));
+router.post('/operatorsUpdate/:_id', auth, responseHandler(adminController.operatorsUpdate));
+router.post('/createDriver', auth, upload.single('image'), responseHandler(driverController.createDriver));
+router.get('/viewDriver', auth, responseHandler(driverController.viewDriver));
+router.post('/updateDriver/:_id', auth, upload.single('image'), responseHandler(driverController.updateDriver));
+router.post('/deleteDriver/:_id', auth, responseHandler(driverController.deleteDriver));
+router.get('/viewTaxiType', auth, responseHandler(taxiTypeController.viewTaxiType));
+router.post('/updateTaxiType/:_id', auth, upload.single('image'), responseHandler(taxiTypeController.updateTaxiType));
+router.post('/updateTaxistatus', auth, responseHandler(taxiTypeController.updateTaxiStatus));
+router.get('/userList', auth, responseHandler(userManController.userListing));
+router.post('/updateStatusUser', auth, responseHandler(userManController.updateStatusUser));
+router.get('/userRideingDetails/:id', auth, responseHandler(userManController.userRideingDetails));
 
-router.get('/rental-list',auth, rentalController.rentalListData);
-router.post('/rental-edit-data/:id',auth, rentalController.rentalEditData);
-router.post('/createRental',auth, rentalController.createRental); // need to check this route
-router.get('/view-vehicle',auth, vehicleController.viewVehicle);
+router.post('/createRental', auth, responseHandler(rentalController.createRental));
+router.post('/rentalEditData/:id', auth, responseHandler(rentalController.rentalEditData));
+router.get('/rentalList', auth, responseHandler(rentalController.rentalListData));
+router.get('/viewVehicle', auth, responseHandler(vehicleController.viewVehicle));
+router.get('/vehicleTypeList', auth, responseHandler(vehicleController.vehicleTypeList));
+router.post('/createVehicle', auth, responseHandler(vehicleController.createVehicle));
+router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
+
 // Export the router for use in the main application
 module.exports = router;

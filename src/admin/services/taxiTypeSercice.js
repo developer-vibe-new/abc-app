@@ -1,15 +1,19 @@
 const taxiTypeModel = require('../../models/taxiTypeModel');
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-exports.taxiTypeList = async(req,res,next)=>{
+exports.taxiTypeList = async (req) => {
     try {
         let page = req.query.page || 1;
         let pagesize = req.query.pagesize || 10;
         let search_value = req.query.search || "";
-        var conditions;
+        var conditions = [];
 
         if (search_value) {
-            conditions = _.assign(conditions, { $or: [{ "title": { $regex: new RegExp(search_value, "gi") } }] });
+            conditions.push({
+                $match: {
+                    state: { $regex: search_value, $options: "i" }
+                }
+            });
         }
         const findTaxi = await taxiTypeModel.find(conditions)
             .sort({ title: 1 })
@@ -31,37 +35,37 @@ exports.taxiTypeList = async(req,res,next)=>{
         console.log(error);
     }
 };
-exports.updateTaxiTypeList = async(req,res,next)=>{
+exports.updateTaxiTypeList = async (req) => {
     try {
-        const body = req.body
-        const image = req.file.filename
-        const editData = await taxiTypeModel.findByIdAndUpdate({_id:req.params.id},{body,image},{new:true});
+        const body = req.body;
+        const image = req.file.filename;
+        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params._id }, { body, image }, { new: true });
 
-        if(editData){
+        if (editData) {
             return {
                 success: true,
                 message: "Data Updated Successfully",
-                data:editData
+                data: editData
             };
         } else {
             return {
                 success: false,
-                message:"Data Not Updated"
+                message: "Data Not Updated"
             };
         }
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 };
 
-exports.updateTaxiStatus = async(req,res,next)=>{
+exports.updateTaxiStatus = async (req) => {
     try {
-        const updateData = await taxiTypeModel.findByIdAndUpdate({_id:new mongoose.Types.ObjectId(req.body.id)},{is_active:false},{new:true});
-        if(updateData){
+        const updateData = await taxiTypeModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.body._id) }, { is_active: false }, { new: true });
+        if (updateData) {
             return {
                 success: true,
-                data:updateData  
-            }
+                data: updateData
+            };
         } else {
             return {
                 success: false,
@@ -70,4 +74,4 @@ exports.updateTaxiStatus = async(req,res,next)=>{
     } catch (error) {
         console.log(error);
     }
-}
+};

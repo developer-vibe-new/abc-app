@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
-const { type } = require("os");
-const Schema = mongoose.Schema;
+const { Schema } = require("mongoose");
 
-var rentalSchema = new Schema({
+const rentalSchema = new mongoose.Schema({
     packages: {
-        type: Object
+        type: Schema.Types.Mixed
     },
 
 }, {

@@ -11,7 +11,7 @@ exports.addTaxiTypeController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.updateTaxiStatusController = async (req) => {
     try {
@@ -21,9 +21,9 @@ exports.updateTaxiStatusController = async (req) => {
             statusCode: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
             message: error.message
-        }
+        };
     }
-}
+};
 
 exports.updateTaxiTypeController = async (req) => {
     try {
@@ -33,6 +33,6 @@ exports.updateTaxiTypeController = async (req) => {
             statusCode: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
             message: error.message
-        }
+        };
     }
-}
+};

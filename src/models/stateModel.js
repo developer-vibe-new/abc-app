@@ -1,13 +1,10 @@
-const mongoose = require("mongoose"),
-	ObjectId = mongoose.Types.ObjectId;
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
-
-
-var stateSchema = new Schema({
+const stateSchema = new mongoose.Schema({
 	state: {
 		type: String,
-		required:true
+		required: true,
+		unique: true
 	}
 }, {
 	timestamps: {
@@ -23,11 +20,11 @@ var stateSchema = new Schema({
 		getters: true,
 		virtuals: true
 	},
-	versionKey:false
+	versionKey: false
 });
 
 
 
 
 //make this available to our users in Node applications
-module.exports.State = mongoose.model('State', stateSchema);
+module.exports = mongoose.model('State', stateSchema);

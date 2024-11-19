@@ -176,6 +176,6 @@ const providerSchema = new mongoose.Schema({
 	}
 }, { timestamps: true, versionKey: false });
 
-const provideModel = mongoose.model('provider', providerSchema);
+module.exports = mongoose.model('provider', providerSchema);
 
-module.exports = provideModel;
+// module.exports = provideModel;

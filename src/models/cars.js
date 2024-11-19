@@ -1,9 +1,6 @@
-const mongoose = require("mongoose"),
-    ObjectId = mongoose.Types.ObjectId;
-const Schema = mongoose.Schema;
-// const MODALFUNC = require('./model_functions').functions;
+const mongoose = require("mongoose");
 
-var CarSchema = new Schema({
+const CarSchema = new mongoose.Schema({
     title: {
         type: String
     },
@@ -24,7 +21,7 @@ var CarSchema = new Schema({
         type: Boolean,
         default: true
     },
-    city_id:{
+    city_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'City'
     },

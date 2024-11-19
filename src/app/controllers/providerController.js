@@ -11,7 +11,7 @@ exports.registerOperatorController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.loginOperatorController = async (req) => {
     try {
@@ -23,7 +23,7 @@ exports.loginOperatorController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.verifyOtpController = async (req) => {
     try {
@@ -35,7 +35,7 @@ exports.verifyOtpController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.addDriverController = async (req) => {
     try {
@@ -47,7 +47,7 @@ exports.addDriverController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.updateDriverStatusController = async (req) => {
     try {
@@ -59,7 +59,7 @@ exports.updateDriverStatusController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.driverBlockListController = async () => {
     try {
@@ -71,11 +71,11 @@ exports.driverBlockListController = async () => {
             message: error.message
         };
     }
-}
+};
 
 exports.driverListController = async () => {
     try {
-        return await service.driverList()
+        return await service.driverList();
     } catch (error) {
         return {
             statusCode: statusCode.INTERNAL_SERVER_ERROR,
@@ -83,7 +83,7 @@ exports.driverListController = async () => {
             message: error.message
         };
     }
-}
+};
 
 exports.driverOnlineStatusController = async (req) => {
     try {
@@ -95,9 +95,9 @@ exports.driverOnlineStatusController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
-exports.updateDriverController = async (req, res) => {
+exports.updateDriverController = async (req) => {
     try {
         return await service.updateDriver(req);
     } catch (error) {
@@ -107,4 +107,4 @@ exports.updateDriverController = async (req, res) => {
             message: error.message
         };
     }
-}
+};
