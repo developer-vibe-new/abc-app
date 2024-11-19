@@ -481,6 +481,87 @@
           }
         }
       }
+    },
+    "/user/viewDriver": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/viewDriver",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/viewDriverResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/adminlogin": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/adminlogin",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/adminlogin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/adminloginResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -894,6 +975,97 @@
             "createdAt": "2024-11-19T06:36:13.894Z",
             "updatedAt": "2024-11-19T06:36:13.894Z"
           }
+        }
+      }
+    },
+    "viewDriverResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data created successfully",
+          "example": "Data created successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": [
+            {
+              "_id": "673acf4b460436797df7c98e",
+              "name": "Ishmeet Singh",
+              "city_id": null,
+              "type": "operator",
+              "email": "ishmeet18.img@gmail.com",
+              "mobile": "9588829240",
+              "balance": 0,
+              "pending_balance": 0,
+              "fcm_token": "",
+              "is_active": true,
+              "ridereceive": true,
+              "profile_status": "registered",
+              "email_verified": false,
+              "is_notify": true,
+              "is_online": false,
+              "is_outstation": true,
+              "in_ride": false,
+              "goToHome": false,
+              "total_earnings": 100,
+              "total_rides": 0,
+              "pending_amount": 0,
+              "device_id": "",
+              "kycStatus": 0,
+              "vehicleStatus": 0,
+              "stripe_verified": false,
+              "is_delete": false,
+              "stripe_charges_enabled": false,
+              "status": "blocked",
+              "documents": [],
+              "bank_data": [],
+              "createdAt": "2024-11-18T05:23:23.127Z",
+              "updatedAt": "2024-11-19T06:10:42.609Z",
+              "image": "1731996642472.jpg"
+            }
+          ]
+        }
+      }
+    },
+    "adminlogin": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Enter email",
+          "example": "rishika@example.com"
+        },
+        "password": {
+          "type": "string",
+          "description": "Enter password",
+          "example": "securepassword"
+        }
+      }
+    },
+    "adminloginResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "User login Successfully.",
+          "example": "User login Successfully."
+        },
+        "token": {
+          "type": "string",
+          "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM0ODg2MjA3MmI4MWMyYjgxMDE5MDMiLCJpYXQiOjE3MzIwMTAzMjgsImV4cCI6MTczMjA5NjcyOH0._im1X5TGZTxql3x3Yqiqd2t5LcNGTQ_3RT71HjzciuE",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM0ODg2MjA3MmI4MWMyYjgxMDE5MDMiLCJpYXQiOjE3MzIwMTAzMjgsImV4cCI6MTczMjA5NjcyOH0._im1X5TGZTxql3x3Yqiqd2t5LcNGTQ_3RT71HjzciuE"
         }
       }
     }

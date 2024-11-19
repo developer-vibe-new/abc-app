@@ -1,10 +1,9 @@
-
-
 var bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { SECRET_Key } = process.env;
 const operatorModel = require('../../models/operatorModel');
 const adminRegisterModel = require('../../models/adminModel');
+const { statusCode, resMessage } = require('../../config/default.json');
 
 
 
@@ -47,35 +46,37 @@ exports.adminRegister = async (req) => {
 
 exports.login = async (req) => {
     try {
-
-        let findData = await adminRegisterModel.find({
+        let findData = await adminRegisterModel.findOne({
             email: req.body.email,
         });
 
 
-        if (!findData || findData.length === 0) {
+        if (!findData) {
             return {
-                status: false,
-                message: "User not found"
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Data_Not_Found
             };
         }
 
-        const isPasswordMatch = await bcrypt.compare(req.body.password, findData[0].password);
+        const isPasswordMatch = await bcrypt.compare(req.body.password, findData.password);
         if (!isPasswordMatch) {
             return {
-                status: false,
-                message: "Incorrect Password"
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Incorrect_Username_Password
             };
         }
 
-        const auth_key = jwt.sign({ _id: findData[0]._id }, SECRET_Key, { expiresIn: "24h" });
+        const auth_key = jwt.sign({ _id: findData._id }, SECRET_Key, { expiresIn: "24h" });
         await adminRegisterModel.updateOne(
             { email: req.body.email },
             { verification_token: auth_key }
         );
         return {
-            status: true,
-            message: "User login Successfully",
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.User_login_Successfully,
             token: auth_key
         };
     } catch (error) {
