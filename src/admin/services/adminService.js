@@ -12,12 +12,13 @@ const { statusCode, resMessage } = require('../../config/default.json');
 
 exports.adminRegister = async (req) => {
     try {
-        const findEmail = await adminRegisterModel.find({ email: req.body.email });
-        if (findEmail.length > 0) {
+        const findEmail = await adminRegisterModel.findone({ email: req.body.email });
+        if (findEmail) {
             return {
-                message: "The email address you have entered is already in use.",
-                status: false,
-                data: { email: findEmail[0].email },
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Unique_Email_Username
+
             };
         }
 
@@ -30,9 +31,9 @@ exports.adminRegister = async (req) => {
         });
         if (insertAdminuser) {
             return {
-                status: true,
-                message: "User Registered Successfully",
-                data: insertAdminuser,
+                statusCode: statusCode.OK,
+                success: true,
+                message: resMessage.User_login_Successfully,
             };
         }
         return {
@@ -55,7 +56,8 @@ exports.login = async (req) => {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
-                message: resMessage.Data_Not_Found
+                message: resMessage.User_Not_Found,
+
             };
         }
 
@@ -103,19 +105,19 @@ exports.operatorsList = async (req) => {
         }
         conditions.push({ $sort: { fullName: 1 } }, { $skip: ((page - 1) * pagesize) },
             { $limit: pagesize });
-        const operatorsData = await operatorModel.aggregation(conditions);
+        const operatorsData = await operatorModel.aggregate(conditions);
         if (operatorsData.length == 0) {
-
             return {
+                statusCode: statusCode.BAD_REQUEST,
                 success: false,
-                message: "No Data Found",
+                message: resMessage.Data_Not_Found,
 
             };
         } else {
-
             return {
+                statusCode: statusCode.OK,
                 success: true,
-                data: operatorsData
+                data: { operatorsData }
             };
         }
     } catch (error) {
@@ -125,10 +127,12 @@ exports.operatorsList = async (req) => {
 
 exports.updateOperator = async (req) => {
     try {
-        const updateData = await operatorModel.findByIdAndUpdate({ _id: req.params._id }, { status: false }, { new: true });
+        const updateData = await operatorModel.findByIdAndUpdate({ _id: req.params.id }, { status: false }, { new: true });
         return {
+            statusCode: statusCode.OK,
             success: true,
-            data: updateData
+            message: resMessage.Status_Updated_Successfully,
+            data: { updateData }
         };
     } catch (error) {
         console.log(error);

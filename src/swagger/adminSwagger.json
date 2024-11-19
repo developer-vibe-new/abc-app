@@ -562,6 +562,316 @@
           }
         }
       }
+    },
+    "/user/updateDriver/673c31dd6e5a2c7d14466353": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/updateDriver/673c31dd6e5a2c7d14466353",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data; boundary=--------------------------560040168347497074226308"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter name",
+            "required": false,
+            "example": "simran nodejs"
+          },
+          {
+            "name": "type",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter type",
+            "required": false,
+            "example": "main"
+          },
+          {
+            "name": "mobile",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter mobile",
+            "required": false,
+            "example": ""
+          },
+          {
+            "name": "email",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter email",
+            "required": false,
+            "example": ""
+          },
+          {
+            "name": "typeName",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter typeName",
+            "required": false,
+            "example": "admin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673c31dd6e5a2c7d14466353Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/deleteDriver/673c31dd6e5a2c7d14466353": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/deleteDriver/673c31dd6e5a2c7d14466353",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "_id",
+            "in": "path",
+            "description": "please enter _id",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673c31dd6e5a2c7d14466353Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/operators": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/operators",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/operatorsResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/operatorsUpdate/673ac0d52f258e38f1606e00": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/operatorsUpdate/673ac0d52f258e38f1606e00",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "please enter id",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673ac0d52f258e38f1606e00Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/viewTaxiType": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/viewTaxiType",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/viewTaxiTypeResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/deleteDriver/6736c98247b5ffdee7e3a560": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/deleteDriver/6736c98247b5ffdee7e3a560",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "please enter id",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/6736c98247b5ffdee7e3a560Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -986,11 +1296,6 @@
           "description": "true",
           "example": true
         },
-        "message": {
-          "type": "string",
-          "description": "Data created successfully",
-          "example": "Data created successfully"
-        },
         "data": {
           "type": "object",
           "description": "Successfully Data",
@@ -1064,8 +1369,169 @@
         },
         "token": {
           "type": "string",
-          "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM0ODg2MjA3MmI4MWMyYjgxMDE5MDMiLCJpYXQiOjE3MzIwMTAzMjgsImV4cCI6MTczMjA5NjcyOH0._im1X5TGZTxql3x3Yqiqd2t5LcNGTQ_3RT71HjzciuE",
-          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM0ODg2MjA3MmI4MWMyYjgxMDE5MDMiLCJpYXQiOjE3MzIwMTAzMjgsImV4cCI6MTczMjA5NjcyOH0._im1X5TGZTxql3x3Yqiqd2t5LcNGTQ_3RT71HjzciuE"
+          "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM0ODg2MjA3MmI4MWMyYjgxMDE5MDMiLCJpYXQiOjE3MzIwMTU2MTUsImV4cCI6MTczMjEwMjAxNX0.tnnGTevoJGYNH6RTtzGzAw1mqddVe2qGg4N7zcfEAxY",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM0ODg2MjA3MmI4MWMyYjgxMDE5MDMiLCJpYXQiOjE3MzIwMTU2MTUsImV4cCI6MTczMjEwMjAxNX0.tnnGTevoJGYNH6RTtzGzAw1mqddVe2qGg4N7zcfEAxY"
+        }
+      }
+    },
+    "673c31dd6e5a2c7d14466353Response": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data deleted successfully",
+          "example": "Data deleted successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673c31dd6e5a2c7d14466353",
+            "name": "simran",
+            "city_id": null,
+            "type": "main",
+            "email": "simran@gamail.com",
+            "mobile": "3423464435",
+            "balance": 0,
+            "pending_balance": 0,
+            "image": "1732012389494.jpg",
+            "fcm_token": "",
+            "is_active": true,
+            "ridereceive": true,
+            "profile_status": "registered",
+            "email_verified": false,
+            "is_notify": true,
+            "is_online": false,
+            "is_outstation": true,
+            "in_ride": false,
+            "goToHome": false,
+            "total_earnings": 0,
+            "total_rides": 0,
+            "pending_amount": 0,
+            "device_id": "",
+            "kycStatus": 0,
+            "vehicleStatus": 0,
+            "stripe_verified": false,
+            "is_delete": false,
+            "stripe_charges_enabled": false,
+            "status": "Unblock",
+            "documents": [],
+            "bank_data": [],
+            "createdAt": "2024-11-19T06:36:13.894Z",
+            "updatedAt": "2024-11-19T10:33:09.535Z"
+          }
+        }
+      }
+    },
+    "operatorsResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "operatorsData": [
+              {
+                "_id": "673ac0d52f258e38f1606e00",
+                "fullName": "Ishmeet",
+                "phone": 9588829249,
+                "city": "Jaipur",
+                "status": true,
+                "createdAt": "2024-11-18T04:21:42.010Z",
+                "updatedAt": "2024-11-18T04:48:29.517Z",
+                "otp": null,
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3M2FjMGQ1MmYyNThlMzhmMTYwNmUwMCIsImlhdCI6MTczMTkwNTMwOSwiZXhwIjoxNzMxOTA4OTA5fQ.acZaXeX_t3K5msYZrcqlkzYRHAoxlfpiRPcueWkczwE"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "673ac0d52f258e38f1606e00Response": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Status_Updated_Successfully",
+          "example": "Status_Updated_Successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "updateData": {
+              "_id": "673ac0d52f258e38f1606e00",
+              "fullName": "Ishmeet",
+              "phone": 9588829249,
+              "city": "Jaipur",
+              "status": false,
+              "createdAt": "2024-11-18T04:21:42.010Z",
+              "updatedAt": "2024-11-19T11:23:54.765Z",
+              "otp": null,
+              "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3M2FjMGQ1MmYyNThlMzhmMTYwNmUwMCIsImlhdCI6MTczMTkwNTMwOSwiZXhwIjoxNzMxOTA4OTA5fQ.acZaXeX_t3K5msYZrcqlkzYRHAoxlfpiRPcueWkczwE"
+            }
+          }
+        }
+      }
+    },
+    "viewTaxiTypeResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": [
+            {
+              "_id": "6735f37c0e57ce96e8f08564",
+              "type": "operator",
+              "title": "SUV",
+              "icon": "1731999935639.jpg",
+              "base_fare": 10,
+              "airportCharge": 0,
+              "fixed_fare": 0,
+              "distance_fare": 0,
+              "time_fare": 0,
+              "currency": "INR",
+              "is_active": true,
+              "createdAt": "2024-11-14T12:56:28.881Z",
+              "updatedAt": "2024-11-19T07:05:35.738Z"
+            }
+          ]
+        }
+      }
+    },
+    "6736c98247b5ffdee7e3a560Response": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data deleted successfully",
+          "example": "Data deleted successfully"
         }
       }
     }

@@ -17,6 +17,7 @@ exports.driverCreate = async (req) => {
             name: name, mobile: mobile, email: email, type: type, image: image
         });
         return {
+            statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Created_Successfully,
             data: createdData
@@ -57,7 +58,6 @@ exports.driverView = async (req) => {
         return {
             statusCode: statusCode.OK,
             success: true,
-            message: resMessage.Data_Created_Successfully,
             data: viewAllData
         };
     } catch (error) {
@@ -74,11 +74,11 @@ exports.driverUpdate = async (req) => {
     try {
         const body = req.body;
         const image = req.file.filename;
-        const updateData = await driverModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.params._id) }, { body, image }, { new: true });
+        const updateData = await driverModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.params.id) }, { body, image }, { new: true });
         if (updateData) {
             return {
                 success: true,
-                message: resMessage.Data_Created_Successfully,
+                message: resMessage.Data_Updated_Successfully,
                 data: updateData
             };
         } else {
@@ -89,25 +89,36 @@ exports.driverUpdate = async (req) => {
         }
     } catch (error) {
         console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
     }
 };
 
 exports.driverDelete = async (req) => {
     try {
-        const deleteData = await driverModel.findByIdAndDelete({ _id: new mongoose.Types.ObjectId(req.params._id) });
+        const deleteData = await driverModel.findByIdAndDelete({ _id: new mongoose.Types.ObjectId(req.params.id) });
         if (deleteData) {
             return {
                 success: true,
                 message: resMessage.Data_Deleted_Successfully,
-                data: deleteData
-            };
-        } else {
-            return {
-                success: false,
-                message: "Error No Data Deleted",
+                // data: deleteData
             };
         }
+        // else {
+        //     return {
+        //         success: false,
+        //         message: resMessage.Data_Deleted_Successfully,
+        //     };
+        // }
     } catch (error) {
         console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
     }
 };

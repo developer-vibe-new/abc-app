@@ -55,7 +55,7 @@ exports.stateUpdate = async (req) => {
 exports.stateDelete = async (req) => {
     try {
         const deleteSate = await stateModel.findByIdAndDelete({
-            _id: req.params._id
+            _id: req.params.id
         });
         if (deleteSate) {
             return {
@@ -166,7 +166,7 @@ exports.cityUpdate = async (req) => {
 
 exports.cityDelete = async (req) => {
     try {
-        const deleteData = await cityModel.findByIdAndDelete({ _id: req.params._id });
+        const deleteData = await cityModel.findByIdAndDelete({ _id: req.params.id });
         if (deleteData) {
             return {
                 success: true,

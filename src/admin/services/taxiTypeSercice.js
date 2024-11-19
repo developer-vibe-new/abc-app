@@ -15,10 +15,15 @@ exports.taxiTypeList = async (req) => {
                 }
             });
         }
-        const findTaxi = await taxiTypeModel.find(conditions)
-            .sort({ title: 1 })
-            .skip((page - 1) * pagesize).
-            limit(pagesize);
+        conditions.push(
+            { $sort: { title: 1 } },
+            { $skip: (page - 1) * pagesize },
+            { $limit: pagesize }
+        );
+        const findTaxi = await taxiTypeModel.aggregate(conditions);
+        // .sort({ title: 1 })
+        // .skip((page - 1) * pagesize).
+        // limit(pagesize);
         if (findTaxi.length == 0) {
             return {
                 success: false,
@@ -39,7 +44,7 @@ exports.updateTaxiTypeList = async (req) => {
     try {
         const body = req.body;
         const image = req.file.filename;
-        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params._id }, { body, image }, { new: true });
+        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, { body, image }, { new: true });
 
         if (editData) {
             return {
