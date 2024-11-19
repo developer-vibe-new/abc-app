@@ -16,7 +16,7 @@ var CarSchema = new Schema({
     year: {
         type: String
     },
-    type: [{
+    taxi_type: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'TaxiType'
     }],
@@ -27,8 +27,11 @@ var CarSchema = new Schema({
     city_id:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'City'
+    },
+    type: {
+        type: String,
+        enum: ['operator', 'main']
     }
-
 }, {
     timestamps: {
         createdAt: 'created',
@@ -45,13 +48,6 @@ var CarSchema = new Schema({
     }
 });
 
-// CarSchema.virtual('icon_thumb').get(function() {
-//     if (this.icon != undefined && this.icon != '' && this.icon != null) {
-//         return urljoin(process.env.ICON_DISPLAY_PATH, 'thumb_2x', this.icon);
-//     } else {
-//         return "";
-//     }
-// });
+const carModel = mongoose.model('Car', CarSchema);
 
-//make this available to our users in Node applications
-module.exports.Car = mongoose.model('Car', CarSchema);
+module.exports = carModel;
