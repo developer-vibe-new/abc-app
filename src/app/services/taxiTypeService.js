@@ -56,7 +56,7 @@ exports.updateTaxiStatus = async (req) => {
             error: error.message || 'An error occurred while updating taxi status'
         };
     }
-}
+};
 
 exports.updateTaxiType = async (req) => {
     try {
