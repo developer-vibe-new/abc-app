@@ -10,5 +10,5 @@ exports.addCarController = async (req) => {
             success: false,
             message: error.message
         };
-    }   
-}
+    }
+};
