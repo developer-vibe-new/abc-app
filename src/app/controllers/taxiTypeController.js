@@ -11,4 +11,4 @@ exports.addTaxiTypeController = async (req) => {
             message: error.message
         };
     }
-}
+};

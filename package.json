@@ -23,6 +23,8 @@
     "swagger-ui-express": "^5.0.1"
   },
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "preadmin": "eslint .",
+    "admin": "nodemon admin.js"
   }
 }

@@ -1,9 +1,11 @@
 const service = require('../services/reportService');
+const { statusCode } = require('../../config/default.json');
 
-exports.viewRideReport = async(req,res,next)=>{
+
+exports.viewRideReport = async (req) => {
     try {
-        const data = await service.allData(req);
-        return res.status(200).json(Object.assign({success:data.success},data))
+        return await service.allData(req);
+        // return res.status(200).json(Object.assign({ success: data.success }, data));
     } catch (error) {
         console.error("Error in viewRideReport:", error);
         return {
@@ -12,4 +14,4 @@ exports.viewRideReport = async(req,res,next)=>{
             message: error.message
         };
     }
-}
+};

@@ -1,14 +1,14 @@
 const rideModel = require('../../models/ride');
-const transactionModel= require('../../models/transactionsModel');
+// const transactionModel = require('../../models/transactionsModel');
 const moment = require('moment');
 
-exports.allData = async (req, res, next) => {
+exports.allData = async (req) => {
     try {
         var page = parseInt(req.query.page) || 1;
         var pagesize = parseInt(req.query.pagesize) || 10;
         let from_date = req.query.from_date || "";
         let to_date = req.query.to_date || "";
-        let pipeline = []
+        let pipeline = [];
 
         from_date = (from_date) ? from_date : moment().subtract(1, 'months').format("DD-MM-YYYY");
         to_date = (to_date) ? to_date : moment().add(1, 'days').format("DD-MM-YYYY");
@@ -31,7 +31,7 @@ exports.allData = async (req, res, next) => {
                         }
                     }]
                 }
-            })
+            });
         } else if (from_date) {
             pipeline.push({
                 $match: {
@@ -39,7 +39,7 @@ exports.allData = async (req, res, next) => {
                         $gte: start_filter
                     }
                 }
-            })
+            });
 
         } else if (to_date) {
             pipeline.push({
@@ -48,7 +48,7 @@ exports.allData = async (req, res, next) => {
                         $lte: end_filter
                     }
                 }
-            })
+            });
         }
 
 
@@ -62,25 +62,16 @@ exports.allData = async (req, res, next) => {
         const rideViewDetails = await rideModel.aggregate(pipeline);
 
         const reportData = await rideModel.find({});
-        let totalRides = reportData.length
+        let totalRides = reportData.length;
         let completedRides = await rideModel.find({ ride_status: "finished" });
-        let totalCompletedRides = completedRides.length
+        let totalCompletedRides = completedRides.length;
         let cancelledRides = await rideModel.find({ ride_status: "cancelled" });
-        let totalCancelledRides = cancelledRides.length
-
+        let totalCancelledRides = cancelledRides.length;
         return {
             success: true,
             data: { totalRides, totalCompletedRides, totalCancelledRides, rideViewDetails }
-        }
-    } catch (error) {
-        console.log(error)
-    }
-};
-
-exports.reportSales = async(req,res,next)=>{
-    try {
-        
+        };
     } catch (error) {
         console.log(error);
     }
-}
+};

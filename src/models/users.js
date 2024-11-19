@@ -1,9 +1,7 @@
-const mongoose = require("mongoose"),
-	ObjectId = mongoose.Types.ObjectId;
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose");
+const bcrypt = require('bcryptjs');
 
-
-var LocSchema = new Schema({
+const LocSchema = new mongoose.Schema({
 	longitude: {
 		type: Number,
 		required: true
@@ -21,21 +19,22 @@ var LocSchema = new Schema({
 		required: true
 	}
 });
-let userbalance = new Schema({
-    balance: {
-        type: Number,
-        default: 0
-    },
-    bonus: {
-        type: Number,
-        default: 0
-    },
-    withdraw: {
-        type: Number,
-        default: 0
-    }
+// eslint-disable-next-line no-unused-vars
+const userbalance = new mongoose.Schema({
+	balance: {
+		type: Number,
+		default: 0
+	},
+	bonus: {
+		type: Number,
+		default: 0
+	},
+	withdraw: {
+		type: Number,
+		default: 0
+	}
 });
-var UserSchema = new Schema({
+const UserSchema = new mongoose.Schema({
 
 
 	// Role id to seprate normal users from admin
@@ -179,9 +178,9 @@ var UserSchema = new Schema({
 		default: true
 	},
 
-	profile_image:{
-		type:String,
-		default:""
+	profile_image: {
+		type: String,
+		default: ""
 	},
 
 	// If customer is in a ride
@@ -243,8 +242,8 @@ var UserSchema = new Schema({
 	},
 	login_time: {
 		type: Date,
-		get:String,
-		set:String
+		get: String,
+		set: String
 	}
 }, {
 	timestamps: {
@@ -264,15 +263,16 @@ var UserSchema = new Schema({
 
 
 
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function (next) {
 
 	var user = this;
-	Sequence.getNext("user", function(err, seqObj) {
+	// eslint-disable-next-line no-undef
+	Sequence.getNext("user", function (err, seqObj) {
 		if (err) {
 			if (err) return next(err);
 		} else {
-			var str = "" + seqObj.seq
-			var pad = "00000"
+			var str = "" + seqObj.seq;
+			var pad = "00000";
 			user.customer_no = pad.substring(0, pad.length - str.length) + str;
 			next();
 		}
@@ -282,7 +282,7 @@ UserSchema.pre('save', function(next) {
 
 
 //http://devsmash.com/blog/password-authentication-with-mongoose-and-bcrypt
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function (next) {
 
 	var user = this;
 
@@ -290,11 +290,11 @@ UserSchema.pre('save', function(next) {
 	if (!user.isModified('password')) return next();
 
 	// generate a salt
-	bcrypt.genSalt(10, function(err, salt) {
+	bcrypt.genSalt(10, function (err, salt) {
 		if (err) return next(err);
 
 		// hash the password using our new salt
-		bcrypt.hash(user.password, salt, function(err, hash) {
+		bcrypt.hash(user.password, salt, function (err, hash) {
 			if (err) return next(err);
 
 			// override the cleartext password with the hashed one

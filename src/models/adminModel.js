@@ -1,7 +1,5 @@
-const mongoose = require("mongoose"),
-    ObjectId = mongoose.Types.ObjectId;
-const Schema = mongoose.Schema;
-const bcrypt = require('bcryptjs')
+const mongoose = require("mongoose");
+const bcrypt = require('bcryptjs');
 
 // const adminRegisterSchema = new Schema({
 //     username: {
@@ -28,7 +26,7 @@ const bcrypt = require('bcryptjs')
 // });
 
 
-var adminRegisterSchema = new Schema({
+const adminRegisterSchema = new mongoose.Schema({
 
 
 	// Role type to seprate super_admin and admins
@@ -91,8 +89,8 @@ var adminRegisterSchema = new Schema({
 	},
 
 	permission: {
-        type: Array,
-    },
+		type: Array,
+	},
 
 }, {
 	timestamps: {
@@ -111,7 +109,7 @@ var adminRegisterSchema = new Schema({
 });
 
 
-adminRegisterSchema.pre('save', function(next) {
+adminRegisterSchema.pre('save', function (next) {
 
 	var user = this;
 
@@ -119,11 +117,11 @@ adminRegisterSchema.pre('save', function(next) {
 	if (!user.isModified('password')) return next();
 
 	// generate a salt
-	bcrypt.genSalt(10, function(err, salt) {
+	bcrypt.genSalt(10, function (err, salt) {
 		if (err) return next(err);
 
 		// hash the password using our new salt
-		bcrypt.hash(user.password, salt, function(err, hash) {
+		bcrypt.hash(user.password, salt, function (err, hash) {
 			if (err) return next(err);
 
 			// override the cleartext password with the hashed one

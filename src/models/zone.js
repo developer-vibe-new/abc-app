@@ -1,11 +1,6 @@
-const GeoJSON = require('mongoose-geojson-schema');
-const mongoose = require("mongoose"),
-  ObjectId = mongoose.Types.ObjectId;
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
-
-
-var ZoneSchema = new Schema({
+const ZoneSchema = new mongoose.Schema({
 
   type: {
     type: String,

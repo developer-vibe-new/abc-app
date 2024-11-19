@@ -1,21 +1,6 @@
-const mongoose = require("mongoose"),
-	ObjectId = mongoose.Types.ObjectId;
-const Schema = mongoose.Schema;
-// const MODALFUNC = require('./model_functions').functions;
+const mongoose = require("mongoose");
 
-// const Sequence = require('./Sequence.js').Sequence;
-// const City = require('../models/city.js').city;
-// const City = require('./city.js').City;
-
-
-// const Zonerrrrrrrrrrr = require('./zone.js').Zone;
-// const Zone = require('./zone.js').Zone;
-// const TaxiType = require('../models/taxiTypeModel.js');
-
-// const User = require('../models/users.js');
-// const Provider = require('../models/providerModel.js');
-
-var RideSchema = new mongoose.Schema({
+const RideSchema = new mongoose.Schema({
 
 	basic: {
 		ride_type: {
@@ -540,22 +525,23 @@ var RideSchema = new mongoose.Schema({
 // 	}
 // });
 
-// RideSchema.pre('save', function (next) {
-// 	var ride = this;
+RideSchema.pre('save', function (next) {
+	var ride = this;
 
-// 	Sequence.getNext("ride", function (err, seqObj) {
-// 		if (err) {
-// 			if (err) return next(err);
-// 		} else {
+	// eslint-disable-next-line no-undef
+	Sequence.getNext("ride", function (err, seqObj) {
+		if (err) {
+			if (err) return next(err);
+		} else {
 
 
-// 			var str = seqObj.seq
-// 			ride.invoice_no = str
+			var str = seqObj.seq;
+			ride.invoice_no = str;
 
-// 			next();
-// 		}
-// 	});
-// });
+			next();
+		}
+	});
+});
 
 //make this available to our users in Node applications
 module.exports = mongoose.model('Ride', RideSchema);

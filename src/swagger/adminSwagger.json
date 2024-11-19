@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "playT-plus-admin",
+    "title": "taxi-ride-admin",
     "description": "Description of my API",
     "version": "1.0.0"
   },
@@ -44,6 +44,351 @@
             "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/loginResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/createRental": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/createRental",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/createRental"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/createRentalResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/state-create": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/state-create",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/state-create"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/state-createResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/updateState": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/updateState",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/updateState"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/updateStateResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/deleteState/673c151f9c76d7b52a778983": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/deleteState/673c151f9c76d7b52a778983",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "please enter id",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673c151f9c76d7b52a778983Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/viewState": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/viewState",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/viewStateResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/createCity": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/createCity",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/createCity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/createCityResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/updateCity": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/updateCity",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/updateCity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/updateCityResponse"
             }
           },
           "400": {
@@ -106,6 +451,312 @@
           "example": {
             "userId": "6479c2e393445893d7d4fa81",
             "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDc5YzJlMzkzNDQ1ODkzZDdkNGZhODEiLCJlbWFpbCI6InN1cGVyQWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzIwNTA4MTQ2fQ.j5RmlV_x_ODm-C_Osk3RNrlStaPYket8AJepYA1satE"
+          }
+        }
+      }
+    },
+    "createRental": {
+      "type": "object",
+      "properties": {
+        "dis": {
+          "type": "string",
+          "description": "Enter dis",
+          "example": "10km"
+        },
+        "hr": {
+          "type": "string",
+          "description": "Enter hr",
+          "example": "3hr"
+        },
+        "suv": {
+          "type": "number",
+          "description": "Enter suv",
+          "example": 2000
+        },
+        "sedan": {
+          "type": "number",
+          "description": "Enter sedan",
+          "example": 1000
+        },
+        "primun": {
+          "type": "number",
+          "description": "Enter primun",
+          "example": 1999
+        },
+        "any": {
+          "type": "number",
+          "description": "Enter any",
+          "example": 1500
+        }
+      }
+    },
+    "createRentalResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data Created Successfully",
+          "example": "Data Created Successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "packages": {
+              "dis": "10km",
+              "hr": "3hr",
+              "suv": 2000,
+              "sedan": 1000,
+              "primun": 1999,
+              "any": 1500
+            },
+            "_id": "673b2f5d93c90afdf73d2fe4",
+            "created": "2024-11-18T12:13:17.075Z",
+            "updated": "2024-11-18T12:13:17.075Z",
+            "__v": 0
+          }
+        }
+      }
+    },
+    "state-create": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "type": "string",
+          "description": "Enter state",
+          "example": "j&K"
+        }
+      }
+    },
+    "state-createResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "state added successfully",
+          "example": "state added successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "state": "j&K",
+            "_id": "673c151f9c76d7b52a778983",
+            "created": "2024-11-19T04:33:35.833Z",
+            "updated": "2024-11-19T04:33:35.833Z"
+          }
+        }
+      }
+    },
+    "updateState": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Enter id",
+          "example": "673c151f9c76d7b52a778983"
+        },
+        "state": {
+          "type": "string",
+          "description": "Enter state",
+          "example": "rajasthan"
+        }
+      }
+    },
+    "updateStateResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "state updated successfully",
+          "example": "state updated successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673c151f9c76d7b52a778983",
+            "state": "rajasthan",
+            "created": "2024-11-19T04:33:35.833Z",
+            "updated": "2024-11-19T04:44:35.660Z"
+          }
+        }
+      }
+    },
+    "673c151f9c76d7b52a778983Response": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "state deleted successfully",
+          "example": "state deleted successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673c151f9c76d7b52a778983",
+            "state": "rajasthan",
+            "created": "2024-11-19T04:33:35.833Z",
+            "updated": "2024-11-19T04:44:35.660Z"
+          }
+        }
+      }
+    },
+    "viewStateResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": []
+        }
+      }
+    },
+    "createCity": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Enter name",
+          "example": "jaipur"
+        },
+        "city": {
+          "type": "string",
+          "description": "Enter city",
+          "example": "jaipur"
+        },
+        "state": {
+          "type": "string",
+          "description": "Enter state",
+          "example": "rajasthan"
+        },
+        "country": {
+          "type": "string",
+          "description": "Enter country",
+          "example": "india"
+        }
+      }
+    },
+    "createCityResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "City Created successfully",
+          "example": "City Created successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "name": "jaipur",
+            "city": "jaipur",
+            "state": "rajasthan",
+            "country": "india",
+            "coordinates": [
+              0,
+              0
+            ],
+            "is_active": true,
+            "_id": "673c1b01fa8abd83c55e7c53",
+            "created": "2024-11-19T04:58:41.171Z",
+            "updated": "2024-11-19T04:58:41.171Z",
+            "__v": 0
+          }
+        }
+      }
+    },
+    "updateCity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Enter id",
+          "example": "673c1b01fa8abd83c55e7c53"
+        },
+        "name": {
+          "type": "string",
+          "description": "Enter name",
+          "example": "delhi"
+        },
+        "city": {
+          "type": "string",
+          "description": "Enter city",
+          "example": "delhi"
+        },
+        "state": {
+          "type": "string",
+          "description": "Enter state",
+          "example": ""
+        },
+        "country": {
+          "type": "string",
+          "description": "Enter country",
+          "example": "india"
+        }
+      }
+    },
+    "updateCityResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "City updated successfully",
+          "example": "City updated successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673c1b01fa8abd83c55e7c53",
+            "name": "delhi",
+            "city": "delhi",
+            "state": "",
+            "country": "india",
+            "coordinates": [
+              0,
+              0
+            ],
+            "is_active": true,
+            "created": "2024-11-19T04:58:41.171Z",
+            "updated": "2024-11-19T05:13:40.394Z",
+            "__v": 0
           }
         }
       }

@@ -4,7 +4,7 @@ const { statusCode, resMessage } = require('../config/default.json');
 exports.verifyToken = async (req, res, next) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
-        if(!token) {
+        if (!token) {
             return res.json({
                 statusCode: statusCode.UNAUTHORIZED,
                 success: false,
@@ -12,7 +12,7 @@ exports.verifyToken = async (req, res, next) => {
             });
         }
         jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
-            if(err) {
+            if (err) {
                 return res.json({
                     statusCode: statusCode.UNAUTHORIZED,
                     success: false,
@@ -31,4 +31,4 @@ exports.verifyToken = async (req, res, next) => {
             error: error.message || 'An error occurred while verifying the token'
         });
     }
-}
+};

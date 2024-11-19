@@ -11,7 +11,7 @@ exports.registerOperatorController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.loginOperatorController = async (req) => {
     try {
@@ -23,7 +23,7 @@ exports.loginOperatorController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.verifyOtpController = async (req) => {
     try {
@@ -35,7 +35,7 @@ exports.verifyOtpController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.addDriverController = async (req) => {
     try {
@@ -47,7 +47,7 @@ exports.addDriverController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.updateDriverStatusController = async (req) => {
     try {
@@ -59,7 +59,7 @@ exports.updateDriverStatusController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.driverBlockListController = async () => {
     try {
@@ -71,4 +71,4 @@ exports.driverBlockListController = async () => {
             message: error.message
         };
     }
-}
+};

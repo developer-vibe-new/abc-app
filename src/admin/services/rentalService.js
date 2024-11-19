@@ -1,11 +1,11 @@
 const rentalModel = require("../../models/rentalModel");
 
-exports.rentalList = async(req,res,next)=>{
+exports.rentalList = async (req) => {
     try {
 
         var page = req.query.page || 1;
         let pagesize = req.query.pagesize || 10;
-        var conditions; 
+        var conditions;
 
         // let search_value = req.query.search || "";
 
@@ -14,51 +14,59 @@ exports.rentalList = async(req,res,next)=>{
         // }
 
         const rentalData = await rentalModel.find(conditions)
-            .sort({createdAt:-1})
+            .sort({ createdAt: -1 })
             .skip((page - 1) * pagesize).
             limit(pagesize);
 
         return {
-            success:true,
-            data:rentalData
-        }
-    } catch (error) {
-        console.log(error)
-    }
-};
-
-exports.editRental = async(req,res,next)=>{
-    try {
-        const body =req.body
-        const editRentalData = await rentalModel.findByIdAndUpdate({_id:req.params.id},body,{new:true});
-        console.log(editRentalData,"editRentalData")
-        return {
-            success:true,
-            data:editRentalData
-        }
-    } catch (error) {
-        console.log(error)
-    }
-};
-
-exports.addRental = async(req,res,next)=>{
-    try {
-        
-        const createRental = await rentalModel.create({
-            packages:req.body
-        })
-        if(createRental){
-            return {
-                success:true,
-                message:"Data Created Successfully",
-                data:createRental
-            }
-        }
-        return {
-            success:false,
-            message:"Data Not Created",
-        }
+            success: true,
+            data: rentalData
+        };
     } catch (error) {
         console.log(error);
+    }
+};
+
+exports.editRental = async (req) => {
+    try {
+        const body = req.body;
+        const editRentalData = await rentalModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true });
+        console.log(editRentalData, "editRentalData");
+        return {
+            success: true,
+            data: editRentalData
+        };
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+exports.addRental = async ({ body }) => {
+    try {
+
+        const createRental = await rentalModel.create({
+            packages: body
+        });
+
+        if (!createRental) {
+            return {
+                success: false,
+                message: "Data Not Created",
+            };
+        }
+        return {
+            statusCode: 200,
+            success: true,
+            message: "Data Created Successfully",
+            data: createRental,
+        };
+
+    } catch (error) {
+
+        return {
+            statusCode: 400,
+            success: false,
+            message: error.message
+        };
     }
 };

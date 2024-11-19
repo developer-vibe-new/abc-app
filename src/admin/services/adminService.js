@@ -3,7 +3,7 @@
 var bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { SECRET_Key } = process.env;
-const operatorModel = require('../../models/operatorModel')
+const operatorModel = require('../../models/operatorModel');
 const adminRegisterModel = require('../../models/adminModel');
 
 
@@ -11,15 +11,15 @@ const adminRegisterModel = require('../../models/adminModel');
 
 
 
-exports.adminRegister = async (req, res, next) => {
+exports.adminRegister = async (req) => {
     try {
-        const findEmail = await adminRegisterModel.find({ email: req.body.email })
+        const findEmail = await adminRegisterModel.find({ email: req.body.email });
         if (findEmail.length > 0) {
             return {
                 message: "The email address you have entered is already in use.",
                 status: false,
                 data: { email: findEmail[0].email },
-            }
+            };
         }
 
         const insertAdminuser = await adminRegisterModel.create({
@@ -45,7 +45,7 @@ exports.adminRegister = async (req, res, next) => {
     }
 };
 
-exports.login = async (req, res, next) => {
+exports.login = async (req) => {
     try {
 
         let findData = await adminRegisterModel.find({
@@ -65,16 +65,15 @@ exports.login = async (req, res, next) => {
             return {
                 status: false,
                 message: "Incorrect Password"
-            }
+            };
         }
 
         const auth_key = jwt.sign({ _id: findData[0]._id }, SECRET_Key, { expiresIn: "24h" });
-        await adminRegisterModel.updateOne(
+        const data = await adminRegisterModel.updateOne(
             { email: req.body.email },
             { verification_token: auth_key }
         );
-        // console.log(req.session,"req.session")
-        // req.session.auth_key = auth_key;
+        console.log(data, "ooooooooooooooo");
         return {
             status: true,
             message: "User login Successfully",
@@ -85,20 +84,26 @@ exports.login = async (req, res, next) => {
     }
 };
 
-exports.operatorsList = async (req, res, next) => {
+exports.operatorsList = async (req) => {
     try {
         let page = req.query.page || 1;
         let pagesize = req.query.pagesize || 10;
         let search_value = req.query.search || "";
-        var conditions;
+        var conditions = [];
 
+        // if (search_value) {
+        //     conditions = _.assign(conditions, { $or: [{ "fullName": { $regex: new RegExp(search_value, "gi") } }] });
+        // }
         if (search_value) {
-            conditions = _.assign(conditions, { $or: [{ "fullName": { $regex: new RegExp(search_value, "gi") } }] });
+            conditions.push({
+                $match: {
+                    fullName: { $regex: search_value }
+                }
+            });
         }
-        const operatorsData = await operatorModel.find(conditions)
-            .sort({ fullName: 1 })
-            .skip((page - 1) * pagesize).
-            limit(pagesize);
+        conditions.push({ $sort: { fullName: 1 } }, { $skip: ((page - 1) * pagesize) },
+            { $limit: pagesize });
+        const operatorsData = await operatorModel.aggregation(conditions);
         if (operatorsData.length == 0) {
 
             return {
@@ -118,9 +123,9 @@ exports.operatorsList = async (req, res, next) => {
     }
 };
 
-exports.updateOperator = async (req, res, next) => {
+exports.updateOperator = async (req) => {
     try {
-        const updateData = await operatorModel.findByIdAndUpdate({_id:req.params.id},{ status: false }, { new: true })
+        const updateData = await operatorModel.findByIdAndUpdate({ _id: req.params.id }, { status: false }, { new: true });
         return {
             success: true,
             data: updateData
@@ -128,5 +133,5 @@ exports.updateOperator = async (req, res, next) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 

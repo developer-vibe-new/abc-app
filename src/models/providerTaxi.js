@@ -1,69 +1,63 @@
-const mongoose = require("mongoose"),
-	ObjectId = mongoose.Types.ObjectId;
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
-const Provider = require('./providerModel.js').provideModel;
-const Car = require('./Car.js').Car;
-const TaxiType = require('./TaxiType.js').TaxiType;
-
-var ProviderTaxiSchema = new Schema({
+const ProviderTaxiSchema = new mongoose.Schema({
 	provider_id: {
 		type: mongoose.Schema.Types.ObjectId,
-        ref: 'Provider'
+		ref: 'Provider'
 	},
 
 	car_id: {
 		type: mongoose.Schema.Types.ObjectId,
-        ref: 'Car'
+		ref: 'Car'
 	},
 	type_ids: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'TaxiType'
-    }],
-	plateno:{
-		type:String,
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'TaxiType'
+	}],
+	plateno: {
+		type: String,
 		required: false
 	},
-	engine:{
-		type:String,
-		default:""
+	engine: {
+		type: String,
+		default: ""
 	},
-	pst_no:{
-		type:String,
-		default:""
+	pst_no: {
+		type: String,
+		default: ""
 	},
-	gst_no:{
-		type:String,
-		default:""
+	gst_no: {
+		type: String,
+		default: ""
 	},
-	year:{
-		type:String,
+	year: {
+		type: String,
 		required: false
 	},
-	registration_no:{
-		type:String,
+	registration_no: {
+		type: String,
 		required: false
 	},
-	color:{
+	color: {
 		type: String
 	},
-	rc_photo:{
-		type:String
+	rc_photo: {
+		type: String
 	},
-	car_photo:{
-		type:String
+	car_photo: {
+		type: String
 	},
-	documents:[{
-		_id:mongoose.Schema.Types.ObjectId,
-		name:String,
-		date:String,
-		path:String
+	documents: [{
+		_id: mongoose.Schema.Types.ObjectId,
+		name: String,
+		date: String,
+		path: String
 	}],
-	city_id:{
+	city_id: {
 		type: mongoose.Schema.Types.ObjectId,
-        ref: 'City'
+		ref: 'City'
 	},
-	carLeftImage:{
+	carLeftImage: {
 		type: String
 	},
 	carRigthImage: {
@@ -76,9 +70,9 @@ var ProviderTaxiSchema = new Schema({
 		type: String
 	},
 	is_active: {
-        type: Boolean,
-        default: true
-    }
+		type: Boolean,
+		default: true
+	}
 }, {
 	timestamps: {
 		createdAt: 'created',

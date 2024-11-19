@@ -1,10 +1,11 @@
 const services = require("../services/rentalService");
+const { statusCode } = require('../../config/default.json');
 
 
-exports.rentalListData = async(req,res,next)=>{
+exports.rentalListData = async (req) => {
     try {
-        const data = await services.rentalList(req)
-        return res.status(200).json(Object.assign({status:data.success}, data));
+        return await services.rentalList(req);
+        // return res.status(200).json(Object.assign({ status: data.success }, data));
     } catch (error) {
         console.log(error);
         return {
@@ -14,10 +15,10 @@ exports.rentalListData = async(req,res,next)=>{
         };
     }
 };
-exports.rentalEditData = async(req,res,next)=>{
+exports.rentalEditData = async (req) => {
     try {
-        const data = await services.editRental(req);
-        return res.status(200).json(Object.assign({status:data.success},data))
+        return await services.editRental(req);
+        // return res.status(200).json(Object.assign({ status: data.success }, data));
     } catch (error) {
         console.log(error);
         return {
@@ -27,14 +28,14 @@ exports.rentalEditData = async(req,res,next)=>{
         };
     }
 };
-exports.createRental =  async(req,res,next)=>{
+exports.createRental = async (req) => {
     try {
-        const data = await services.addRental(req);
-        if(data.success == true){
-            return res.status(200).json(Object.assign({status:data.success},data))
-        } else {
-            return res.status(400).json(Object.assign({status:data.success,message:data.message}))
-        }
+        return await services.addRental(req);
+        // if(data.success == true){
+        //     return res.status(200).json(Object.assign({status:data.success},data))
+        // } else {
+        //     return res.status(400).json(Object.assign({status:data.success,message:data.message}))
+        // }
     } catch (error) {
         console.log(error);
         return {
@@ -43,4 +44,4 @@ exports.createRental =  async(req,res,next)=>{
             message: error.message
         };
     }
-}
+};

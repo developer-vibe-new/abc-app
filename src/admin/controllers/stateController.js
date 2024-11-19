@@ -4,20 +4,9 @@ const services = require('../services/stateService');
 
 
 
-exports.createState = async(req,res,next)=>{
+exports.createState = async (req, res) => {
     try {
-        const stateData = await services.stateCreate(req);
-        
-        // console.log("stateData", stateData);
-        if(stateData.success){
-            return res
-              .status(200)
-              .json(Object.assign({ status: stateData.success }, stateData));
-
-        } else {
-            return res.status(400)
-            .json(Object.assign({status:stateData.success}))
-        }
+        return await services.stateCreate(req);
 
     } catch (error) {
         console.error("Error in createState:", error);
@@ -28,16 +17,16 @@ exports.createState = async(req,res,next)=>{
     }
 };
 
-exports.updateState =async(req,res,next)=>{
+exports.updateState = async (req, res) => {
     try {
-        const updatedData = await services.stateUpdate(req);
-        if(updatedData.success == true){
-            return res.status(200)
-            .json(Object.assign({ status: updatedData.success }, updatedData))
-        } else {
-            return res.status(400)
-            .json(Object.assign({status:updatedData.success}))
-        }
+        return await services.stateUpdate(req);
+        // if (updatedData.success == true) {
+        //     return res.status(200)
+        //         .json(Object.assign({ status: updatedData.success }, updatedData));
+        // } else {
+        //     return res.status(400)
+        //         .json(Object.assign({ status: updatedData.success }));
+        // }
     } catch (error) {
         console.error("Error in updateState:", error);
         return res.status(500).json({
@@ -47,12 +36,10 @@ exports.updateState =async(req,res,next)=>{
     }
 };
 
-exports.deleteState = async(req,res,next)=>{
+exports.deleteState = async (req, res) => {
     try {
-        const deleteData = await services.stateDelete(req);
-        if(deleteData){
-            return res.status(200).json(Object.assign({ status: deleteData.success},{message:deleteData.message},deleteData ))
-        } 
+        return await services.stateDelete(req);
+
     } catch (error) {
         console.error("Error in deleteState:", error);
         return res.status(500).json({
@@ -62,12 +49,10 @@ exports.deleteState = async(req,res,next)=>{
     }
 };
 
-exports.viewState = async(req,res,next)=>{
+exports.viewState = async (req, res) => {
     try {
-        const ViewData = await services.stateView(req);
-        if(ViewData){
-            return res.status(200).json(Object.assign({ status: ViewData.success},ViewData ))
-        } 
+        return await services.stateView(req);
+
     } catch (error) {
         console.error("Error in viewState:", error);
         return res.status(500).json({
@@ -77,14 +62,10 @@ exports.viewState = async(req,res,next)=>{
     }
 };
 
-exports.createCity = async(req,res,next)=>{
+exports.createCity = async (req, res) => {
     try {
-        const cityData = await services.cityCreate(req);
-        if(cityData){
-            return res.status(200).json(Object.assign({status:cityData.success},cityData))
-        } else {
-            return res.status(400).json(Object.assign({status:cityData.success},cityData))
-        }
+        return await services.cityCreate(req);
+
     } catch (error) {
         console.error("Error in createCity:", error);
         return res.status(500).json({
@@ -94,12 +75,12 @@ exports.createCity = async(req,res,next)=>{
     }
 };
 
-exports.updateCity = async(req,res,next)=>{
+exports.updateCity = async (req, res) => {
     try {
-        const cityData = await services.cityUpdate(req);
-        if(cityData){
-            return res.status(200).json(Object.assign({status:cityData.success},cityData))
-        }
+        return await services.cityUpdate(req);
+        // if (cityData) {
+        //     return res.status(200).json(Object.assign({ status: cityData.success }, cityData));
+        // }
     } catch (error) {
         console.error("Error in updateCity:", error);
         return res.status(500).json({
@@ -109,12 +90,10 @@ exports.updateCity = async(req,res,next)=>{
     }
 };
 
-exports.deleteCity = async(req,res,next)=>{
+exports.deleteCity = async (req, res) => {
     try {
-        const cityData = await services.cityDelete(req);
-        if(cityData){
-            return res.status(200).json(Object.assign({status:cityData.success},{message:cityData.message}))
-        }
+        return await services.cityDelete(req);
+
     } catch (error) {
         console.error("Error in deleteCity:", error);
         return res.status(500).json({
@@ -124,12 +103,10 @@ exports.deleteCity = async(req,res,next)=>{
     }
 };
 
-exports.viewCity = async(req,res,next)=>{
+exports.viewCity = async (req, res) => {
     try {
-        const ViewData = await services.cityView(req);
-        if(ViewData){
-            return res.status(200).json(Object.assign({ status: ViewData.success},ViewData ))
-        } 
+        return await services.cityView(req);
+
     } catch (error) {
         console.error("Error in viewCity:", error);
         return res.status(500).json({

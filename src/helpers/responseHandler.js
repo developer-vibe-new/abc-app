@@ -1,7 +1,7 @@
 const { default: mongoose } = require('mongoose');
 const fs = require('fs');
 const path = require('path');
-// const { autoSwagger } = require('./autoSwagger');
+const { autoSwagger } = require('./autoSwagger');
 
 /**
  * Middleware function to handle responses from controller functions and log requests and responses.
@@ -29,7 +29,7 @@ module.exports = controllerFunction => async (request, response, next) => {
                 // Log the file path
                 console.log(filePath, '-filePath');
                 // Call auto Swagger function if the status code is 200 and success is true
-                // await autoSwagger(filePath, request, resObj);
+                await autoSwagger(filePath, request, resObj);
             }
         }
 

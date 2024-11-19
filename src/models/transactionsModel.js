@@ -1,11 +1,6 @@
-const mongoose = require("mongoose"),
-	ObjectId = mongoose.Types.ObjectId;
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
-
-
-
-var TransactionSchema = new Schema({
+const TransactionSchema = new mongoose.Schema({
 
 	transaction_no: {
 		type: String
@@ -13,7 +8,7 @@ var TransactionSchema = new Schema({
 
 	charge_id: {
 		type: String,
-		default:"",
+		default: "",
 	},
 
 	ride_id: {
@@ -32,17 +27,17 @@ var TransactionSchema = new Schema({
 
 	onlinepayment: {
 		type: Number,
-		default:0
+		default: 0
 	},
 
 	offlinepayment: {
 		type: Number,
-		default:0
+		default: 0
 	},
 
 	refund: {
 		type: Number,
-		default:0
+		default: 0
 	},
 
 	p_earn: {
@@ -63,7 +58,7 @@ var TransactionSchema = new Schema({
 
 	type: {
 		type: String,
-		default:""
+		default: ""
 	},
 
 	pending: {
@@ -77,8 +72,8 @@ var TransactionSchema = new Schema({
 	time: {
 		accepted: {
 			type: Date,
-			
-		},cancelled: {
+
+		}, cancelled: {
 			type: Date,
 		},
 	}
@@ -103,20 +98,21 @@ var TransactionSchema = new Schema({
 // TransactionSchema.path('updated').get(MODALFUNC.string_ts);
 
 
-// TransactionSchema.pre('save', function(next) {
+TransactionSchema.pre('save', function (next) {
 
-// 	var transaction = this;
-// 	Sequence.getNext("transaction", function(err, seqObj) {
-// 		if (err) {
-// 			if (err) return next(err);
-// 		} else {
-// 			var str = "" + seqObj.seq
-// 			var pad = "00000"
-// 			transaction.transaction_no = pad.substring(0, pad.length - str.length) + str;
-// 			next();
-// 		}
-// 	});
-// });
+	var transaction = this;
+	// eslint-disable-next-line no-undef
+	Sequence.getNext("transaction", function (err, seqObj) {
+		if (err) {
+			if (err) return next(err);
+		} else {
+			var str = "" + seqObj.seq;
+			var pad = "00000";
+			transaction.transaction_no = pad.substring(0, pad.length - str.length) + str;
+			next();
+		}
+	});
+});
 
 
 //make this available to our users in Node applications

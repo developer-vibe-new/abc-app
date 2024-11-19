@@ -1,13 +1,12 @@
-const mongoose = require("mongoose"),
-    ObjectId = mongoose.Types.ObjectId;
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
-var CitySchema = new Schema({
+const CitySchema = new mongoose.Schema({
 
     // min fare
     name: {
         type: String,
-        requried: true
+        requried: true,
+        unique: true
     },
     city: {
         type: String,
@@ -21,20 +20,20 @@ var CitySchema = new Schema({
         type: String,
         requried: true
     },
-    coordinates: { type: [Number], index: "2dsphere",default:[0,0] },// [longitude, latitude]
+    coordinates: { type: [Number], index: "2dsphere", default: [0, 0] },// [longitude, latitude]
     // per kilometer
     icon: {
         type: String
     },
-	gst: {
+    gst: {
         type: String
 
     },
-	pst: {
+    pst: {
         type: String
 
     },
-	earn_ratio: {
+    earn_ratio: {
         type: String
 
     },
@@ -43,7 +42,7 @@ var CitySchema = new Schema({
         default: true
     }
 
-},{
+}, {
     timestamps: {
         createdAt: 'created',
         updatedAt: 'updated'

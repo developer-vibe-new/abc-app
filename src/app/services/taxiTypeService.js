@@ -4,8 +4,8 @@ const Taxitype = require('../../models/taxiTypeModel');
 exports.addTaxiType = async (req) => {
     try {
         const taxi = req.body;
-        if(!taxi.title || !taxi.type) {
-            return { 
+        if (!taxi.title || !taxi.type) {
+            return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Required_Data
@@ -22,7 +22,7 @@ exports.addTaxiType = async (req) => {
         return {
             success: false,
             message: resMessage.Internal_Server_Error,
-            error: error.message || "Internal Server Error",
-        }
+            error: error.message || "Internal Server Error"
+        };
     }
-}
+};
