@@ -12,3 +12,15 @@ exports.addCarController = async (req) => {
         };
     }   
 }
+
+exports.updateCarStatusController = async (req) => {
+    try {
+        return await service.updateCarStatus(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
