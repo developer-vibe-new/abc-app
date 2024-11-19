@@ -399,6 +399,88 @@
           }
         }
       }
+    },
+    "/user/createDriver": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/createDriver",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data; boundary=--------------------------040290958260065773740826"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter name",
+            "required": false,
+            "example": "simran"
+          },
+          {
+            "name": "mobile",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter mobile",
+            "required": false,
+            "example": "3423464435"
+          },
+          {
+            "name": "email",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter email",
+            "required": false,
+            "example": "simran@gamail.com"
+          },
+          {
+            "name": "typeName",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter typeName",
+            "required": false,
+            "example": "driver"
+          },
+          {
+            "name": "type",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter type",
+            "required": false,
+            "example": "main"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/createDriverResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -757,6 +839,60 @@
             "created": "2024-11-19T04:58:41.171Z",
             "updated": "2024-11-19T05:13:40.394Z",
             "__v": 0
+          }
+        }
+      }
+    },
+    "createDriverResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data created successfully",
+          "example": "Data created successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "name": "simran",
+            "city_id": null,
+            "type": "main",
+            "email": "simran@gamail.com",
+            "mobile": "3423464435",
+            "balance": 0,
+            "pending_balance": 0,
+            "image": "1731998173833.jpg",
+            "fcm_token": "",
+            "is_active": true,
+            "ridereceive": true,
+            "profile_status": "registered",
+            "email_verified": false,
+            "is_notify": true,
+            "is_online": false,
+            "is_outstation": true,
+            "in_ride": false,
+            "goToHome": false,
+            "total_earnings": 0,
+            "total_rides": 0,
+            "pending_amount": 0,
+            "device_id": "",
+            "kycStatus": 0,
+            "vehicleStatus": 0,
+            "stripe_verified": false,
+            "is_delete": false,
+            "stripe_charges_enabled": false,
+            "status": "Unblock",
+            "_id": "673c31dd6e5a2c7d14466353",
+            "documents": [],
+            "bank_data": [],
+            "createdAt": "2024-11-19T06:36:13.894Z",
+            "updatedAt": "2024-11-19T06:36:13.894Z"
           }
         }
       }
