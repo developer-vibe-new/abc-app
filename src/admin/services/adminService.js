@@ -76,7 +76,7 @@ exports.login = async (req) => {
         return {
             status: true,
             message: "User login Successfully",
-            data: { auth_key: auth_key }
+            token: auth_key
         };
     } catch (error) {
         console.log(error);
