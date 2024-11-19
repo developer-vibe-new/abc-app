@@ -248,3 +248,43 @@ exports.driverOninerStatus = async (req) => {
         }
     }
 }
+
+exports.updateDriver = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, email,mobile } = req.body;
+        const imagePath = req.file ? req.file.filename : driverData.image;
+        const driverData = await Provider.findOne({ _id: id, type: "operator" });
+        if(!driverData) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        const updatedDriver = await Provider.updateOne(
+            { _id: id },
+            {
+                $set: {
+                    name,
+                    email,
+                    mobile,
+                    image: imagePath
+                }
+            }
+        );
+
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Updated_Successfully
+        }
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || 'Internal Server Error'
+        }
+    }
+}

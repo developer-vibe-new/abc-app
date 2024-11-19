@@ -6,7 +6,6 @@ const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const staticPath = path.join(__dirname, `../public/uploads`);
         
-        // Check if the directory exists, if not, create it
         if (!fs.existsSync(staticPath)) {
             fs.mkdirSync(staticPath, { recursive: true });
         }
