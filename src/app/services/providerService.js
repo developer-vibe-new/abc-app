@@ -191,3 +191,25 @@ exports.driverBlockList = async () => {
         }
     }
 }
+
+exports.driverList = async () => {
+    try {
+        const data = await Provider.find({ type: 'operator' });
+        if(!data) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data
+        }
+    }
+    catch (error) {
+
+    }
+}
