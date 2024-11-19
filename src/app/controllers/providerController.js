@@ -72,3 +72,39 @@ exports.driverBlockListController = async () => {
         };
     }
 };
+
+exports.driverListController = async () => {
+    try {
+        return await service.driverList();
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
+
+exports.driverOnlineStatusController = async (req) => {
+    try {
+        return await service.driverOninerStatus(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
+
+exports.updateDriverController = async (req) => {
+    try {
+        return await service.updateDriver(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};

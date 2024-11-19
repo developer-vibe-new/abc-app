@@ -12,3 +12,15 @@ exports.addTaxiTypeController = async (req) => {
         };
     }
 };
+
+exports.updateTaxiStatusController = async (req) => {
+    try {
+        return await service.updateTaxiStatus(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
