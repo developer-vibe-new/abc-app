@@ -40,15 +40,16 @@ router.post('/deleteCity/:id', auth, responseHandler(stateController.deleteCity)
 router.get('/viewCity', auth, responseHandler(stateController.viewCity));
 router.get('/operators', auth, responseHandler(adminController.operators));
 router.post('/operatorsUpdate/:id', auth, responseHandler(adminController.operatorsUpdate));
-router.post('/createDriver', auth, upload.single('image'), responseHandler(driverController.createDriver));
 
 // driver 
+router.post('/createDriver', auth, upload.single('image'), responseHandler(driverController.createDriver));
 router.get('/viewDriver', auth, responseHandler(driverController.viewDriver));
 router.get('/editDriver/:id', auth, responseHandler(driverController.editDriver));
 router.post('/updateDriver/:id', auth, upload.single('image'), responseHandler(driverController.updateDriver));
 router.post('/blockDriver', auth, responseHandler(driverController.blockDriver));
 router.post('/deleteDriver/:id', auth, responseHandler(driverController.deleteDriver));
 router.get('/blockedDriversList', auth, responseHandler(driverController.blockedDriversList));
+
 // 
 router.get('/viewTaxiType', auth, responseHandler(taxiTypeController.viewTaxiType));
 router.post('/updateTaxiType/:id', auth, upload.single('image'), responseHandler(taxiTypeController.updateTaxiType));

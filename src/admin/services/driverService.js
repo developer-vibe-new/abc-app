@@ -5,9 +5,9 @@ const mongoose = require('mongoose');
 
 exports.driverCreate = async (req) => {
     try {
-        const { name, mobile, email, type } = req.body;
+        const { first_name, last_name, full_name, mobile, email, type } = req.body;
         const image = `${req.body.typeName}/${req.file.filename}`;
-        if (!name || !mobile || !email || !type || !image) {
+        if (!first_name || !last_name || !full_name || !mobile || !email || !type || !image) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
@@ -15,7 +15,7 @@ exports.driverCreate = async (req) => {
             };
         }
         const createdData = await driverModel.create({
-            name: name, mobile: mobile, email: email, type: type, image: image
+            first_name: first_name, last_name: last_name, full_name: full_name, mobile: mobile, email: email, type: type, image: image
         });
         return {
             statusCode: statusCode.OK,
@@ -45,7 +45,7 @@ exports.driverView = async (req) => {
         if (search_value) {
             conditions.push({
                 $match: {
-                    name: { $regex: search_value, $options: "i" }
+                    first_name: { $regex: search_value, $options: "i" }
                 }
             });
         }
@@ -111,7 +111,9 @@ exports.driverView = async (req) => {
         },
             {
                 $project: {
-                    name: 1,
+                    first_name: 1,
+                    last_name: 1,
+                    full_name: 1,
                     image: 1,
                     email: 1,
                     mobile: 1,
@@ -124,7 +126,7 @@ exports.driverView = async (req) => {
                 }
             });
         conditions.push(
-            { $sort: { name: 1 } },
+            { $sort: { first_name: 1 } },
             { $skip: (page - 1) * pagesize },
             { $limit: pagesize }
         );
@@ -147,7 +149,7 @@ exports.driverView = async (req) => {
 };
 exports.driverEdit = async (req) => {
     try {
-        const getData = await driverModel.findOne({ _id: req.params.id }, { name: 1, email: 1, mobile: 1, image: 1 });
+        const getData = await driverModel.findOne({ _id: req.params.id }, { first_name: 1, email: 1, mobile: 1, image: 1, last_name: 1 });
         return {
             statusCode: statusCode.OK,
             success: true,
@@ -240,10 +242,26 @@ exports.blockDriver = async (req) => {
     }
 };
 
-exports.blockedDriverList = async () => {
+exports.blockedDriverList = async (req) => {
     try {
         let pipeline = [];
-        pipeline.push([
+        let search_value = req.query.search || "";
+        console.log(req.query.search, "req.query.search");
+        if (search_value) {
+            pipeline.push({
+                $match: {
+                    $or: [
+                        { "name": { $regex: search_value, $options: "i" } },
+                        { "email": { $regex: search_value, $options: "i" } },
+                        { "mobile": { $regex: search_value, $options: "i" } }
+                    ]
+                }
+            });
+        }
+
+
+
+        pipeline.push(
             {
                 $match: {
                     status: "blocked"
@@ -261,7 +279,9 @@ exports.blockedDriverList = async () => {
             },
             {
                 $project: {
-                    name: 1,
+                    first_name: 1,
+                    last_name: 1,
+                    full_name: 1,
                     image: 1,
                     email: 1,
                     mobile: 1,
@@ -273,7 +293,8 @@ exports.blockedDriverList = async () => {
                     pending_amount: 1
                 }
             }
-        ]);
+        );
+
         const getData = await driverModel.aggregate(pipeline);
         return {
             statusCode: statusCode.OK,

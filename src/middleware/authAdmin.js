@@ -1,15 +1,16 @@
 const jwt = require("jsonwebtoken");
 const SECRET_Key = process.env.SECRET_Key;
-// const { statusCode, resMessage } = require('../config/default.json');
+const { statusCode, resMessage } = require('../config/default.json');
 
 exports.auth = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
         // console.log(authHeader,"oooooooooooooo")
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({
+            return res.json({
+                statusCode: statusCode.UNAUTHORIZED,
                 success: false,
-                message: "No token provided"
+                message: resMessage.Token_Required
             });
         }
 
@@ -17,21 +18,26 @@ exports.auth = async (req, res, next) => {
         const decoded = jwt.verify(token, SECRET_Key);
 
         if (!decoded) {
-            return res.status(401).json({
+            return res.json({
+                statusCode: statusCode.UNAUTHORIZED,
                 success: false,
-                message: "Invalid token"
+                message: resMessage.Invalid_Token,
+
             });
+
         }
-        console.log(authHeader, "authHeader");
+        // console.log(jwt.verify(token, SECRET_Key), "decoded");
         req._id = decoded._id;
-        console.log(req._id, "req._id");
+
+        // console.log(req._id, "req._id");
         next();
 
     } catch (error) {
-        console.error(error);
-        return res.status(401).json({
+        return res.json({
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
-            message: "Authentication failed"
+            message: resMessage.Internal_Server_Error,
+            error: error.message || 'An error occurred while verifying the token'
         });
     }
 };

@@ -1,77 +1,89 @@
 const mongoose = require('mongoose');
 
 const providerSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    city_id: {
+	first_name: {
+		type: String,
+		default: ""
+
+	},
+
+	last_name: {
+		type: String,
+		default: ""
+
+	},
+
+	full_name: {
+		type: String,
+
+	},
+	city_id: {
 		type: mongoose.Schema.Types.ObjectId,
+		ref: 'City',
 		default: null
 	},
 	type: {
 		type: String,
 		required: true,
-        enum: ['operator', 'main']
+		enum: ['operator', 'main']
 	},
-    email: {
+	email: {
 		type: String,
 		default: ""
 	},
-    mobile: {
+	mobile: {
 		type: String
 	},
-    password: {
+	password: {
 		type: String,
 		select: false
 	},
-    balance: {
+	balance: {
 		type: Number,
 		default: 0
 	},
-    pending_balance: {
+	pending_balance: {
 		type: Number,
 		default: 0
 	},
-    os: {
+	os: {
 		type: String
 	},
 	image: {
 		type: String
 	},
-    arn_token: {
+	arn_token: {
 		type: String
 	},
 	fcm_token: {
 		type: String,
 		default: ""
 	},
-    login_token: {
+	login_token: {
 		type: String,
 		index: true
 	},
-    is_active: {
+	is_active: {
 		type: Boolean,
 		default: true
 	},
-    ridereceive: {
+	ridereceive: {
 		type: Boolean,
 		default: true
 	},
-    profile_status: {
+	profile_status: {
 		type: String,
 		default: "registered"
 	},
-    email_verified: {
+	email_verified: {
 		type: Boolean,
 		default: false
 	},
-    is_notify: {
+	is_notify: {
 		type: Boolean,
 		default: true
 	},
-    is_online: {
+	is_online: {
 		type: Boolean,
 		default: false
 	},
@@ -79,7 +91,7 @@ const providerSchema = new mongoose.Schema({
 		type: Boolean,
 		default: true
 	},
-    in_ride: {
+	in_ride: {
 		type: Boolean,
 		default: false
 	},
@@ -88,14 +100,14 @@ const providerSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
-    ride_id: {
+	ride_id: {
 		type: mongoose.Schema.Types.ObjectId
 	},
 
 	online_taxi: {
 		type: mongoose.Schema.Types.ObjectId,
 	},
-    total_earnings: {
+	total_earnings: {
 		type: Number,
 		default: 0
 	},
@@ -104,15 +116,15 @@ const providerSchema = new mongoose.Schema({
 		type: Number,
 		default: 0
 	},
-    pending_amount: {
+	pending_amount: {
 		type: Number,
 		default: 0
 	},
-    device_id: {
+	device_id: {
 		type: String,
 		default: ''
 	},
-    photo: {
+	photo: {
 		type: String
 	},
 	otp: {
@@ -125,13 +137,13 @@ const providerSchema = new mongoose.Schema({
 		date: String,
 		path: String
 	}],
-    zone_id: {
+	zone_id: {
 		type: mongoose.Schema.Types.ObjectId
 	},
 	subzone_id: {
 		type: mongoose.Schema.Types.ObjectId
 	},
-    bank_data: [{
+	bank_data: [{
 		_id: mongoose.Schema.Types.ObjectId,
 		account_holder_type: String,
 		account_holder_name: String,
@@ -144,7 +156,7 @@ const providerSchema = new mongoose.Schema({
 			default: false
 		},
 	}],
-    stripe_id: {
+	stripe_id: {
 		type: String
 	},
 	kycStatus: {
@@ -155,7 +167,7 @@ const providerSchema = new mongoose.Schema({
 		type: Number,
 		default: 0
 	},
-    stripe_verified: {
+	stripe_verified: {
 		type: Boolean,
 		default: false
 	},
@@ -166,7 +178,7 @@ const providerSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
-    stripe_charges_enabled: {
+	stripe_charges_enabled: {
 		type: Boolean,
 		default: false
 	},
