@@ -54,6 +54,45 @@
           }
         }
       }
+    },
+    "/car/updateCar/673c590524e5cacdecb108ab": {
+      "post": {
+        "tags": [
+          "car"
+        ],
+        "description": "fetch data by /car/updateCar/673c590524e5cacdecb108ab",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/updateCar/673c590524e5cacdecb108ab"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673c590524e5cacdecb108abResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -112,6 +151,41 @@
             "userId": "66715a2b1cf2fcf3b653189a",
             "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjcxNWEyYjFjZjJmY2YzYjY1MzE4OWEiLCJpYXQiOjE3MTk5MjU5MDF9.D_lQYnRm7Z-s2urPNgEi4JsEe_g6zPoFvCErxnLx2pI"
           }
+        }
+      }
+    },
+    "updateCar/673c590524e5cacdecb108ab": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Enter title",
+          "example": "Creta"
+        },
+        "make": {
+          "type": "string",
+          "description": "Enter make",
+          "example": "Hyundau"
+        },
+        "model": {
+          "type": "string",
+          "description": "Enter model",
+          "example": "top"
+        }
+      }
+    },
+    "673c590524e5cacdecb108abResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data updated successfully",
+          "example": "Data updated successfully"
         }
       }
     }

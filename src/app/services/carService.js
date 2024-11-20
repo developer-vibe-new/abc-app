@@ -53,3 +53,48 @@ exports.updateCarStatus = async (req) => {
         };
     }
 };
+
+exports.updateCar = async (req) => {
+    try {
+        const { id } = req.params;
+        const { title, make, model } = req.body;
+        if (!title || !make || !model) {
+            return {
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Required_Data
+            };
+        }
+        const data = await Car.findOne({ _id: id, type: "operator" });
+        if (!data) {
+            return {
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Data_Not_Found
+            };
+        }
+        await Car.updateOne(
+            {
+                _id: id
+            },
+            {
+                $set: {
+                    title,
+                    make,
+                    model
+                }
+            }
+        );
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Updated_Successfully
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};

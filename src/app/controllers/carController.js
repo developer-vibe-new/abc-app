@@ -24,3 +24,15 @@ exports.updateCarStatusController = async (req) => {
         };
     }
 };
+
+exports.updateCarController = async (req) => {
+    try {
+        return await service.updateCar(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
