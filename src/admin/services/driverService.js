@@ -26,6 +26,7 @@ exports.driverCreate = async (req) => {
     } catch (error) {
         console.log(error);
         return {
+            statusCode: statusCode.BAD_REQUEST,
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",
@@ -48,6 +49,53 @@ exports.driverView = async (req) => {
                 }
             });
         }
+        if (req.query.kycStatus) {
+
+            if (req.query.kycStatus == "Complete") {
+                conditions.push({
+                    $match: {
+                        kycStatus: 1
+                    }
+                });
+            }
+            if (req.query.kycStatus == "Pending") {
+                conditions.push({
+                    $match: {
+                        kycStatus: 0
+                    }
+                });
+            }
+            if (req.query.kycStatus == "Not Uploaded") {
+                conditions.push({
+                    $match: {
+                        kycStatus: -1
+                    }
+                });
+            }
+        }
+        if (req.query.vehicleStatus) {
+
+            if (req.query.vehicleStatus == "Pending") {
+                conditions.push({
+                    $match: {
+                        vehicleStatus: 0
+                    }
+                });
+            }
+            if (req.query.vehicleStatus == "Complete") {
+                conditions.push({
+                    $match: {
+                        vehicleStatus: 1
+                    }
+                });
+            }
+        }
+
+        conditions.push({
+            $match: {
+                status: "Unblock"
+            }
+        });
 
         conditions.push({
             $addFields:
@@ -97,21 +145,39 @@ exports.driverView = async (req) => {
         };
     }
 };
-
-exports.driverUpdate = async ({ body, file }) => {
+exports.driverEdit = async (req) => {
     try {
-        // console.log(req.params, "jjjjjjjjj");
-        // const body = req.body;
+        const getData = await driverModel.findOne({ _id: req.params.id }, { name: 1, email: 1, mobile: 1, image: 1 });
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data: getData
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+
+exports.driverUpdate = async ({ body, file, params }) => {
+    try {
         body.image = file.filename;
-        const updateData = await driverModel.findByIdAndUpdate(body.id, body, { new: true });
+        const updateData = await driverModel.findByIdAndUpdate(params.id, body, { new: true });
         if (!updateData) {
             return {
+                statusCode: statusCode.BAD_REQUEST,
                 success: false,
-                message: "Error No Data Updated",
+                // message: resMessage.Data_Not_Found,
             };
         }
 
         return {
+            statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Updated_Successfully,
             data: updateData
@@ -119,6 +185,7 @@ exports.driverUpdate = async ({ body, file }) => {
     } catch (error) {
         console.log(error);
         return {
+            statusCode: statusCode.BAD_REQUEST,
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",
@@ -145,6 +212,80 @@ exports.driverDelete = async (req) => {
     } catch (error) {
         console.log(error);
         return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+
+exports.blockDriver = async (req) => {
+    try {
+        const updateData = await driverModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.body.id) }, { status: "blocked" }, { new: true },);
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Updated_Successfully,
+            data: updateData
+
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+
+exports.blockedDriverList = async () => {
+    try {
+        let pipeline = [];
+        pipeline.push([
+            {
+                $match: {
+                    status: "blocked"
+                }
+            },
+            {
+                $addFields: {
+                    image: {
+                        $concat: [
+                            "http://localhost:6161/",
+                            "$image"
+                        ]
+                    }
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    image: 1,
+                    email: 1,
+                    mobile: 1,
+                    balance: 1,
+                    is_online: 1,
+                    kycStatus: 1,
+                    vehicleStatus: 1,
+                    status: 1,
+                    pending_amount: 1
+                }
+            }
+        ]);
+        const getData = await driverModel.aggregate(pipeline);
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data: getData
+
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",

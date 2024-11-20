@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const SECRET_Key = process.env.SECRET_Key;
+// const { statusCode, resMessage } = require('../config/default.json');
 
 exports.auth = async (req, res, next) => {
     try {
@@ -21,9 +22,10 @@ exports.auth = async (req, res, next) => {
                 message: "Invalid token"
             });
         }
-
-        req._id = decoded._id; 
-        next(); 
+        console.log(authHeader, "authHeader");
+        req._id = decoded._id;
+        console.log(req._id, "req._id");
+        next();
 
     } catch (error) {
         console.error(error);

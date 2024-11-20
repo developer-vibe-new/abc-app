@@ -506,6 +506,13 @@
             "description": "Bearer token",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "please enter search",
+            "example": "rishika",
+            "required": false
           }
         ],
         "responses": {
@@ -962,6 +969,205 @@
           }
         }
       }
+    },
+    "/user/editDriver/673c832bf81c6e10129ff017": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/editDriver/673c832bf81c6e10129ff017",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "please enter id",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673c832bf81c6e10129ff017Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/updateDriver/673c832bf81c6e10129ff017": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/updateDriver/673c832bf81c6e10129ff017",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data; boundary=--------------------------770826490147187233799015"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "typeName",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter typeName",
+            "required": false,
+            "example": "driver"
+          },
+          {
+            "name": "image",
+            "in": "formData",
+            "type": "file",
+            "description": "please enter image",
+            "required": false,
+            "example": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673c832bf81c6e10129ff017Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/blockDriver": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/blockDriver",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/blockDriver"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/blockDriverResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/blockedDriversList": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/blockedDriversList",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/blockedDriversListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -1396,17 +1602,17 @@
           "description": "Successfully Data",
           "example": [
             {
-              "_id": "673acf4b460436797df7c98e",
-              "name": "ishmeetnodejs",
-              "email": "",
-              "mobile": "",
+              "_id": "673c832bf81c6e10129ff017",
+              "name": "rishika",
+              "email": "rishika@gmail.com",
+              "mobile": "9753264374",
               "balance": 0,
+              "image": "http://192.168.0.18:6161/1732075985038.jpg",
               "is_online": false,
               "pending_amount": 0,
               "kycStatus": 0,
               "vehicleStatus": 0,
-              "status": "blocked",
-              "image": "http://192.168.0.18:6161/1732017529007.jpg"
+              "status": "Unblock"
             }
           ]
         }
@@ -1664,6 +1870,130 @@
             "updatedAt": "2024-11-19T11:58:49.040Z",
             "image": "1732017529007.jpg"
           }
+        }
+      }
+    },
+    "673c832bf81c6e10129ff017Response": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data fetch successfully",
+          "example": "Data fetch successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673c832bf81c6e10129ff017",
+            "name": "rishika",
+            "email": "rishika@gmail.com",
+            "mobile": "9753264374",
+            "image": "1732075985038.jpg"
+          }
+        }
+      }
+    },
+    "blockDriverResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data updated successfully",
+          "example": "Data updated successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673c8284f81c6e10129ff015",
+            "name": "simran",
+            "city_id": null,
+            "type": "main",
+            "email": "simran@gmail.com",
+            "mobile": "9753264374",
+            "balance": 0,
+            "pending_balance": 0,
+            "image": "driver/1732018820157.jpg",
+            "fcm_token": "",
+            "is_active": true,
+            "ridereceive": true,
+            "profile_status": "registered",
+            "email_verified": false,
+            "is_notify": true,
+            "is_online": false,
+            "is_outstation": true,
+            "in_ride": false,
+            "goToHome": false,
+            "total_earnings": 0,
+            "total_rides": 0,
+            "pending_amount": 0,
+            "device_id": "",
+            "kycStatus": 0,
+            "vehicleStatus": 0,
+            "stripe_verified": false,
+            "is_delete": false,
+            "stripe_charges_enabled": false,
+            "status": "blocked",
+            "documents": [],
+            "bank_data": [],
+            "createdAt": "2024-11-19T12:20:20.216Z",
+            "updatedAt": "2024-11-20T04:46:01.662Z"
+          }
+        }
+      }
+    },
+    "blockDriver": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Enter id",
+          "example": "673c8284f81c6e10129ff015"
+        }
+      }
+    },
+    "blockedDriversListResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data fetch successfully",
+          "example": "Data fetch successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": [
+            {
+              "_id": "673acf4b460436797df7c98e",
+              "name": "ishmeetnodejs",
+              "email": "",
+              "mobile": "",
+              "balance": 0,
+              "is_online": false,
+              "pending_amount": 0,
+              "kycStatus": 0,
+              "vehicleStatus": 0,
+              "status": "blocked",
+              "image": "http://localhost:6161/1732017529007.jpg"
+            }
+          ]
         }
       }
     }
