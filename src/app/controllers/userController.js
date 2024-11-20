@@ -24,3 +24,15 @@ exports.verifyOtpController = async (req) => {
         };
     }
 }
+
+exports.updateUserController = async (req) => {
+    try {
+        return await service.updateUser(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
