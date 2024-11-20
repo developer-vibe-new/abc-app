@@ -59,7 +59,7 @@ const UserSchema = new mongoose.Schema({
 	},
 
 	userbalance: {
-		type: String,
+		type: Number,
 		default: 0
 	},
 
@@ -80,7 +80,7 @@ const UserSchema = new mongoose.Schema({
 	},
 
 	mobile: {
-		type: String,
+		type: Number,
 		required: true
 	},
 
@@ -263,47 +263,50 @@ const UserSchema = new mongoose.Schema({
 
 
 
-UserSchema.pre('save', function (next) {
+// UserSchema.pre('save', function (next) {
 
-	var user = this;
-	// eslint-disable-next-line no-undef
-	Sequence.getNext("user", function (err, seqObj) {
-		if (err) {
-			if (err) return next(err);
-		} else {
-			var str = "" + seqObj.seq;
-			var pad = "00000";
-			user.customer_no = pad.substring(0, pad.length - str.length) + str;
-			next();
-		}
-	});
-});
+// 	var user = this;
+// 	// eslint-disable-next-line no-undef
+// 	Sequence.getNext("user", function (err, seqObj) {
+// 		if (err) {
+// 			if (err) return next(err);
+// 		} else {
+// 			var str = "" + seqObj.seq;
+// 			var pad = "00000";
+// 			user.customer_no = pad.substring(0, pad.length - str.length) + str;
+// 			next();
+// 		}
+// 	});
+// });
 
 
 
 //http://devsmash.com/blog/password-authentication-with-mongoose-and-bcrypt
-UserSchema.pre('save', function (next) {
+// UserSchema.pre('save', function (next) {
 
-	var user = this;
+// 	var user = this;
 
-	// only hash the password if it has been modified (or is new)
-	if (!user.isModified('password')) return next();
+// 	// only hash the password if it has been modified (or is new)
+// 	if (!user.isModified('password')) return next();
 
-	// generate a salt
-	bcrypt.genSalt(10, function (err, salt) {
-		if (err) return next(err);
+// 	// generate a salt
+// 	bcrypt.genSalt(10, function (err, salt) {
+// 		if (err) return next(err);
 
-		// hash the password using our new salt
-		bcrypt.hash(user.password, salt, function (err, hash) {
-			if (err) return next(err);
+// 		// hash the password using our new salt
+// 		bcrypt.hash(user.password, salt, function (err, hash) {
+// 			if (err) return next(err);
 
-			// override the cleartext password with the hashed one
-			user.password = hash;
-			next();
-		});
-	});
-});
+// 			// override the cleartext password with the hashed one
+// 			user.password = hash;
+// 			next();
+// 		});
+// 	});
+// });
 
+const userModel = mongoose.model('User', UserSchema);
+
+module.exports = userModel;
 
 //make this available to our users in Node applications
 module.exports.User = mongoose.model('User', UserSchema);
