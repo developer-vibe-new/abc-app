@@ -93,6 +93,45 @@
           }
         }
       }
+    },
+    "/car/carList": {
+      "get": {
+        "tags": [
+          "car"
+        ],
+        "description": "fetch data by /car/carList",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/carList"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/carListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -186,6 +225,61 @@
           "type": "string",
           "description": "Data updated successfully",
           "example": "Data updated successfully"
+        }
+      }
+    },
+    "carList": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Enter title",
+          "example": "Creta"
+        },
+        "make": {
+          "type": "string",
+          "description": "Enter make",
+          "example": "Hyundau"
+        },
+        "model": {
+          "type": "string",
+          "description": "Enter model",
+          "example": "top"
+        }
+      }
+    },
+    "carListResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data fetch successfully",
+          "example": "Data fetch successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": [
+            {
+              "_id": "673c590524e5cacdecb108ab",
+              "title": "Creta",
+              "make": "Hyundau",
+              "model": "top",
+              "taxi_type": [
+                "6735f37c0e57ce96e8f08564"
+              ],
+              "is_active": true,
+              "type": "operator",
+              "created": "2024-11-19T09:23:17.055Z",
+              "updated": "2024-11-19T13:04:37.084Z",
+              "__v": 0
+            }
+          ]
         }
       }
     }
