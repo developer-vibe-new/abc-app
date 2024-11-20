@@ -259,7 +259,29 @@ exports.blockedDriverList = async (req) => {
             });
         }
 
-
+        if (req.query.kycStatus) {
+            if (req.query.kycStatus == "Not uploaded") {
+                pipeline.push({
+                    $match: {
+                        kycStatus: -1
+                    }
+                });
+            }
+            if (req.query.kycStatus == "Pending") {
+                pipeline.push({
+                    $match: {
+                        kycStatus: 0
+                    }
+                });
+            }
+            if (req.query.kycStatus == "Complete") {
+                pipeline.push({
+                    $match: {
+                        kycStatus: 1
+                    }
+                });
+            }
+        }
 
         pipeline.push(
             {
@@ -296,11 +318,80 @@ exports.blockedDriverList = async (req) => {
         );
 
         const getData = await driverModel.aggregate(pipeline);
+        console.log(getData, "getData");
         return {
             statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Fetch_Successfully,
             data: getData
+
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+exports.editBlockDriver = async (req) => {
+    try {
+        const getData = await driverModel.findOne({ _id: req.params.id }, { first_name: 1, email: 1, mobile: 1, image: 1, last_name: 1 });
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data: getData
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+
+exports.blockedDriverUpdate = async ({ body, file, params }) => {
+    try {
+        body.image = file.filename;
+        const updateData = await driverModel.findByIdAndUpdate(params.id, body, { new: true });
+        if (!updateData) {
+            return {
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                // message: resMessage.Data_Not_Found,
+            };
+        }
+
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Updated_Successfully,
+            data: updateData
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+exports.unblockDriver = async (req) => {
+    try {
+        const updateData = await driverModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.body.id) }, { status: "Unblock" }, { new: true },);
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Updated_Successfully,
+            data: updateData
 
         };
     } catch (error) {

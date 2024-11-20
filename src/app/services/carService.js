@@ -26,6 +26,31 @@ exports.addCar = async (req) => {
     }
 };
 
+exports.carList = async () => {
+    try {
+        const data = await Car.find({ type: 'operator' });
+        if (!data) {
+            return {
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Data_Not_Found
+            };
+        }
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data: data
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+
 exports.updateCarStatus = async (req) => {
     try {
         const { id } = req.params;

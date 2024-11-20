@@ -6,6 +6,7 @@ const controller = require('../controllers/carController');
 const router = express.Router();
 
 router.post('/addCar', responseHandler(controller.addCarController));
+router.get('/carList', responseHandler(controller.carListcontroller));
 router.post('/updateCarStatus/:id', responseHandler(controller.updateCarStatusController));
 router.post('/updateCar/:id', responseHandler(controller.updateCarController));
 
