@@ -6,19 +6,19 @@ exports.sendOtp = async (req) => {
     try {
         const { mobile } = req.body;
         const register = await User.findOne({ mobile });
-        if(!register) {
+        if (!register) {
             await User.create({ mobile, otp: 1234 });
             return {
                 status: statusCode.Ok,
                 success: true,
                 message: resMessage.Otp_Send_Success
-            }
+            };
         }
         return {
             status: statusCode.BAD_REQUEST,
             success: false,
             message: resMessage.Unique_Mobile_Verify
-        }
+        };
     } catch (error) {
         return {
             success: false,
@@ -26,25 +26,25 @@ exports.sendOtp = async (req) => {
             error: error.message || "Internal Server Error"
         };
     }
-}
+};
 
 exports.verifyOtp = async (req) => {
     try {
         const { mobile, otp } = req.body;
         const user = await User.findOne({ mobile });
-        if(!user) {
+        if (!user) {
             return {
                 status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.User_Not_Found
-            }
+            };
         }
-        if(user.otp !== otp) {
+        if (user.otp !== otp) {
             return {
                 status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Otp_Verify_Failed
-            }
+            };
         }
         const token = jwt.sign({
             id: user._id
@@ -59,7 +59,7 @@ exports.verifyOtp = async (req) => {
             success: true,
             message: resMessage.Otp_Verify_Successfully,
             token
-        }
+        };
     } catch (error) {
         return {
             success: false,
@@ -67,7 +67,7 @@ exports.verifyOtp = async (req) => {
             error: error.message || "Internal Server Error"
         };
     }
-}
+};
 
 exports.updateUser = async (req) => {
     try {

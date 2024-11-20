@@ -22,9 +22,9 @@ const taxiTypeSchema = new mongoose.Schema({
         default: 0
     },
     airportCharge: {
-		type: Number,
-		default: 0,
-	},
+        type: Number,
+        default: 0,
+    },
     fixed_fare: {
         type: Number,
         default: 0
@@ -45,6 +45,25 @@ const taxiTypeSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    outstation_status: {
+        type: Boolean,
+        default: true
+    },
+    outstation_distance_fare: {
+        type: Number,
+        default: 0
+    },
+    rental_distance_fare: {
+        type: Number,
+        default: 0
+    },
+    outstation_two_distance_fare: {
+        type: Number,
+        default: 0
+    },
+
+
+
 }, { timestamps: true, versionKey: false });
 
 module.exports = mongoose.model("taxi_type", taxiTypeSchema);

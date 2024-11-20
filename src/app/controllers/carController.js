@@ -23,7 +23,7 @@ exports.carListcontroller = async () => {
             message: error.message
         };
     }
-}
+};
 
 exports.updateCarStatusController = async (req) => {
     try {

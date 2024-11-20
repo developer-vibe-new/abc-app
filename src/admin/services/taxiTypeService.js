@@ -16,22 +16,28 @@ exports.taxiTypeList = async (req) => {
                 }
             });
         }
+        conditions.push({
+            $project: {
+                icon: 1,
+                title: 1,
+                currency: 1,
+                base_fare: 1,
+                time_fare: 1,
+                distance_fare: 1,
+                airportCharge: 1,
+                outstation_distance_fare: 1,
+                outstation_two_distance_fare: 1,
+                rental_distance_fare: 1,
+                is_active: 1,
+                outstation_status: 1
+            }
+        });
         conditions.push(
             { $sort: { title: 1 } },
             { $skip: (page - 1) * pagesize },
             { $limit: pagesize }
         );
         const findTaxi = await taxiTypeModel.aggregate(conditions);
-        // .sort({ title: 1 })
-        // .skip((page - 1) * pagesize).
-        // limit(pagesize);
-        // if (findTaxi.length == 0) {
-        //     return {
-        //         success: false,
-        //         message: "No Data Found",
-
-        //     };
-        // } else {
         return {
             statusCode: statusCode.OK,
             success: true,

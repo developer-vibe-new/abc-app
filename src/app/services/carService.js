@@ -29,7 +29,7 @@ exports.addCar = async (req) => {
 exports.carList = async () => {
     try {
         const data = await Car.find({ type: 'operator' });
-        if(!data) {
+        if (!data) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
@@ -49,7 +49,7 @@ exports.carList = async () => {
             error: error.message || "Internal Server Error",
         };
     }
-}
+};
 
 exports.updateCarStatus = async (req) => {
     try {

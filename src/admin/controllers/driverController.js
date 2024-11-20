@@ -66,15 +66,7 @@ exports.blockDriver = async (req) => {
 exports.updateDriver = async (req) => {
     try {
         return await services.driverUpdate(req);
-        // if (getdata.success == true) {
-        //     return res
-        //         .status(200)
-        //         .json(Object.assign({ status: getdata.success }, getdata));
-        // } else {
-        //     return res
-        //         .status(400)
-        //         .json(Object.assign({ status: getdata.success }, { message: getdata.message }));
-        // }
+
     } catch (error) {
         console.log(error);
         return {
@@ -87,15 +79,7 @@ exports.updateDriver = async (req) => {
 exports.deleteDriver = async (req) => {
     try {
         return await services.driverDelete(req);
-        // if (getdata.success == true) {
-        //     return res
-        //         .status(200)
-        //         .json(Object.assign({ status: getdata.success }, getdata));
-        // } else {
-        //     return res
-        //         .status(400)
-        //         .json(Object.assign({ status: getdata.success }, { message: getdata.message }));
-        // }
+
     } catch (error) {
         console.log(error);
         return {
@@ -118,4 +102,62 @@ exports.blockedDriversList = async (req) => {
     }
 };
 
+exports.editBlockDriver = async (req) => {
+    try {
+        return await services.editBlockDriver(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
+exports.blockedDriverUpdate = async (req) => {
+    try {
+        return await services.blockedDriverUpdate(req);
+        // if (getdata.success == true) {
+        //     return res
+        //         .status(200)
+        //         .json(Object.assign({ status: getdata.success }, getdata));
+        // } else {
+        //     return res
+        //         .status(400)
+        //         .json(Object.assign({ status: getdata.success }, { message: getdata.message }));
+        // }
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
 
+exports.unblockDriver = async (req) => {
+    try {
+        return await services.unblockDriver(req);
+
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
+exports.onlineDriverList = async (req) => {
+    try {
+        return await services.onlineDriverList(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};

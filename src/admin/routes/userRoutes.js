@@ -47,9 +47,12 @@ router.get('/viewDriver', auth, responseHandler(driverController.viewDriver));
 router.get('/editDriver/:id', auth, responseHandler(driverController.editDriver));
 router.post('/updateDriver/:id', auth, upload.single('image'), responseHandler(driverController.updateDriver));
 router.post('/blockDriver', auth, responseHandler(driverController.blockDriver));
-router.post('/deleteDriver/:id', auth, responseHandler(driverController.deleteDriver));
+// router.post('/deleteDriver/:id', auth, responseHandler(driverController.deleteDriver));
 router.get('/blockedDriversList', auth, responseHandler(driverController.blockedDriversList));
-
+router.get('/editBlockDriver/:id', auth, responseHandler(driverController.editBlockDriver));
+router.post('/blockedDriverUpdate/:id', auth, upload.single('image'), responseHandler(driverController.blockedDriverUpdate));
+router.post('/unblockDriver', auth, responseHandler(driverController.unblockDriver));
+router.get('/onlineDriverList', auth, responseHandler(driverController.onlineDriverList));
 // 
 router.get('/viewTaxiType', auth, responseHandler(taxiTypeController.viewTaxiType));
 router.post('/updateTaxiType/:id', auth, upload.single('image'), responseHandler(taxiTypeController.updateTaxiType));

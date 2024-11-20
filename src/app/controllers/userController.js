@@ -11,7 +11,7 @@ exports.sendOtpController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.verifyOtpController = async (req) => {
     try {
