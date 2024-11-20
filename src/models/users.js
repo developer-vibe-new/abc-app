@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require('bcryptjs');
+// const bcrypt = require('bcryptjs');
 
 const LocSchema = new mongoose.Schema({
 	longitude: {

@@ -93,7 +93,8 @@ exports.driverView = async (req) => {
 
         conditions.push({
             $match: {
-                status: "Unblock"
+                status: "Unblock",
+                is_delete: false
             }
         });
 
@@ -286,7 +287,8 @@ exports.blockedDriverList = async (req) => {
         pipeline.push(
             {
                 $match: {
-                    status: "blocked"
+                    status: "blocked",
+                    is_delete: false
                 }
             },
             {
@@ -318,7 +320,6 @@ exports.blockedDriverList = async (req) => {
         );
 
         const getData = await driverModel.aggregate(pipeline);
-        console.log(getData, "getData");
         return {
             statusCode: statusCode.OK,
             success: true,
@@ -358,7 +359,9 @@ exports.editBlockDriver = async (req) => {
 
 exports.blockedDriverUpdate = async ({ body, file, params }) => {
     try {
-        body.image = file.filename;
+        if (file) {
+            body.image = file.filename;
+        }
         const updateData = await driverModel.findByIdAndUpdate(params.id, body, { new: true });
         if (!updateData) {
             return {

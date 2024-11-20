@@ -11,4 +11,4 @@ exports.sendOtpController = async (req) => {
             message: error.message
         };
     }
-}
+};
