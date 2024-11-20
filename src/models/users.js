@@ -133,7 +133,7 @@ const UserSchema = new mongoose.Schema({
 
 	// otp 
 	otp: {
-		type: String
+		type: Number
 	},
 
 	mobileDetails: {

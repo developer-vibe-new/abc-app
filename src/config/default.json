@@ -50,7 +50,7 @@
         "Number_of_groups_and_match_dates_do_not_match": "Number of groups and match dates do not match.",
         "Maximum_stages_reached": "Maximum stages reached",
         "Stage_name_already_exists": "Stage name already exists",
-        "Unique_Mobile_Verify": "Mobile number already exists and is verified",
+        "Unique_Mobile_Verify": "Mobile number already exists",
         "Unique_Mobile_Unverify": "OTP updated and sent again",
         "Signup_Add_Successfully": "User created successfully and OTP sent",
         "Otp_Verify_Successfully": "OTP Verified Successfully",
