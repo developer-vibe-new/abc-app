@@ -149,3 +149,15 @@ exports.unblockDriver = async (req) => {
         };
     }
 };
+exports.onlineDriverList = async (req) => {
+    try {
+        return await services.onlineDriverList(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};

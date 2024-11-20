@@ -408,7 +408,7 @@ exports.unblockDriver = async (req) => {
     }
 };
 
-exports.driverView = async (req) => {
+exports.onlineDriverList = async (req) => {
     try {
         var page = req.query.page || 1;
         let pagesize = req.query.pagesize || 10;
@@ -419,16 +419,20 @@ exports.driverView = async (req) => {
         if (search_value) {
             conditions.push({
                 $match: {
-                    first_name: { $regex: search_value, $options: "i" }
+                    $or: [
+                        { "name": { $regex: search_value, $options: "i" } },
+                        { "email": { $regex: search_value, $options: "i" } },
+                        { "mobile": { $regex: search_value, $options: "i" } }
+                    ]
                 }
             });
         }
-        if (req.query.kycStatus) {
 
-            if (req.query.kycStatus == "Complete") {
+        if (req.query.kycStatus) {
+            if (req.query.kycStatus == "Not uploaded") {
                 conditions.push({
                     $match: {
-                        kycStatus: 1
+                        kycStatus: -1
                     }
                 });
             }
@@ -439,36 +443,19 @@ exports.driverView = async (req) => {
                     }
                 });
             }
-            if (req.query.kycStatus == "Not Uploaded") {
+            if (req.query.kycStatus == "Complete") {
                 conditions.push({
                     $match: {
-                        kycStatus: -1
+                        kycStatus: 1
                     }
                 });
             }
         }
-        if (req.query.vehicleStatus) {
-
-            if (req.query.vehicleStatus == "Pending") {
-                conditions.push({
-                    $match: {
-                        vehicleStatus: 0
-                    }
-                });
-            }
-            if (req.query.vehicleStatus == "Complete") {
-                conditions.push({
-                    $match: {
-                        vehicleStatus: 1
-                    }
-                });
-            }
-        }
-
         conditions.push({
             $match: {
                 status: "Unblock",
-                is_delete: false
+                is_delete: false,
+                is_online: true
             }
         });
 

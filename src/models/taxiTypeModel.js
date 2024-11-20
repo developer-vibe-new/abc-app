@@ -57,6 +57,10 @@ const taxiTypeSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    outstation_two_distance_fare: {
+        type: Number,
+        default: 0
+    },
 
 
 
