@@ -1,6 +1,7 @@
 const { default: mongoose } = require('mongoose');
 const fs = require('fs');
 const path = require('path');
+// eslint-disable-next-line no-unused-vars
 const { autoSwagger } = require('./autoSwagger');
 
 /**
@@ -29,7 +30,7 @@ module.exports = controllerFunction => async (request, response, next) => {
                 // Log the file path
                 console.log(filePath, '-filePath');
                 // Call auto Swagger function if the status code is 200 and success is true
-                await autoSwagger(filePath, request, resObj);
+                // await autoSwagger(filePath, request, resObj);
             }
         }
 

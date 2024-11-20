@@ -49,6 +49,48 @@ exports.driverView = async (req) => {
                 }
             });
         }
+        if (req.query.kycStatus) {
+
+            if (req.query.kycStatus == "Complete") {
+                conditions.push({
+                    $match: {
+                        kycStatus: 1
+                    }
+                });
+            }
+            if (req.query.kycStatus == "Pending") {
+                conditions.push({
+                    $match: {
+                        kycStatus: 0
+                    }
+                });
+            }
+            if (req.query.kycStatus == "Not Uploaded") {
+                conditions.push({
+                    $match: {
+                        kycStatus: -1
+                    }
+                });
+            }
+        }
+        if (req.query.vehicleStatus) {
+
+            if (req.query.vehicleStatus == "Pending") {
+                conditions.push({
+                    $match: {
+                        vehicleStatus: 0
+                    }
+                });
+            }
+            if (req.query.vehicleStatus == "Complete") {
+                conditions.push({
+                    $match: {
+                        vehicleStatus: 1
+                    }
+                });
+            }
+        }
+
         conditions.push({
             $match: {
                 status: "Unblock"
@@ -124,8 +166,6 @@ exports.driverEdit = async (req) => {
 
 exports.driverUpdate = async ({ body, file, params }) => {
     try {
-        // console.log(req.params, "jjjjjjjjj");
-        // const body = req.body;
         body.image = file.filename;
         const updateData = await driverModel.findByIdAndUpdate(params.id, body, { new: true });
         if (!updateData) {
@@ -187,6 +227,59 @@ exports.blockDriver = async (req) => {
             success: true,
             message: resMessage.Data_Updated_Successfully,
             data: updateData
+
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+
+exports.blockedDriverList = async () => {
+    try {
+        let pipeline = [];
+        pipeline.push([
+            {
+                $match: {
+                    status: "blocked"
+                }
+            },
+            {
+                $addFields: {
+                    image: {
+                        $concat: [
+                            "http://localhost:6161/",
+                            "$image"
+                        ]
+                    }
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    image: 1,
+                    email: 1,
+                    mobile: 1,
+                    balance: 1,
+                    is_online: 1,
+                    kycStatus: 1,
+                    vehicleStatus: 1,
+                    status: 1,
+                    pending_amount: 1
+                }
+            }
+        ]);
+        const getData = await driverModel.aggregate(pipeline);
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data: getData
 
         };
     } catch (error) {

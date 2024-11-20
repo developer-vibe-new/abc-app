@@ -506,6 +506,13 @@
             "description": "Bearer token",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "please enter search",
+            "example": "rishika",
+            "required": false
           }
         ],
         "responses": {
@@ -1109,6 +1116,48 @@
             "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/blockDriverResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/blockedDriversList": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/blockedDriversList",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/blockedDriversListResponse"
             }
           },
           "400": {
@@ -1911,6 +1960,40 @@
           "type": "string",
           "description": "Enter id",
           "example": "673c8284f81c6e10129ff015"
+        }
+      }
+    },
+    "blockedDriversListResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data fetch successfully",
+          "example": "Data fetch successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": [
+            {
+              "_id": "673acf4b460436797df7c98e",
+              "name": "ishmeetnodejs",
+              "email": "",
+              "mobile": "",
+              "balance": 0,
+              "is_online": false,
+              "pending_amount": 0,
+              "kycStatus": 0,
+              "vehicleStatus": 0,
+              "status": "blocked",
+              "image": "http://localhost:6161/1732017529007.jpg"
+            }
+          ]
         }
       }
     }

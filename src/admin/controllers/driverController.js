@@ -105,5 +105,17 @@ exports.deleteDriver = async (req) => {
         };
     }
 };
+exports.blockedDriversList = async (req) => {
+    try {
+        return await services.blockedDriverList(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
 
 
