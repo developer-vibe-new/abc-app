@@ -26,6 +26,7 @@ exports.driverCreate = async (req) => {
     } catch (error) {
         console.log(error);
         return {
+            statusCode: statusCode.BAD_REQUEST,
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",
@@ -48,6 +49,11 @@ exports.driverView = async (req) => {
                 }
             });
         }
+        conditions.push({
+            $match: {
+                status: "Unblock"
+            }
+        });
 
         conditions.push({
             $addFields:
@@ -97,21 +103,41 @@ exports.driverView = async (req) => {
         };
     }
 };
+exports.driverEdit = async (req) => {
+    try {
+        const getData = await driverModel.findOne({ _id: req.params.id }, { name: 1, email: 1, mobile: 1, image: 1 });
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data: getData
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
 
-exports.driverUpdate = async ({ body, file }) => {
+exports.driverUpdate = async ({ body, file, params }) => {
     try {
         // console.log(req.params, "jjjjjjjjj");
         // const body = req.body;
         body.image = file.filename;
-        const updateData = await driverModel.findByIdAndUpdate(body.id, body, { new: true });
+        const updateData = await driverModel.findByIdAndUpdate(params.id, body, { new: true });
         if (!updateData) {
             return {
+                statusCode: statusCode.BAD_REQUEST,
                 success: false,
-                message: "Error No Data Updated",
+                // message: resMessage.Data_Not_Found,
             };
         }
 
         return {
+            statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Updated_Successfully,
             data: updateData
@@ -119,6 +145,7 @@ exports.driverUpdate = async ({ body, file }) => {
     } catch (error) {
         console.log(error);
         return {
+            statusCode: statusCode.BAD_REQUEST,
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",
@@ -145,6 +172,27 @@ exports.driverDelete = async (req) => {
     } catch (error) {
         console.log(error);
         return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+
+exports.blockDriver = async (req) => {
+    try {
+        const updateData = await driverModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.body.id) }, { status: "blocked" }, { new: true },);
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Updated_Successfully,
+            data: updateData
+
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",

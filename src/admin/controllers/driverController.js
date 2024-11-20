@@ -35,6 +35,34 @@ exports.viewDriver = async (req) => {
     }
 };
 
+
+exports.editDriver = async (req) => {
+    try {
+        return await services.driverEdit(req);
+
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
+exports.blockDriver = async (req) => {
+    try {
+        return await services.blockDriver(req);
+
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
+
 exports.updateDriver = async (req) => {
     try {
         return await services.driverUpdate(req);
