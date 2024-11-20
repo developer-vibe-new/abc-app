@@ -52,8 +52,11 @@ exports.taxiTypeList = async (req) => {
 exports.updateTaxiTypeList = async (req) => {
     try {
         const body = req.body;
-        const image = req.file.filename;
-        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, { body, image }, { new: true });
+        if (req.file) {
+
+            body.image = req.file.filename;
+        }
+        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true });
 
         if (editData) {
             return {
@@ -74,7 +77,33 @@ exports.updateTaxiTypeList = async (req) => {
 
 exports.updateTaxiStatus = async (req) => {
     try {
-        const updateData = await taxiTypeModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.body._id) }, { is_active: false }, { new: true });
+        const updateData = await taxiTypeModel.findById({ _id: new mongoose.Types.ObjectId(req.body._id) });
+        console.log(updateData, "updateData");
+        if (updateData) {
+            updateData.is_active = !updateData.is_active;
+            await updateData.save();
+        }
+        if (updateData) {
+            return {
+                success: true,
+                data: updateData
+            };
+        } else {
+            return {
+                success: false,
+            };
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+exports.updateTaxiOutstationStatus = async (req) => {
+    try {
+        const updateData = await taxiTypeModel.findById({ _id: new mongoose.Types.ObjectId(req.body._id) });
+        if (updateData) {
+            updateData.outstation_status = !updateData.outstation_status;
+            await updateData.save();
+        }
         if (updateData) {
             return {
                 success: true,

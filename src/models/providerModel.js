@@ -12,6 +12,12 @@ const providerSchema = new mongoose.Schema({
 		default: ""
 
 	},
+	taxi_type: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'taxi_type',
+		default: null
+
+	},
 
 	// full_name: {
 	// 	type: String,

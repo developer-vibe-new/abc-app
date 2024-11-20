@@ -53,7 +53,9 @@ router.get('/editBlockDriver/:id', auth, responseHandler(driverController.editBl
 router.post('/blockedDriverUpdate/:id', auth, upload.single('image'), responseHandler(driverController.blockedDriverUpdate));
 router.post('/unblockDriver', auth, responseHandler(driverController.unblockDriver));
 router.get('/onlineDriverList', auth, responseHandler(driverController.onlineDriverList));
-// 
+router.get('/taxiTypeDropDown', auth, responseHandler(driverController.taxiTypeDropDown));
+
+// taxitype manger
 router.get('/viewTaxiType', auth, responseHandler(taxiTypeController.viewTaxiType));
 router.post('/updateTaxiType/:id', auth, upload.single('image'), responseHandler(taxiTypeController.updateTaxiType));
 router.post('/updateTaxistatus', auth, responseHandler(taxiTypeController.updateTaxiStatus));

@@ -1,13 +1,14 @@
 const driverModel = require('../../models/providerModel');
+const taxiTypeModel = require('../../models/taxiTypeModel');
 const { statusCode, resMessage } = require('../../config/default.json');
 const mongoose = require('mongoose');
 
 
 exports.driverCreate = async (req) => {
     try {
-        const { first_name, last_name, mobile, email, type } = req.body;
+        const { first_name, last_name, mobile, email, type, taxi_type } = req.body;
         const image = `${req.body.typeName}/${req.file.filename}`;
-        if (!first_name || !last_name || !mobile || !email || !type || !image) {
+        if (!first_name || !last_name || !mobile || !email || !type || !image || !taxi_type) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
@@ -15,7 +16,7 @@ exports.driverCreate = async (req) => {
             };
         }
         const createdData = await driverModel.create({
-            first_name: first_name, last_name: last_name, mobile: mobile, email: email, type: type, image: image
+            first_name: first_name, last_name: last_name, mobile: mobile, email: email, type: type, image: image, taxi_type: taxi_type
         });
         return {
             statusCode: statusCode.OK,
@@ -96,7 +97,20 @@ exports.driverView = async (req) => {
                 status: "Unblock",
                 is_delete: false
             }
-        });
+        }, {
+            $lookup: {
+                from: "taxi_types",
+                localField: "taxi_type",
+                foreignField: "_id",
+                as: "taxi_types"
+            }
+        },
+            {
+                $unwind: {
+                    path: "$taxi_types",
+                    preserveNullAndEmptyArrays: true
+                }
+            },);
 
         conditions.push({
             $addFields:
@@ -106,26 +120,36 @@ exports.driverView = async (req) => {
                         "http://192.168.0.18:6161/",
                         "$image"
                     ]
-                }
+                },
+                taxitype: "$taxi_types.title"
 
             }
-        },
-            {
-                $project: {
-                    first_name: 1,
-                    last_name: 1,
+        });
+        if (req.query.taxitype) {
 
-                    image: 1,
-                    email: 1,
-                    mobile: 1,
-                    balance: 1,
-                    is_online: 1,
-                    kycStatus: 1,
-                    vehicleStatus: 1,
-                    status: 1,
-                    pending_amount: 1
+            conditions.push({
+                $match: {
+                    taxitype: { $regex: search_value, $options: "i" }
                 }
             });
+        }
+        conditions.push({
+            $project: {
+                first_name: 1,
+                last_name: 1,
+
+                image: 1,
+                email: 1,
+                mobile: 1,
+                balance: 1,
+                is_online: 1,
+                kycStatus: 1,
+                vehicleStatus: 1,
+                status: 1,
+                pending_amount: 1,
+            }
+        });
+
         conditions.push(
             { $sort: { first_name: 1 } },
             { $skip: (page - 1) * pagesize },
@@ -148,6 +172,33 @@ exports.driverView = async (req) => {
         };
     }
 };
+
+exports.taxiTypeDropDown = async () => {
+    try {
+        const getData = await taxiTypeModel.aggregate([
+            {
+                $project: {
+                    title: 1
+                }
+            }
+        ]);
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data: getData
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+
 exports.driverEdit = async (req) => {
     try {
         const getData = await driverModel.findOne({ _id: req.params.id }, { first_name: 1, email: 1, mobile: 1, image: 1, last_name: 1 });
@@ -169,7 +220,7 @@ exports.driverEdit = async (req) => {
 
 exports.driverUpdate = async ({ body, file, params }) => {
     try {
-        if(file) {
+        if (file) {
             body.image = file.filename;
         }
         const updateData = await driverModel.findByIdAndUpdate(params.id, body, { new: true });
@@ -511,3 +562,17 @@ exports.onlineDriverList = async (req) => {
         };
     }
 };
+
+// exports.editDriver = async (req) => {
+//     try {
+
+//     } catch (error) {
+//         console.log(error);
+//         return {
+//             statusCode: statusCode.BAD_REQUEST,
+//             success: false,
+//             message: resMessage.Internal_Server_Error,
+//             error: error.message || "Internal Server Error",
+//         };
+//     }
+// }

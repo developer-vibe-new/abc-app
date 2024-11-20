@@ -161,3 +161,15 @@ exports.onlineDriverList = async (req) => {
         };
     }
 };
+exports.taxiTypeDropDown = async (req) => {
+    try {
+        return await services.taxiTypeDropDown(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
