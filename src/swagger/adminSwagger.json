@@ -1386,6 +1386,11 @@
           "description": "true",
           "example": true
         },
+        "message": {
+          "type": "string",
+          "description": "Data fetch successfully",
+          "example": "Data fetch successfully"
+        },
         "data": {
           "type": "object",
           "description": "Successfully Data",
@@ -1393,37 +1398,15 @@
             {
               "_id": "673acf4b460436797df7c98e",
               "name": "ishmeetnodejs",
-              "city_id": null,
-              "type": "operator",
               "email": "",
               "mobile": "",
               "balance": 0,
-              "pending_balance": 0,
-              "fcm_token": "",
-              "is_active": true,
-              "ridereceive": true,
-              "profile_status": "registered",
-              "email_verified": false,
-              "is_notify": true,
               "is_online": false,
-              "is_outstation": true,
-              "in_ride": false,
-              "goToHome": false,
-              "total_earnings": 100,
-              "total_rides": 0,
               "pending_amount": 0,
-              "device_id": "",
               "kycStatus": 0,
               "vehicleStatus": 0,
-              "stripe_verified": false,
-              "is_delete": false,
-              "stripe_charges_enabled": false,
               "status": "blocked",
-              "documents": [],
-              "bank_data": [],
-              "createdAt": "2024-11-18T05:23:23.127Z",
-              "updatedAt": "2024-11-19T11:58:49.040Z",
-              "image": "http://192.168.0.18:6161/$image"
+              "image": "http://192.168.0.18:6161/1732017529007.jpg"
             }
           ]
         }

@@ -60,7 +60,21 @@ exports.driverView = async (req) => {
                 }
 
             }
-        });
+        },
+            {
+                $project: {
+                    name: 1,
+                    image: 1,
+                    email: 1,
+                    mobile: 1,
+                    balance: 1,
+                    is_online: 1,
+                    kycStatus: 1,
+                    vehicleStatus: 1,
+                    status: 1,
+                    pending_amount: 1
+                }
+            });
         conditions.push(
             { $sort: { name: 1 } },
             { $skip: (page - 1) * pagesize },
@@ -71,6 +85,7 @@ exports.driverView = async (req) => {
         return {
             statusCode: statusCode.OK,
             success: true,
+            message: resMessage.Data_Fetch_Successfully,
             data: viewAllData
         };
     } catch (error) {
