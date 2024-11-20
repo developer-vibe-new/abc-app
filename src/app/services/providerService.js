@@ -253,7 +253,7 @@ exports.updateDriver = async (req) => {
     try {
         const { id } = req.params;
         const { name, email, mobile } = req.body;
-        const imagePath = req.file ? req.file.filename : driverData.image;
+        const imagePath = req.file ? req.file.filename : "";
         const driverData = await Provider.findOne({ _id: id, type: "operator" });
         if (!driverData) {
             return {

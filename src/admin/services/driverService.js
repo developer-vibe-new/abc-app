@@ -168,7 +168,9 @@ exports.driverEdit = async (req) => {
 
 exports.driverUpdate = async ({ body, file, params }) => {
     try {
-        body.image = file.filename;
+        if(file) {
+            body.image = file.filename;
+        }
         const updateData = await driverModel.findByIdAndUpdate(params.id, body, { new: true });
         if (!updateData) {
             return {
