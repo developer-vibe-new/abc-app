@@ -121,7 +121,8 @@ exports.driverView = async (req) => {
                         "$image"
                     ]
                 },
-                taxitype: "$taxi_types.title"
+                taxitype: "$taxi_types.title",
+                status: "Block",
 
             }
         });
