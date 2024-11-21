@@ -74,24 +74,24 @@ exports.updateUser = async (req) => {
         const { first_name, last_name, email } = req.body;
         const data = await User.findById(req.auth.id);
         const imagePath = req.file ? req.file.filename : "";
-        if(!data) {
+        if (!data) {
             return {
                 status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.User_Not_Found
-            }
+            };
         }
         await User.findByIdAndUpdate(req.auth.id, {
             first_name,
             last_name,
             email,
             profile_image: imagePath
-        })
+        });
         return {
             status: statusCode.OK,
             success: true,
             message: resMessage.Data_Updated_Successfully
-        }
+        };
     } catch (error) {
         return {
             success: false,
@@ -99,4 +99,4 @@ exports.updateUser = async (req) => {
             error: error.message || "Internal Server Error"
         };
     }
-}
+};

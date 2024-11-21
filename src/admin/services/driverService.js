@@ -110,7 +110,7 @@ exports.driverView = async (req) => {
                     path: "$taxi_types",
                     preserveNullAndEmptyArrays: true
                 }
-            },);
+            });
 
         conditions.push({
             $addFields:
@@ -129,7 +129,7 @@ exports.driverView = async (req) => {
 
             conditions.push({
                 $match: {
-                    taxitype: { $regex: search_value, $options: "i" }
+                    taxitype: { $regex: req.query.taxitype, $options: "i" }
                 }
             });
         }
@@ -305,7 +305,7 @@ exports.blockedDriverList = async (req) => {
             pipeline.push({
                 $match: {
                     $or: [
-                        { "name": { $regex: search_value, $options: "i" } },
+                        { "first_name": { $regex: search_value, $options: "i" } },
                         { "email": { $regex: search_value, $options: "i" } },
                         { "mobile": { $regex: search_value, $options: "i" } }
                     ]
@@ -345,15 +345,38 @@ exports.blockedDriverList = async (req) => {
                 }
             },
             {
+                $lookup: {
+                    from: "taxi_types",
+                    localField: "taxi_type",
+                    foreignField: "_id",
+                    as: "taxi_types"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$taxi_types",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
                 $addFields: {
                     image: {
                         $concat: [
                             "http://localhost:6161/",
                             "$image"
                         ]
-                    }
+                    },
+                    taxitype: "$taxi_types.title"
                 }
-            },
+            });
+        if (req.query.taxitype) {
+            pipeline.push({
+                $match: {
+                    taxitype: { $regex: req.query.taxitype, $options: "i" }
+                }
+            });
+        }
+        pipeline.push(
             {
                 $project: {
                     first_name: 1,
@@ -473,7 +496,7 @@ exports.onlineDriverList = async (req) => {
             conditions.push({
                 $match: {
                     $or: [
-                        { "name": { $regex: search_value, $options: "i" } },
+                        { "first_name": { $regex: search_value, $options: "i" } },
                         { "email": { $regex: search_value, $options: "i" } },
                         { "mobile": { $regex: search_value, $options: "i" } }
                     ]
@@ -510,7 +533,21 @@ exports.onlineDriverList = async (req) => {
                 is_delete: false,
                 is_online: true
             }
-        });
+        },
+            {
+                $lookup: {
+                    from: "taxi_types",
+                    localField: "taxi_type",
+                    foreignField: "_id",
+                    as: "taxi_types"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$taxi_types",
+                    preserveNullAndEmptyArrays: true
+                }
+            },);
 
         conditions.push({
             $addFields:
@@ -520,10 +557,20 @@ exports.onlineDriverList = async (req) => {
                         "http://192.168.0.18:6161/",
                         "$image"
                     ]
-                }
+                },
+                taxitype: "$taxi_types.title"
 
             }
-        },
+        });
+        if (req.query.taxitype) {
+
+            conditions.push({
+                $match: {
+                    taxitype: { $regex: req.query.taxitype, $options: "i" }
+                }
+            });
+        }
+        conditions.push(
             {
                 $project: {
                     first_name: 1,
@@ -539,7 +586,8 @@ exports.onlineDriverList = async (req) => {
                     status: 1,
                     pending_amount: 1
                 }
-            });
+            }
+        );
         conditions.push(
             { $sort: { first_name: 1 } },
             { $skip: (page - 1) * pagesize },

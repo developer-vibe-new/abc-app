@@ -23,8 +23,7 @@ exports.verifyOtpController = async (req) => {
             message: error.message
         };
     }
-}
-
+};
 exports.updateUserController = async (req) => {
     try {
         return await service.updateUser(req);
@@ -35,4 +34,4 @@ exports.updateUserController = async (req) => {
             message: error.message
         };
     }
-}
+};
