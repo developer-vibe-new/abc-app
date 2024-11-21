@@ -7,8 +7,8 @@ const { verifyToken } = require('../../middleware/auth');
 const router = express.Router();
 
 router.post('/addCar', verifyToken, responseHandler(controller.addCarController));
-router.get('/carList', responseHandler(controller.carListcontroller));
-router.post('/updateCarStatus/:id', responseHandler(controller.updateCarStatusController));
-router.post('/updateCar/:id', responseHandler(controller.updateCarController));
+router.get('/carList', verifyToken, responseHandler(controller.carListcontroller));
+router.post('/updateCarStatus/:id', verifyToken, responseHandler(controller.updateCarStatusController));
+router.post('/updateCar/:id', verifyToken, responseHandler(controller.updateCarController));
 
 module.exports = router;

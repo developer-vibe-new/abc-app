@@ -29,9 +29,9 @@ exports.addCar = async (req) => {
     }
 };
 
-exports.carList = async () => {
+exports.carList = async (req) => {
     try {
-        const data = await Car.find({ type: 'operator' });
+        const data = await Car.find({ operator_id: req.auth.id });
         if (!data) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
@@ -57,7 +57,7 @@ exports.carList = async () => {
 exports.updateCarStatus = async (req) => {
     try {
         const { id } = req.params;
-        const data = await Car.findOne({ _id: id, type: "operator" });
+        const data = await Car.findOne({ _id: id });
         if (!data) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
@@ -65,13 +65,21 @@ exports.updateCarStatus = async (req) => {
                 message: resMessage.Data_Not_Found
             };
         }
-        const updateStatus = data.is_active === true ? false : true;
-        data.is_active = updateStatus;
-        await data.save();
+        const operatorId = new mongoose.Types.ObjectId(req.auth.id);
+        if (data.operator_id && data.operator_id.equals(operatorId)) {
+            const updateStatus = data.is_active === true ? false : true;
+            data.is_active = updateStatus;
+            await data.save();
+            return {
+                statusCode: statusCode.OK,
+                success: true,
+                message: resMessage.Status_Updated_Successfully
+            };
+        }
         return {
-            statusCode: statusCode.OK,
-            success: true,
-            message: resMessage.Status_Updated_Successfully
+            status: statusCode.UNAUTHORIZED,
+            success: false,
+            message: resMessage.Unauthorized_Access
         };
     } catch (error) {
         return {
@@ -93,7 +101,7 @@ exports.updateCar = async (req) => {
                 message: resMessage.Required_Data
             };
         }
-        const data = await Car.findOne({ _id: id, type: "operator" });
+        const data = await Car.findOne({ _id: id });
         if (!data) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
@@ -101,22 +109,30 @@ exports.updateCar = async (req) => {
                 message: resMessage.Data_Not_Found
             };
         }
-        await Car.updateOne(
-            {
-                _id: id
-            },
-            {
-                $set: {
-                    title,
-                    make,
-                    model
+        const operatorId = new mongoose.Types.ObjectId(req.auth.id);
+        if (data.operator_id && data.operator_id.equals(operatorId)) {
+            await Car.updateOne(
+                {
+                    _id: id
+                },
+                {
+                    $set: {
+                        title,
+                        make,
+                        model
+                    }
                 }
-            }
-        );
+            );
+            return {
+                statusCode: statusCode.OK,
+                success: true,
+                message: resMessage.Data_Updated_Successfully
+            };
+        }
         return {
-            statusCode: statusCode.OK,
-            success: true,
-            message: resMessage.Data_Updated_Successfully
+            status: statusCode.UNAUTHORIZED,
+            success: false,
+            message: resMessage.Unauthorized_Access
         };
     } catch (error) {
         return {
