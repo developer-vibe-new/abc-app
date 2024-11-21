@@ -3,7 +3,6 @@ const taxiTypeModel = require('../../models/taxiTypeModel');
 const { statusCode, resMessage } = require('../../config/default.json');
 const mongoose = require('mongoose');
 
-
 exports.driverCreate = async (req) => {
     try {
         const { first_name, last_name, mobile, email, type, taxi_type } = req.body;
@@ -38,7 +37,7 @@ exports.driverCreate = async (req) => {
 exports.driverView = async (req) => {
     try {
         var page = req.query.page || 1;
-        let pagesize = req.query.pagesize || 10;
+        let pagesize = parseInt(req.query.pagesize) || 10;
 
         let search_value = req.query.search || "";
         var conditions = [];
@@ -51,7 +50,6 @@ exports.driverView = async (req) => {
             });
         }
         if (req.query.kycStatus) {
-
             if (req.query.kycStatus == "Complete") {
                 conditions.push({
                     $match: {
@@ -75,7 +73,6 @@ exports.driverView = async (req) => {
             }
         }
         if (req.query.vehicleStatus) {
-
             if (req.query.vehicleStatus == "Pending") {
                 conditions.push({
                     $match: {
@@ -123,22 +120,21 @@ exports.driverView = async (req) => {
                 },
                 taxitype: "$taxi_types.title",
                 status: "Block",
-
             }
         });
-        if (req.query.taxitype) {
 
+        if (req.query.taxitype) {
             conditions.push({
                 $match: {
                     taxitype: { $regex: req.query.taxitype, $options: "i" }
                 }
             });
         }
+
         conditions.push({
             $project: {
                 first_name: 1,
                 last_name: 1,
-
                 image: 1,
                 email: 1,
                 mobile: 1,
@@ -156,13 +152,27 @@ exports.driverView = async (req) => {
             { $skip: (page - 1) * pagesize },
             { $limit: pagesize }
         );
+
+        const totalCount = await driverModel.aggregate([
+            ...conditions.slice(0, -2),
+            { $count: "total" }
+        ]);
+
+        const totalRecords = totalCount.length > 0 ? totalCount[0].total : 0;
+        const totalPages = Math.ceil(totalRecords / pagesize);
+
         const viewAllData = await driverModel.aggregate(conditions);
 
         return {
             statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Fetch_Successfully,
-            data: viewAllData
+            data: viewAllData,
+            pagination: {
+                currentPage: parseInt(page),
+                totalPages: totalPages,
+                totalRecords: totalRecords,
+            }
         };
     } catch (error) {
         console.log(error);
