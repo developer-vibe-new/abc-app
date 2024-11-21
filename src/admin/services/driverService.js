@@ -117,7 +117,7 @@ exports.driverView = async (req) => {
             {
                 image: {
                     $concat: [
-                        "http://192.168.0.18:6161/",
+                        "http://192.168.0.18:6161/driver/",
                         "$image"
                     ]
                 },
