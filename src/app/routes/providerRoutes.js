@@ -5,10 +5,6 @@ const { upload } = require('../../helpers/multer');
 
 const router = express.Router();
 
-router.post('/registerOperator', responseHandler(controller.registerOperatorController));
-router.post('/loginOperator', responseHandler(controller.loginOperatorController));
-router.post('/verifyOtpOperator', responseHandler(controller.verifyOtpController));
-
 router.post('/addDriver', responseHandler(controller.addDriverController));
 router.get('/driverList', responseHandler(controller.driverListController));
 router.post('/updateDriverStatus/:id', responseHandler(controller.updateDriverStatusController));

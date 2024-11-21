@@ -5,9 +5,10 @@ const taxiTypeSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'City'
     },
-    type: {
-        type: String,
-        enum: ['operator', 'main']
+    operator_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Operator',
+        default: null
     },
     title: {
         type: String

@@ -4,12 +4,15 @@ const Taxitype = require('../../models/taxiTypeModel');
 exports.addTaxiType = async (req) => {
     try {
         const taxi = req.body;
-        if (!taxi.title || !taxi.type) {
+        if (!taxi.title) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Required_Data
             };
+        }
+        if (req.auth && req.auth.role === "operator") {
+            taxi.operator_id = req.auth.id;
         }
         await Taxitype.create(taxi);
         return {
@@ -30,7 +33,7 @@ exports.addTaxiType = async (req) => {
 exports.updateTaxiStatus = async (req) => {
     try {
         const { id } = req.params;
-        const data = await Taxitype.findOne({ _id: id, type: "operator" });
+        const data = await Taxitype.findOne({ _id: id, operator_id: req.auth.id });
         if (!data) {
             return {
                 status: statusCode.DATA_NOT_FOUND,

@@ -19,10 +19,14 @@ const operatorSchema = new mongoose.Schema({
     },
     status: {
         type: Boolean,
-        default: false
+        default: true
     },
     otp: {
         type: Number
+    },
+    type: {
+        type: String,
+        default: "operator"  
     },
     token: {
         type: String
