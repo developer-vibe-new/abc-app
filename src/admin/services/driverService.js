@@ -300,7 +300,7 @@ exports.blockedDriverList = async (req) => {
     try {
         let pipeline = [];
         let search_value = req.query.search || "";
-        console.log(req.query.search, "req.query.search");
+        // console.log(req.query.search, "req.query.search");
         if (search_value) {
             pipeline.push({
                 $match: {
@@ -465,12 +465,14 @@ exports.blockedDriverUpdate = async ({ body, file, params }) => {
 };
 exports.unblockDriver = async (req) => {
     try {
-        const updateData = await driverModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.body.id) }, { status: "Unblock" }, { new: true },);
+
+        await driverModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.body.id) }, { status: "Unblock" }, { new: true });
+
         return {
             statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Updated_Successfully,
-            data: updateData
+
 
         };
     } catch (error) {
