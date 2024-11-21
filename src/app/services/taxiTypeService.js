@@ -1,5 +1,6 @@
 const { statusCode, resMessage } = require('../../config/default.json');
 const Taxitype = require('../../models/taxiTypeModel');
+const mongoose = require('mongoose')
 
 exports.addTaxiType = async (req) => {
     try {
@@ -33,7 +34,7 @@ exports.addTaxiType = async (req) => {
 exports.updateTaxiStatus = async (req) => {
     try {
         const { id } = req.params;
-        const data = await Taxitype.findOne({ _id: id, operator_id: req.auth.id });
+        const data = await Taxitype.findOne({ _id: id });
         if (!data) {
             return {
                 status: statusCode.DATA_NOT_FOUND,
@@ -41,14 +42,22 @@ exports.updateTaxiStatus = async (req) => {
                 message: resMessage.Data_Not_Found
             };
         }
-        const status = data.is_active === true ? false : true;
-        data.is_active = status;
-        await data.save();
+        const operatorId = new mongoose.Types.ObjectId(req.auth.id);
+        if (data.operator_id && data.operator_id.equals(operatorId)) {
+            const status = data.is_active === true ? false : true;
+            data.is_active = status;
+            await data.save();
+            return {
+                status: statusCode.OK,
+                success: true,
+                message: resMessage.Status_Updated_Successfully,
+                data: data
+            };
+        }
         return {
-            status: statusCode.OK,
-            success: true,
-            message: resMessage.Status_Updated_Successfully,
-            data: data
+            status: statusCode.UNAUTHORIZED,
+            success: false,
+            message: resMessage.Unauthorized_Access
         };
     } catch (error) {
         console.log('Error', error);
