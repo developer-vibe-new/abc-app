@@ -10,5 +10,6 @@ router.post('/sendOtp', responseHandler(controller.sendOtpController));
 router.post('/verifyOtp', responseHandler(controller.verifyOtpController));
 router.post('/updateUser', verifyToken, upload.single('image'), responseHandler(controller.updateUserController));
 router.get('/userDetails', verifyToken, responseHandler(controller.userDetailsController));
+router.post('/deleteUser', verifyToken, responseHandler(controller.deleteUserController));
 
 module.exports = router;

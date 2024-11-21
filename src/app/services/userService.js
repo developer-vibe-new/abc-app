@@ -32,7 +32,7 @@ exports.sendOtp = async (req) => {
 exports.verifyOtp = async (req) => {
     try {
         const { mobile, otp } = req.body;
-        const user = await User.findOne({ mobile });
+        const user = await User.findOne({ mobile, is_active: true });
         if (!user) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -73,7 +73,7 @@ exports.verifyOtp = async (req) => {
 exports.updateUser = async (req) => {
     try {
         const { first_name, last_name, email, mobile } = req.body;
-        const data = await User.findById(req.auth.id);
+        const data = await User.findOne({ _id: req.auth.id });
         const imagePath = req.file ? req.file.filename : "";
         if (!data) {
             return {
@@ -133,6 +133,31 @@ exports.userDetails = async (req) => {
             message: resMessage.Data_Retrieved_Successfully,
             data: user[0]
         };
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error"
+        };
+    }
+}
+
+exports.deleteUser = async (req) => {
+    try {
+        const user = await User.findById(req.auth.id);
+        if (!user) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.User_Not_Found
+            }
+        }
+        await User.findByIdAndUpdate(req.auth.id, { is_active: false });
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.User_Deleted_Successfully
+        }
     } catch (error) {
         return {
             success: false,
