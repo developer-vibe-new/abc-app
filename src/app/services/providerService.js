@@ -1,15 +1,19 @@
 const { statusCode, resMessage } = require('../../config/default.json');
 const Provider = require('../../models/providerModel');
+const mongoose = require('mongoose');
 
 exports.addDriver = async (req) => {
     try {
         const driver = req.body;
-        if (!driver.name || !driver.mobile || !driver.email || !driver.type) {
+        if (!driver.first_name || !driver.last_name || !driver.mobile || !driver.email) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Required_Data
             };
+        }
+        if (req.auth && req.auth.role === "operator") {
+            driver.operator_id = req.auth.id;
         }
         await Provider.create(driver);
         return {
@@ -29,7 +33,7 @@ exports.addDriver = async (req) => {
 exports.updateDriverStatus = async (req) => {
     try {
         const { id } = req.params;
-        const provider = await Provider.findOne({ _id: id, type: "operator" });
+        const provider = await Provider.findOne({ _id: id });
         if (!provider) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -37,14 +41,22 @@ exports.updateDriverStatus = async (req) => {
                 message: resMessage.Provider_Not_Found
             };
         }
-        const status = provider.status === "unblocked" ? "blocked" : "unblocked";
-        provider.status = status;
-        await provider.save();
+        const operatorId = new mongoose.Types.ObjectId(req.auth.id);
+        if (provider.operator_id && provider.operator_id.equals(operatorId)) {
+            const status = provider.status === "unblocked" ? "blocked" : "unblocked";
+            provider.status = status;
+            await provider.save();
+            return {
+                status: statusCode.OK,
+                success: true,
+                message: resMessage.Status_Updated_Successfully,
+                data: provider
+            };
+        }
         return {
-            status: statusCode.OK,
-            success: true,
-            message: resMessage.Status_Updated_Successfully,
-            data: provider
+            status: statusCode.UNAUTHORIZED,
+            success: false,
+            message: resMessage.Unauthorized_Access
         };
     } catch (error) {
         return {
@@ -55,9 +67,9 @@ exports.updateDriverStatus = async (req) => {
     }
 };
 
-exports.driverBlockList = async () => {
+exports.driverBlockList = async (req) => {
     try {
-        const blocked = await Provider.find({ type: "operator", status: "blocked" });
+        const blocked = await Provider.find({ operator_id: req.auth.id, status: "blocked" });
         if (!blocked) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -80,9 +92,9 @@ exports.driverBlockList = async () => {
     }
 };
 
-exports.driverList = async () => {
+exports.driverList = async (req) => {
     try {
-        const data = await Provider.find({ type: 'operator' });
+        const data = await Provider.find({ operator_id: req.auth.id });
         if (!data) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -110,7 +122,7 @@ exports.driverList = async () => {
 exports.driverOninerStatus = async (req) => {
     try {
         const { id } = req.params;
-        const driverData = await Provider.findOne({ _id: id, type: "operator" });
+        const driverData = await Provider.findOne({ _id: id });
         if (!driverData) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -118,14 +130,22 @@ exports.driverOninerStatus = async (req) => {
                 message: resMessage.Data_Not_Found
             };
         }
-        const onlineStatus = driverData.is_online === true ? false : true;
-        driverData.is_online = onlineStatus;
-        await driverData.save();
+        const operatorId = new mongoose.Types.ObjectId(req.auth.id);
+        if (driverData.operator_id && driverData.operator_id.equals(operatorId)) {
+            const onlineStatus = driverData.is_online === true ? false : true;
+            driverData.is_online = onlineStatus;
+            await driverData.save();
+            return {
+                status: statusCode.OK,
+                success: true,
+                message: resMessage.Status_Updated_Successfully,
+                data: driverData
+            };
+        }
         return {
-            status: statusCode.OK,
-            success: true,
-            message: resMessage.Status_Updated_Successfully,
-            data: driverData
+            status: statusCode.UNAUTHORIZED,
+            success: false,
+            message: resMessage.Unauthorized_Access
         };
     } catch (error) {
         return {
@@ -140,9 +160,9 @@ exports.driverOninerStatus = async (req) => {
 exports.updateDriver = async (req) => {
     try {
         const { id } = req.params;
-        const { name, email, mobile } = req.body;
+        const { first_name, last_name, email, mobile } = req.body;
         const imagePath = req.file ? req.file.filename : "";
-        const driverData = await Provider.findOne({ _id: id, type: "operator" });
+        const driverData = await Provider.findOne({ _id: id });
         if (!driverData) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -150,23 +170,30 @@ exports.updateDriver = async (req) => {
                 message: resMessage.Data_Not_Found
             };
         }
-        // eslint-disable-next-line no-unused-vars
-        const updatedDriver = await Provider.updateOne(
-            { _id: id },
-            {
-                $set: {
-                    name,
-                    email,
-                    mobile,
-                    image: imagePath
+        const operatorId = new mongoose.Types.ObjectId(req.auth.id);
+        if (driverData.operator_id && driverData.operator_id.equals(operatorId)) {
+            await Provider.updateOne(
+                { _id: id },
+                {
+                    $set: {
+                        first_name,
+                        last_name,
+                        email,
+                        mobile,
+                        image: imagePath
+                    }
                 }
-            }
-        );
-
+            );
+            return {
+                status: statusCode.OK,
+                success: true,
+                message: resMessage.Data_Updated_Successfully
+            };
+        }
         return {
-            status: statusCode.OK,
-            success: true,
-            message: resMessage.Data_Updated_Successfully
+            status: statusCode.UNAUTHORIZED,
+            success: false,
+            message: resMessage.Unauthorized_Access
         };
     } catch (error) {
         return {

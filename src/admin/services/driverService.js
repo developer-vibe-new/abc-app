@@ -326,7 +326,6 @@ exports.blockedDriverList = async (req) => {
     try {
         let pipeline = [];
         let search_value = req.query.search || "";
-        // console.log(req.query.search, "req.query.search");
         if (search_value) {
             pipeline.push({
                 $match: {

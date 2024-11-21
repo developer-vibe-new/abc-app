@@ -6,7 +6,11 @@ const providerSchema = new mongoose.Schema({
 		default: ""
 
 	},
-
+	operator_id: {
+		type: mongoose.Schema.Types.ObjectId,
+        ref: 'Operator',
+        default: null
+	},
 	last_name: {
 		type: String,
 		default: ""
@@ -27,11 +31,6 @@ const providerSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'City',
 		default: null
-	},
-	type: {
-		type: String,
-		required: true,
-		enum: ['operator', 'main']
 	},
 	email: {
 		type: String,

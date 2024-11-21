@@ -61,9 +61,9 @@ exports.updateDriverStatusController = async (req) => {
     }
 };
 
-exports.driverBlockListController = async () => {
+exports.driverBlockListController = async (req) => {
     try {
-        return await service.driverBlockList();
+        return await service.driverBlockList(req);
     } catch (error) {
         return {
             statusCode: statusCode.INTERNAL_SERVER_ERROR,
@@ -73,9 +73,9 @@ exports.driverBlockListController = async () => {
     }
 };
 
-exports.driverListController = async () => {
+exports.driverListController = async (req) => {
     try {
-        return await service.driverList();
+        return await service.driverList(req);
     } catch (error) {
         return {
             statusCode: statusCode.INTERNAL_SERVER_ERROR,
