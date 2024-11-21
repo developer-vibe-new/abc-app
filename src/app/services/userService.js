@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const { statusCode, resMessage } = require('../../config/default.json');
 const User = require('../../models/users');
 
@@ -100,3 +101,42 @@ exports.updateUser = async (req) => {
         };
     }
 };
+
+exports.userDetails = async (req) => {
+    try {
+        const user = await User.aggregate([
+            {
+              $match: {
+                _id: new mongoose.Types.ObjectId(req.auth.id)
+              }
+            },
+            {
+              $project: {
+                first_name: 1,
+                last_name: 1,
+                profile_image: 1, 
+                email: 1
+              }
+            }
+        ]);
+        if(!user) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.User_Not_Found
+            };
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Retrieved_Successfully,
+            data: user[0]
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error"
+        };
+    }
+}

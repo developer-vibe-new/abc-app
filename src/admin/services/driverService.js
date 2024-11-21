@@ -201,12 +201,37 @@ exports.taxiTypeDropDown = async () => {
 
 exports.driverEdit = async (req) => {
     try {
-        const getData = await driverModel.findOne({ _id: req.params.id }, { first_name: 1, email: 1, mobile: 1, image: 1, last_name: 1 });
+        const getData = await driverModel.aggregate([
+            {
+              $match: {
+                _id: new mongoose.Types.ObjectId(req.params.id)
+              }
+            },
+            {
+              $addFields: {
+                image: {
+                  $concat: [
+                    "http://192.168.0.18:6161/driver/",
+                    "$image"
+                  ]
+                }
+              }
+            },
+            {
+              $project: {
+                first_name: 1,
+                last_name: 1,
+                email: 1,
+                mobile: 1,
+                image: 1
+              }
+            }
+        ]);
         return {
             statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Fetch_Successfully,
-            data: getData
+            data: getData[0]
         };
     } catch (error) {
         console.log(error);

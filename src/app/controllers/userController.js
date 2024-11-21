@@ -35,3 +35,15 @@ exports.updateUserController = async (req) => {
         };
     }
 };
+
+exports.userDetailsController = async (req) => {
+    try {
+        return await service.userDetails(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
