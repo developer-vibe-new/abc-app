@@ -17,6 +17,10 @@ const CarSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'TaxiType'
     }],
+    operator_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Operator'
+    },
     is_active: {
         type: Boolean,
         default: true

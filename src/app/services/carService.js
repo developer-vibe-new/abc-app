@@ -4,12 +4,15 @@ const Car = require('../../models/cars');
 exports.addCar = async (req) => {
     try {
         const car = req.body;
-        if (!car.taxi_type || !car.title || !car.make || !car.model || !car.type) {
+        if (!car.taxi_type || !car.title || !car.make || !car.model) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Required_Data
             };
+        }
+        if (req.auth && req.auth.role === "operator") {
+            car.operator_id = req.auth.id;
         }
         await Car.create(car);
         return {
