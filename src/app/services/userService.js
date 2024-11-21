@@ -72,7 +72,7 @@ exports.verifyOtp = async (req) => {
 
 exports.updateUser = async (req) => {
     try {
-        const { first_name, last_name, email } = req.body;
+        const { first_name, last_name, email, mobile } = req.body;
         const data = await User.findById(req.auth.id);
         const imagePath = req.file ? req.file.filename : "";
         if (!data) {
@@ -86,6 +86,7 @@ exports.updateUser = async (req) => {
             first_name,
             last_name,
             email,
+            mobile,
             profile_image: imagePath
         });
         return {
