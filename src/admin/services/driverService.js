@@ -234,7 +234,8 @@ exports.driverEdit = async (req) => {
                 last_name: 1,
                 email: 1,
                 mobile: 1,
-                image: 1
+                image: 1,
+                status: 1
               }
             }
         ]);
@@ -313,7 +314,11 @@ exports.driverDelete = async (req) => {
 
 exports.blockDriver = async (req) => {
     try {
-        const updateData = await driverModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.body.id) }, { status: "blocked" }, { new: true },);
+        const updateData = await driverModel.findByIdAndUpdate(
+            { _id: new mongoose.Types.ObjectId(req.body.id) },
+            { status: "blocked", comment: req.body.comment },
+            { new: true }
+        );
         return {
             statusCode: statusCode.OK,
             success: true,
@@ -397,9 +402,9 @@ exports.blockedDriverList = async (req) => {
                 $addFields: {
                     image: {
                         $concat: [
-                            "http://localhost:6161/",
+                            "http://192.168.0.18:6161/driver/",
                             "$image"
-                        ]
+                          ]
                     },
                     taxitype: "$taxi_types.title"
                 }
@@ -416,7 +421,6 @@ exports.blockedDriverList = async (req) => {
                 $project: {
                     first_name: 1,
                     last_name: 1,
-
                     image: 1,
                     email: 1,
                     mobile: 1,
@@ -425,7 +429,8 @@ exports.blockedDriverList = async (req) => {
                     kycStatus: 1,
                     vehicleStatus: 1,
                     status: 1,
-                    pending_amount: 1
+                    pending_amount: 1,
+                    new_status: "Unblock"
                 }
             }
         );
@@ -448,6 +453,7 @@ exports.blockedDriverList = async (req) => {
         };
     }
 };
+
 exports.editBlockDriver = async (req) => {
     try {
         const getData = await driverModel.findOne({ _id: req.params.id }, { first_name: 1, email: 1, mobile: 1, image: 1, last_name: 1 });

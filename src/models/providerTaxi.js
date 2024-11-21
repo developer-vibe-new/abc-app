@@ -14,6 +14,10 @@ const ProviderTaxiSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'TaxiType'
 	}],
+	operator_id: {
+		type: mongoose.Schema.Types.ObjectId,
+        ref: 'Operator'
+	},
 	plateno: {
 		type: String,
 		required: false
@@ -89,5 +93,6 @@ const ProviderTaxiSchema = new mongoose.Schema({
 	}
 });
 
+const providerTaxiMoodel = mongoose.model('ProviderTaxi', ProviderTaxiSchema);
 //make this available to our users in Node applications
-module.exports = mongoose.model('ProviderTaxi', ProviderTaxiSchema, 'provider_taxies');
+module.exports = providerTaxiMoodel;

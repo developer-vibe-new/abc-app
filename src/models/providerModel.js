@@ -32,6 +32,9 @@ const providerSchema = new mongoose.Schema({
 		ref: 'City',
 		default: null
 	},
+	comment: {
+		type: String,
+	},
 	email: {
 		type: String,
 		default: ""
