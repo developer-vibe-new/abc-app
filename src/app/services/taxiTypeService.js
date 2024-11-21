@@ -74,8 +74,11 @@ exports.updateTaxiType = async (req) => {
     try {
         const { id } = req.params;
         const { base_fare, airportCharge, fixed_fare, distance_fare, time_fare, currency } = req.body;
-        const icon = req.file.filename;
-        const data = await Taxitype.findOne({ _id: id, type: "operator" });
+        let icon;
+        if(req.file) {
+            icon = req.file.filename;
+        }
+        const data = await Taxitype.findOne({ _id: id });
         if (!data) {
             return {
                 status: statusCode.DATA_NOT_FOUND,
@@ -83,26 +86,34 @@ exports.updateTaxiType = async (req) => {
                 message: resMessage.Data_Not_Found
             };
         }
-        await Taxitype.updateOne(
-            {
-                _id: id
-            },
-            {
-                $set: {
-                    icon,
-                    base_fare,
-                    airportCharge,
-                    fixed_fare,
-                    distance_fare,
-                    time_fare,
-                    currency
+        const operatorId = new mongoose.Types.ObjectId(req.auth.id);
+        if (data.operator_id && data.operator_id.equals(operatorId)) {
+            await Taxitype.updateOne(
+                {
+                    _id: id
+                },
+                {
+                    $set: {
+                        icon,
+                        base_fare,
+                        airportCharge,
+                        fixed_fare,
+                        distance_fare,
+                        time_fare,
+                        currency
+                    }
                 }
-            }
-        );
+            );
+            return {
+                status: statusCode.OK,
+                success: true,
+                message: resMessage.Data_Updated_Successfully
+            };
+        }
         return {
-            status: statusCode.OK,
-            success: true,
-            message: resMessage.Data_Updated_Successfully
+            status: statusCode.UNAUTHORIZED,
+            success: false,
+            message: resMessage.Unauthorized_Access
         };
     } catch (error) {
         console.log('Error', error);

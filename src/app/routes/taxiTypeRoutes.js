@@ -8,6 +8,6 @@ const router = express.Router();
 
 router.post('/addTaxiType', verifyToken, responseHandler(controller.addTaxiTypeController));
 router.post('/updateTaxiStatus/:id', verifyToken, responseHandler(controller.updateTaxiStatusController));
-router.post('/updateTaxiType/:id', upload.single('icon'), responseHandler(controller.updateTaxiTypeController));
+router.post('/updateTaxiType/:id', verifyToken, upload.single('icon'), responseHandler(controller.updateTaxiTypeController));
 
 module.exports = router;
