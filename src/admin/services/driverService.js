@@ -5,9 +5,12 @@ const mongoose = require('mongoose');
 
 exports.driverCreate = async (req) => {
     try {
-        const { first_name, last_name, mobile, email, type, taxi_type } = req.body;
-        const image = `${req.body.typeName}/${req.file.filename}`;
-        if (!first_name || !last_name || !mobile || !email || !type || !image || !taxi_type) {
+        const { first_name, last_name, mobile, email } = req.body;
+        let image;
+        if(req.file) {
+            image = `${req.body.typeName}/${req.file.filename}`;
+        }
+        if (!first_name || !last_name || !mobile || !email) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
@@ -15,7 +18,7 @@ exports.driverCreate = async (req) => {
             };
         }
         const createdData = await driverModel.create({
-            first_name: first_name, last_name: last_name, mobile: mobile, email: email, type: type, image: image, taxi_type: taxi_type
+            first_name: first_name, last_name: last_name, full_name: first_name + " " + last_name, mobile: mobile, email: email, image: image
         });
         return {
             statusCode: statusCode.OK,

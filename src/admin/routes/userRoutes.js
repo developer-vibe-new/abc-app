@@ -42,7 +42,7 @@ router.get('/operators', auth, responseHandler(adminController.operators));
 router.post('/operatorsUpdate/:id', auth, responseHandler(adminController.operatorsUpdate));
 
 // driver 
-router.post('/createDriver', auth, upload.single('image'), responseHandler(driverController.createDriver));
+router.post('/createDriver', upload.single('image'), responseHandler(driverController.createDriver));
 router.get('/viewDriver', responseHandler(driverController.viewDriver));
 router.get('/editDriver/:id', auth, responseHandler(driverController.editDriver));
 router.post('/updateDriver/:id', auth, upload.single('image'), responseHandler(driverController.updateDriver));

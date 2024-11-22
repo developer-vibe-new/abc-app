@@ -22,11 +22,9 @@ const providerSchema = new mongoose.Schema({
 		default: null
 
 	},
-
-	// full_name: {
-	// 	type: String,
-
-	// },
+	full_name: {
+		type: String,
+	},
 	city_id: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'City',

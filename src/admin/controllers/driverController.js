@@ -4,10 +4,6 @@ const { statusCode } = require('../../config/default.json');
 exports.createDriver = async (req) => {
     try {
         return await services.driverCreate(req);
-        // return res
-        //     .status(200)
-        //     .json(Object.assign({ status: data.success }, data));
-
     } catch (error) {
         console.log(error);
         return {
@@ -21,10 +17,6 @@ exports.createDriver = async (req) => {
 exports.viewDriver = async (req) => {
     try {
         return await services.driverView(req);
-        // return res
-        //     .status(200)
-        //     .json(Object.assign({ status: data.success }, data));
-
     } catch (error) {
         console.log(error);
         return {
