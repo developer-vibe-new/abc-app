@@ -7,4 +7,5 @@ module.exports = (app) => {
   app.use(`${apiV1Prefix}/car`, require('./carRoutes'));
   app.use(`${apiV1Prefix}/user`, require('./userRoutes'));
   app.use(`${apiV1Prefix}/operator`, require('./operatorRoutes'));
+  app.use(`${apiV1Prefix}/providerTaxi`, require('./providerTaxiRoutes'));
 };

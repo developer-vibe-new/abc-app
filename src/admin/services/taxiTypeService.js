@@ -16,20 +16,28 @@ exports.taxiTypeList = async (req) => {
                 }
             });
         }
+
+        conditions.push();
+
         conditions.push({
             $project: {
-                icon: 1,
-                title: 1,
-                currency: 1,
-                base_fare: 1,
-                time_fare: 1,
-                distance_fare: 1,
-                airportCharge: 1,
-                outstation_distance_fare: 1,
-                outstation_two_distance_fare: 1,
-                rental_distance_fare: 1,
-                is_active: 1,
-                outstation_status: 1
+                    icon: {
+                        $concat: [
+                            "http://192.168.0.18:6161/taxiType/",
+                            "$icon"
+                        ]
+                    },
+                    title: 1,
+                    currency: 1,
+                    base_fare: 1,
+                    time_fare: 1,
+                    distance_fare: 1,
+                    airportCharge: 1,
+                    outstation_distance_fare: 1,
+                    outstation_two_distance_fare: 1,
+                    rental_distance_fare: 1,
+                    is_active: 1,
+                    outstation_status: 1
             }
         });
         conditions.push(
