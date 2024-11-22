@@ -165,7 +165,12 @@ exports.editTaxiType = async (req) => {
                 outstation_two_distance_fare: 1,
                 rental_distance_fare: 1,
                 base_fare: 1,
-                icon: 1
+                icon: {
+                    $concat: [
+                        "http://192.168.0.18:6161/taxiType/",
+                        "$icon"
+                    ]
+                },
               }
             }
         ]);
