@@ -143,3 +143,49 @@ exports.updateTaxiOutstationStatus = async (req) => {
         };
     }
 };
+
+exports.editTaxiType = async (req) => {
+    try {
+        const { id } = req.params;
+        const data = await taxiTypeModel.aggregate([
+            {
+              $match: {
+                _id: new mongoose.Types.ObjectId(id)
+              }
+            },
+            {
+              $project: {
+                title: 1,
+                time_fare: 1,
+                currency: 1,
+                distance_fare: 1,
+                airportCharge: 1,
+                outstation_distance_fare: 1,
+                outstation_two_distance_fare: 1,
+                rental_distance_fare: 1,
+                base_fare: 1,
+                icon: 1
+              }
+            }
+        ]);
+        if(!data) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data: data[0]
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}

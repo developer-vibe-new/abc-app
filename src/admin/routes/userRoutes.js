@@ -47,6 +47,7 @@ router.get('/viewDriver', auth, responseHandler(driverController.viewDriver));
 router.get('/editDriver/:id', auth, responseHandler(driverController.editDriver));
 router.post('/updateDriver/:id', auth, upload.single('image'), responseHandler(driverController.updateDriver));
 router.post('/blockDriver', auth, responseHandler(driverController.blockDriver));
+
 // router.post('/deleteDriver/:id', auth, responseHandler(driverController.deleteDriver));
 router.get('/blockedDriversList', responseHandler(driverController.blockedDriversList));
 router.get('/editBlockDriver/:id', auth, responseHandler(driverController.editBlockDriver));
@@ -63,6 +64,7 @@ router.get('/userList', auth, responseHandler(userManController.userListing));
 router.post('/updateStatusUser', auth, responseHandler(userManController.updateStatusUser));
 router.get('/userRideingDetails/:id', auth, responseHandler(userManController.userRideingDetails));
 router.post('/updateTaxiOutstationStatus', auth, responseHandler(taxiTypeController.updateTaxiTypeOutstationStatusController));
+router.get('/editTaxiType/:id', auth, responseHandler(taxiTypeController.editTaxiTypeController));
 
 router.post('/createRental', auth, responseHandler(rentalController.createRental));
 router.post('/rentalEditData/:id', auth, responseHandler(rentalController.rentalEditData));

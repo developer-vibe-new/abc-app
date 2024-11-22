@@ -49,3 +49,15 @@ exports.updateTaxiTypeOutstationStatusController = async (req) => {
         };
     }
 }
+
+exports.editTaxiTypeController = async (req) => {
+    try {
+        return await services.editTaxiType(req)
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
