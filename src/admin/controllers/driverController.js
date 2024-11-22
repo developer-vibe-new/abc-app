@@ -58,7 +58,6 @@ exports.blockDriver = async (req) => {
 exports.updateDriver = async (req) => {
     try {
         return await services.driverUpdate(req);
-
     } catch (error) {
         console.log(error);
         return {

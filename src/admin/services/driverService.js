@@ -264,6 +264,9 @@ exports.driverUpdate = async ({ body, file, params }) => {
         if (file) {
             body.image = file.filename;
         }
+        if(body.first_name && body.last_name) {
+            body.full_name = body.first_name + " " + body.last_name;
+        }
         const updateData = await driverModel.findByIdAndUpdate(params.id, body, { new: true });
         if (!updateData) {
             return {
@@ -345,6 +348,11 @@ exports.blockedDriverList = async (req) => {
     try {
         let pipeline = [];
         let search_value = req.query.search || "";
+
+        let page = parseInt(req.query.page) || 1; 
+        let perPage = parseInt(req.query.perPage) || 10;
+        let skip = (page - 1) * perPage;
+
         if (search_value) {
             pipeline.push({
                 $match: {
@@ -420,6 +428,20 @@ exports.blockedDriverList = async (req) => {
                 }
             });
         }
+
+        let countPipeline = [...pipeline];
+        countPipeline.push({ $count: "totalCount" });
+
+        // Aggregate to get total count
+        const countData = await driverModel.aggregate(countPipeline);
+        const totalCount = countData.length > 0 ? countData[0].totalCount : 0;
+
+        // Add pagination to the original pipeline
+        pipeline.push(
+            { $skip: skip },
+            { $limit: perPage }
+        );
+
         pipeline.push(
             {
                 $project: {
@@ -445,8 +467,13 @@ exports.blockedDriverList = async (req) => {
             statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Fetch_Successfully,
-            data: getData
-
+            data: getData,
+            pagination: {
+                page: page,
+                perPage: perPage,
+                totalItems: totalCount,
+                totalPages: Math.ceil(totalCount / perPage)
+            }
         };
     } catch (error) {
         console.log(error);

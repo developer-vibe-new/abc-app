@@ -4,8 +4,8 @@ const { statusCode, resMessage } = require('../../config/default.json');
 
 exports.taxiTypeList = async (req) => {
     try {
-        let page = req.query.page || 1;
-        let pagesize = req.query.pagesize || 10;
+        let page = parseInt(req.query.page) || 1;
+        let pagesize = parseInt(req.query.pagesize) || 10;
         let search_value = req.query.search || "";
         var conditions = [];
 
@@ -17,42 +17,56 @@ exports.taxiTypeList = async (req) => {
             });
         }
 
-        conditions.push();
-
         conditions.push({
             $project: {
-                    icon: {
-                        $concat: [
-                            "http://192.168.0.18:6161/taxiType/",
-                            "$icon"
-                        ]
-                    },
-                    title: 1,
-                    currency: 1,
-                    base_fare: 1,
-                    time_fare: 1,
-                    distance_fare: 1,
-                    airportCharge: 1,
-                    outstation_distance_fare: 1,
-                    outstation_two_distance_fare: 1,
-                    rental_distance_fare: 1,
-                    is_active: 1,
-                    outstation_status: 1
+                icon: {
+                    $concat: [
+                        "http://192.168.0.18:6161/taxiType/",
+                        "$icon"
+                    ]
+                },
+                title: 1,
+                currency: 1,
+                base_fare: 1,
+                time_fare: 1,
+                distance_fare: 1,
+                airportCharge: 1,
+                outstation_distance_fare: 1,
+                outstation_two_distance_fare: 1,
+                rental_distance_fare: 1,
+                is_active: 1,
+                outstation_status: 1
             }
         });
-        conditions.push(
-            { $sort: { title: 1 } },
-            { $skip: (page - 1) * pagesize },
-            { $limit: pagesize }
-        );
+
+        conditions.push({ $sort: { title: 1 } });
+
+        conditions.push({
+            $skip: (page - 1) * pagesize
+        });
+
+        conditions.push({ $limit: pagesize });
+
         const findTaxi = await taxiTypeModel.aggregate(conditions);
+
+        const totalCount = await taxiTypeModel.countDocuments({
+            title: { $regex: search_value, $options: "i" }
+        });
+
+        const totalPages = Math.ceil(totalCount / pagesize);
+
         return {
             statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Fetch_Successfully,
-            data: findTaxi
+            data: findTaxi,
+            pagination: {
+                totalCount: totalCount,
+                totalPages: totalPages,
+                currentPage: page,
+                pageSize: pagesize
+            }
         };
-        // }
     } catch (error) {
         return {
             success: false,
