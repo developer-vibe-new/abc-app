@@ -62,6 +62,7 @@ router.post('/updateTaxistatus', auth, responseHandler(taxiTypeController.update
 router.get('/userList', auth, responseHandler(userManController.userListing));
 router.post('/updateStatusUser', auth, responseHandler(userManController.updateStatusUser));
 router.get('/userRideingDetails/:id', auth, responseHandler(userManController.userRideingDetails));
+router.post('/updateTaxiOutstationStatus', auth, responseHandler(taxiTypeController.updateTaxiTypeOutstationStatusController));
 
 router.post('/createRental', auth, responseHandler(rentalController.createRental));
 router.post('/rentalEditData/:id', auth, responseHandler(rentalController.rentalEditData));

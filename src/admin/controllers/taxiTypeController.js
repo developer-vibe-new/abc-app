@@ -37,3 +37,15 @@ exports.updateTaxiStatus = async (req) => {
         console.log(error);
     }
 };
+
+exports.updateTaxiTypeOutstationStatusController = async (req) => {
+    try {
+        return await services.updateTaxiOutstationStatus(req)
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}

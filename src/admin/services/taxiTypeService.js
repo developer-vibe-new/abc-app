@@ -54,7 +54,11 @@ exports.taxiTypeList = async (req) => {
         };
         // }
     } catch (error) {
-        console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
     }
 };
 exports.updateTaxiTypeList = async (req) => {
@@ -79,7 +83,11 @@ exports.updateTaxiTypeList = async (req) => {
             };
         }
     } catch (error) {
-        console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
     }
 };
 
@@ -102,27 +110,36 @@ exports.updateTaxiStatus = async (req) => {
             message: resMessage.Data_Updated_Successfully
         }
     } catch (error) {
-        console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
     }
 };
 exports.updateTaxiOutstationStatus = async (req) => {
     try {
-        const updateData = await taxiTypeModel.findById({ _id: new mongoose.Types.ObjectId(req.body._id) });
-        if (updateData) {
-            updateData.outstation_status = !updateData.outstation_status;
-            await updateData.save();
-        }
-        if (updateData) {
+        const updateData = await taxiTypeModel.findById(req.body.id);
+        if(!updateData) {
             return {
-                success: true,
-                data: updateData
-            };
-        } else {
-            return {
+                status: statusCode.BAD_REQUEST,
                 success: false,
-            };
+                message: resMessage.Data_Not_Found
+            }
+        }
+        const updateStatus = updateData.outstation_status === true ? false : true;
+        updateData.outstation_status = updateStatus;
+        await updateData.save();
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Updated_Successfully
         }
     } catch (error) {
-        console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
     }
 };
