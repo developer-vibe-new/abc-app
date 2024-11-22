@@ -42,13 +42,13 @@ router.get('/operators', auth, responseHandler(adminController.operators));
 router.post('/operatorsUpdate/:id', auth, responseHandler(adminController.operatorsUpdate));
 
 // driver 
-router.post('/createDriver', upload.single('image'), responseHandler(driverController.createDriver));
-router.get('/viewDriver', responseHandler(driverController.viewDriver));
+router.post('/createDriver', auth, upload.single('image'), responseHandler(driverController.createDriver));
+router.get('/viewDriver', auth, responseHandler(driverController.viewDriver));
 router.get('/editDriver/:id', auth, responseHandler(driverController.editDriver));
 router.post('/updateDriver/:id', auth, upload.single('image'), responseHandler(driverController.updateDriver));
 router.post('/blockDriver', auth, responseHandler(driverController.blockDriver));
 // router.post('/deleteDriver/:id', auth, responseHandler(driverController.deleteDriver));
-router.get('/blockedDriversList', auth, responseHandler(driverController.blockedDriversList));
+router.get('/blockedDriversList', responseHandler(driverController.blockedDriversList));
 router.get('/editBlockDriver/:id', auth, responseHandler(driverController.editBlockDriver));
 router.post('/blockedDriverUpdate/:id', auth, upload.single('image'), responseHandler(driverController.blockedDriverUpdate));
 router.post('/unblockDriver', auth, responseHandler(driverController.unblockDriver));

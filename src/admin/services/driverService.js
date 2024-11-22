@@ -48,7 +48,7 @@ exports.driverView = async (req) => {
         if (search_value) {
             conditions.push({
                 $match: {
-                    first_name: { $regex: search_value, $options: "i" }
+                    full_name: { $regex: search_value, $options: "i" }
                 }
             });
         }
@@ -147,6 +147,7 @@ exports.driverView = async (req) => {
                 vehicleStatus: 1,
                 status: 1,
                 pending_amount: 1,
+                full_name: 1
             }
         });
 
@@ -348,7 +349,7 @@ exports.blockedDriverList = async (req) => {
             pipeline.push({
                 $match: {
                     $or: [
-                        { "first_name": { $regex: search_value, $options: "i" } },
+                        { "full_name": { $regex: search_value, $options: "i" } },
                         { "email": { $regex: search_value, $options: "i" } },
                         { "mobile": { $regex: search_value, $options: "i" } }
                     ]
@@ -433,7 +434,8 @@ exports.blockedDriverList = async (req) => {
                     vehicleStatus: 1,
                     status: 1,
                     pending_amount: 1,
-                    new_status: "Unblock"
+                    new_status: "Unblock",
+                    full_name: 1
                 }
             }
         );

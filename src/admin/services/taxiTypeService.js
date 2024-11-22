@@ -85,21 +85,21 @@ exports.updateTaxiTypeList = async (req) => {
 
 exports.updateTaxiStatus = async (req) => {
     try {
-        const updateData = await taxiTypeModel.findById({ _id: new mongoose.Types.ObjectId(req.body._id) });
-        console.log(updateData, "updateData");
-        if (updateData) {
-            updateData.is_active = !updateData.is_active;
-            await updateData.save();
-        }
-        if (updateData) {
+        const updateData = await taxiTypeModel.findById(req.body.id);
+        if(!updateData) {
             return {
-                success: true,
-                data: updateData
-            };
-        } else {
-            return {
+                status: statusCode.BAD_REQUEST,
                 success: false,
-            };
+                message: resMessage.Data_Not_Found
+            }
+        }
+        const updateStatus = updateData.is_active === true ? false : true;
+        updateData.is_active = updateStatus;
+        await updateData.save();
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Updated_Successfully
         }
     } catch (error) {
         console.log(error);
