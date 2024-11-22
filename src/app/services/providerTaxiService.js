@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const { statusCode, resMessage } = require('../../config/default.json');
 const ProviderTaxi = require('../../models/providerTaxi');
 
@@ -41,6 +42,40 @@ exports.addProviderTaxi = async (req) => {
             statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Created_Successfully,
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}
+
+exports.deleteProviderTaxi = async (req) => {
+    try {
+        const { id } = req.params;
+        const data = await ProviderTaxi.findById(id);
+        if(!data) {
+            return {
+                statusCode: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            };
+        }
+        const operatorId = new mongoose.Types.ObjectId(req.auth.id);
+        if (data.operator_id && data.operator_id.equals(operatorId)) {
+            await ProviderTaxi.findByIdAndUpdate(id, { is_active: false })
+            return {
+                statusCode: statusCode.OK,
+                success: true,
+                message: resMessage.Data_Deleted_Successfully,
+            }
+        }
+        return {
+            statusCode: statusCode.UNAUTHORIZED,
+            success: false,
+            message: resMessage.Unauthorized_Access,
         }
     } catch (error) {
         return {

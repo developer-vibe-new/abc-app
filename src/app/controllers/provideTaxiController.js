@@ -12,3 +12,15 @@ exports.addProviderTaxiController = async (req) => {
         };
     }
 }
+
+exports.deleteProviderTaxiController = async (req) => {
+    try {
+        return await service.deleteProviderTaxi(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
