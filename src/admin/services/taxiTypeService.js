@@ -61,12 +61,13 @@ exports.taxiTypeList = async (req) => {
         };
     }
 };
+
 exports.updateTaxiTypeList = async (req) => {
     try {
         const body = req.body;
         if (req.file) {
 
-            body.image = req.file.filename;
+            body.icon = req.file.filename;
         }
         const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true });
 
