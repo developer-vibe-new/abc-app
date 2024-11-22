@@ -355,13 +355,7 @@ exports.blockedDriverList = async (req) => {
 
         if (search_value) {
             pipeline.push({
-                $match: {
-                    $or: [
-                        { "full_name": { $regex: search_value, $options: "i" } },
-                        { "email": { $regex: search_value, $options: "i" } },
-                        { "mobile": { $regex: search_value, $options: "i" } }
-                    ]
-                }
+                $match: { "full_name": { $regex: search_value, $options: "i" } }
             });
         }
 
