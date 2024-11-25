@@ -71,7 +71,7 @@ router.get('/veiwRentalData/:id', auth, responseHandler(rentalController.viewRen
 router.post('/rentalEditData/:id', auth, responseHandler(rentalController.rentalEditData));
 router.get('/rentalList', auth, responseHandler(rentalController.rentalListData));
 router.get('/viewVehicle', auth, responseHandler(vehicleController.viewVehicle));
-router.post('/updateVehicleStatus/:id', responseHandler(vehicleController.updateVehicleStatusController));
+router.post('/updateVehicleStatus/:id', auth, responseHandler(vehicleController.updateVehicleStatusController));
 router.get('/vehicleTypeList', auth, responseHandler(vehicleController.vehicleTypeList));
 router.post('/createVehicle', auth, responseHandler(vehicleController.createVehicle));
 router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
