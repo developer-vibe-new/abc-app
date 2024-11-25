@@ -71,10 +71,11 @@ router.get('/veiwRentalData/:id', auth, responseHandler(rentalController.viewRen
 router.post('/rentalEditData/:id', auth, responseHandler(rentalController.rentalEditData));
 router.get('/rentalList', auth, responseHandler(rentalController.rentalListData));
 router.get('/viewVehicle', auth, responseHandler(vehicleController.viewVehicle));
-router.post('/updateVehicleStatus/:id', auth, responseHandler(vehicleController.updateVehicleStatusController));
+router.post('/updateVehicleStatus', auth, responseHandler(vehicleController.updateVehicleStatusController));
 router.get('/vehicleTypeList', auth, responseHandler(vehicleController.vehicleTypeList));
 router.post('/createVehicle', auth, responseHandler(vehicleController.createVehicle));
 router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
+router.get('/editVehicle/:id', auth, responseHandler(vehicleController.editVehicleController));
 
 // Export the router for use in the main application
 module.exports = router;

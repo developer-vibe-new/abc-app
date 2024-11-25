@@ -49,3 +49,15 @@ exports.updateVehicleStatusController = async (req) => {
         };
     }
 }
+
+exports.editVehicleController = async (req) => {
+    try {
+        return await service.editVehicle(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}

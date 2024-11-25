@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const vehicleModel = require('../../models/cars');
 const taxiTypeModel = require('../../models/taxiTypeModel');
 const { statusCode, resMessage } = require('../../config/default.json');
@@ -53,7 +54,8 @@ exports.vehicleList = async (req) => {
               title: 1,
               make: 1,
               model: 1,
-              type: 1
+              type: 1,
+              is_active: 1
             }
           },
           { $skip: skip },
@@ -139,7 +141,7 @@ exports.addVehicle = async (req) => {
 
 exports.updateVehicleStatus = async (req) => {
     try {
-        const { id } = req.params;
+        const { id } = req.body;
         const data = await vehicleModel.findById(id);
         if(!data) {
             return {
@@ -158,6 +160,61 @@ exports.updateVehicleStatus = async (req) => {
             success: true,
             message: resMessage.Data_Updated_Successfully,
             data
+        }
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
+
+exports.editVehicle = async (req) => {
+    try {
+        const { id } = req.params;
+        const data = await vehicleModel.aggregate([
+            {
+              $match: {
+                _id: new mongoose.Types.ObjectId(id)
+              }
+            },
+            {
+              $lookup: {
+                from: "taxi_types",
+                localField: "taxi_type",
+                foreignField: "_id",
+                as: "taxi_type"
+              }
+            },
+            {
+              $addFields: {
+                taxi_type: {
+                  $arrayElemAt: ["$taxi_type.title", 0]
+                }
+              }
+            },
+              {
+                $project: {
+                  taxi_type: 1,
+                title: 1,
+                make: 1,
+                model: 1
+                }
+              }
+        ]);
+        if(!data) {
+            return {
+                statusCode: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            };
+        }
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Retrieved_Successfully,
+            data: data[0]
         }
     } catch (error) {
         return {
