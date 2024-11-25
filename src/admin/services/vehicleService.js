@@ -1,7 +1,6 @@
 const vehicleModel = require('../../models/cars');
 const taxiTypeModel = require('../../models/taxiTypeModel');
-
-
+const { statusCode, resMessage } = require('../../config/default.json');
 
 exports.vehicleList = async (req) => {
     try {
@@ -59,31 +58,30 @@ exports.showVehicleType = async () => {
 
 exports.addVehicle = async (req) => {
     try {
-        // console.log(req.body,"bbbbbbbb")
         const createData = await vehicleModel.create({
-            type: req.body.type,
+            taxi_type: req.body.taxi_type,
             title: req.body.title,
             make: req.body.make,
             model: req.body.model
         });
         if (createData) {
             return {
+                statusCode: statusCode.OK,
                 success: true,
-                message: "Vehicle Created Successfully",
-                // data:createData
-            };
-        } else {
-            return {
-                success: false,
-                message: "Vehicle Not Created",
-                // data:createData
+                message: resMessage.Data_Created_Successfully,
+                data: createData,
             };
         }
-    } catch (error) {
-        console.log(error);
         return {
+            status: statusCode.BAD_REQUEST,
             success: false,
-            message: "An error occurred while creating vehicles Data."
+            message: resMessage.Vehicle_Not_Created
+        };
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
         };
     }
 };

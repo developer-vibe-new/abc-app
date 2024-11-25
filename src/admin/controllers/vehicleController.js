@@ -30,12 +30,6 @@ exports.vehicleTypeList = async (req, res) => {
 exports.createVehicle = async (req, res) => {
     try {
         return await service.addVehicle(req);
-        // if (data.success == true) {
-
-        //     return res.status(200).json(Object.assign({ success: data.success }, data));
-        // } else {
-        //     return res.status(400).json(Object.assign({ success: data.success }, { message: data.message }));
-        // }
     } catch (error) {
         console.error("Error in createVehicle:", error);
         return res.status(500).json({

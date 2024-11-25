@@ -30,10 +30,6 @@ const CarSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'City'
     },
-    type: {
-        type: String,
-        enum: ['operator', 'main']
-    }
 }, {
     timestamps: {
         createdAt: 'created',
