@@ -136,3 +136,34 @@ exports.addVehicle = async (req) => {
         };
     }
 };
+
+exports.updateVehicleStatus = async (req) => {
+    try {
+        const { id } = req.params;
+        const data = await vehicleModel.findById(id);
+        if(!data) {
+            return {
+                statusCode: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            };
+        }
+
+        const status = data.is_active === true ? false : true;
+        data.is_active = status;
+        await data.save();
+        
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Updated_Successfully,
+            data
+        }
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}

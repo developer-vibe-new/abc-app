@@ -38,3 +38,14 @@ exports.createVehicle = async (req, res) => {
     }
 };
 
+exports.updateVehicleStatusController = async (req) => {
+    try {
+        return await service.updateVehicleStatus(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}

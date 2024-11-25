@@ -69,8 +69,9 @@ router.get('/editTaxiType/:id', auth, responseHandler(taxiTypeController.editTax
 router.post('/createRental', auth, responseHandler(rentalController.createRental));
 router.get('/veiwRentalData/:id', auth, responseHandler(rentalController.viewRentalDataController));
 router.post('/rentalEditData/:id', auth, responseHandler(rentalController.rentalEditData));
-router.get('/rentalList', responseHandler(rentalController.rentalListData));
-router.get('/viewVehicle', responseHandler(vehicleController.viewVehicle));
+router.get('/rentalList', auth, responseHandler(rentalController.rentalListData));
+router.get('/viewVehicle', auth, responseHandler(vehicleController.viewVehicle));
+router.post('/updateVehicleStatus/:id', responseHandler(vehicleController.updateVehicleStatusController));
 router.get('/vehicleTypeList', auth, responseHandler(vehicleController.vehicleTypeList));
 router.post('/createVehicle', auth, responseHandler(vehicleController.createVehicle));
 router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
