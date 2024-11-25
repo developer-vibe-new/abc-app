@@ -60,9 +60,12 @@ router.get('/taxiTypeDropDown', auth, responseHandler(driverController.taxiTypeD
 router.get('/viewTaxiType', auth, responseHandler(taxiTypeController.viewTaxiType));
 router.post('/updateTaxiType/:id', auth, upload.single('image'), responseHandler(taxiTypeController.updateTaxiType));
 router.post('/updateTaxistatus', auth, responseHandler(taxiTypeController.updateTaxiStatus));
+
+// user
 router.get('/userList', auth, responseHandler(userManController.userListing));
 router.post('/updateStatusUser', auth, responseHandler(userManController.updateStatusUser));
 router.get('/userRideingDetails/:id', auth, responseHandler(userManController.userRideingDetails));
+
 router.post('/updateTaxiOutstationStatus', auth, responseHandler(taxiTypeController.updateTaxiTypeOutstationStatusController));
 router.get('/editTaxiType/:id', auth, responseHandler(taxiTypeController.editTaxiTypeController));
 
