@@ -4,38 +4,89 @@ const { statusCode, resMessage } = require('../../config/default.json');
 
 exports.vehicleList = async (req) => {
     try {
-        var page = parseInt(req.query.page) || 1;
-        var pagesize = parseInt(req.query.pagesize) || 10;
-        let search_value = req.query.search_value || "";
-
-
         let pipeline = [];
-        if (search_value) {
+        let search = req.query.search;
+        if(search) {
             pipeline.push({
-                $match: {
-                    title: { $regex: search_value, $options: "i" }
+                $match: { 
+                    $or: [
+                        { title: { $regex: search, $options: "i" } },
+                        { make: { $regex: search, $options: "i" } },
+                        { model: { $regex: search, $options: "i" } },
+                        { type: { $regex: search, $options: "i" } }
+                    ]
                 }
             });
         }
-        pipeline.push(
-            { $sort: { createdAt: -1 } },
-            { $skip: (page - 1) * pagesize },
-            { $limit: pagesize }
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        pipeline.push({
+            $addFields: {
+              added_on: {
+                $dateToString: {
+                  format: "%d-%m-%Y",
+                  date: "$created"
+                }
+              },
+              vehicle_name: "$title"
+            }
+          },
+          {
+            $lookup: {
+              from: "taxi_types",
+              localField: "taxi_type",
+              foreignField: "_id",
+              as: "taxi_type"
+            }
+          },
+          {
+            $addFields: {
+              type: {
+                $arrayElemAt: ["$taxi_type.title", 0]
+              }
+            }
+          },
+          {
+            $project: {
+              added_on: 1,
+              title: 1,
+              make: 1,
+              model: 1,
+              type: 1
+            }
+          },
+          { $skip: skip },
+          { $limit: limit }
         );
-
         const vehicalView = await vehicleModel.aggregate(pipeline);
-
-
+        const totalVehicles = await vehicleModel.countDocuments();
+        const totalPages = Math.ceil(totalVehicles / limit);
+        if(!vehicalView) {
+            return {
+                statusCode: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.No_Data_Found
+            };
+        }
         return {
+            status: statusCode.OK,
             success: true,
-            data: vehicalView
+            message: resMessage.Data_Retrieved_Successfully,
+            data: vehicalView,
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+                totalItems: totalVehicles,
+                pageSize: limit
+            }
         };
-
     } catch (error) {
         console.log(error);
         return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
-            message: "An error occurred while fetching vehicles Data."
+            message: error.message
         };
     }
 };

@@ -1,12 +1,10 @@
 const services = require("../services/rentalService");
 const { statusCode } = require('../../config/default.json');
 
-
 exports.rentalListData = async (req) => {
     try {
         return await services.rentalList(req);
     } catch (error) {
-        console.log(error);
         return {
             statusCode: statusCode.BAD_REQUEST,
             success: false,

@@ -1,16 +1,15 @@
 const service = require('../services/vehicleService');
+const { statusCode } = require('../../config/default.json');
 
-
-exports.viewVehicle = async (req, res) => {
+exports.viewVehicle = async (req) => {
     try {
         return await service.vehicleList(req);
-        // return res.status(200).json(Object.assign({ success: data.success }, data));
     } catch (error) {
-        console.error("Error in viewVehicle:", error);
-        return res.status(500).json({
+        return {
+            statusCode: statusCode.BAD_REQUEST,
             success: false,
-            message: "An internal server error occurred.",
-        });
+            message: error.message
+        };
     }
 };
 
