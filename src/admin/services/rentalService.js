@@ -1,29 +1,45 @@
 const rentalModel = require("../../models/rentalModel");
+const { statusCode, resMessage } = require('../../config/default.json');
 
-exports.rentalList = async (req) => {
+exports.rentalList = async () => {
     try {
-
-        var page = req.query.page || 1;
-        let pagesize = req.query.pagesize || 10;
-        var conditions;
-
-        // let search_value = req.query.search || "";
-
-        // if (search_value) {
-        //     conditions = _.assign(conditions, { $or: [{ "state": { $regex: new RegExp(search_value, "gi") } }] });
-        // }
-
-        const rentalData = await rentalModel.find(conditions)
-            .sort({ createdAt: -1 })
-            .skip((page - 1) * pagesize).
-            limit(pagesize);
-
+        const rentalData = await rentalModel.aggregate([
+            {
+              $sort: {
+                created: -1
+              }
+            },
+            {
+              $project: {
+                added_on: {
+                  $dateToString: {
+                    format: "%d-%m-%Y",
+                    date: "$created"
+                  }
+                },
+                packages: 1
+              }
+            }
+          ]);
+        if(!rentalData) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
         return {
+            status: statusCode.OK,
             success: true,
+            message: "Data Retrieved Successfully",
             data: rentalData
-        };
+        }
     } catch (error) {
-        console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
     }
 };
 

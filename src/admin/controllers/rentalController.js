@@ -2,10 +2,9 @@ const services = require("../services/rentalService");
 const { statusCode } = require('../../config/default.json');
 
 
-exports.rentalListData = async (req) => {
+exports.rentalListData = async () => {
     try {
-        return await services.rentalList(req);
-        // return res.status(200).json(Object.assign({ status: data.success }, data));
+        return await services.rentalList();
     } catch (error) {
         console.log(error);
         return {
