@@ -17,7 +17,6 @@ exports.rentalListData = async (req) => {
 exports.rentalEditData = async (req) => {
     try {
         return await services.editRental(req);
-        // return res.status(200).json(Object.assign({ status: data.success }, data));
     } catch (error) {
         console.log(error);
         return {

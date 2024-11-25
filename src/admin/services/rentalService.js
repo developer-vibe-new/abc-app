@@ -62,12 +62,21 @@ exports.rentalList = async (req) => {
 
 exports.editRental = async (req) => {
     try {
-        const body = req.body;
-        const editRentalData = await rentalModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true });
+        const package = req.body;
+        const editRentalData = await rentalModel.findByIdAndUpdate({ _id: req.params.id }, { packages: package }, { new: true });
+        if(!editRentalData) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
         return {
+            status: statusCode.OK,
             success: true,
+            message: resMessage.Data_Updated_Successfully,
             data: editRentalData
-        };
+        }
     } catch (error) {
         console.log(error);
     }
