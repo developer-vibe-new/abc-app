@@ -1,8 +1,11 @@
 const rentalModel = require("../../models/rentalModel");
 const { statusCode, resMessage } = require('../../config/default.json');
 
-exports.rentalList = async () => {
+exports.rentalList = async (req) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
         const rentalData = await rentalModel.aggregate([
             {
               $sort: {
@@ -19,8 +22,15 @@ exports.rentalList = async () => {
                 },
                 packages: 1
               }
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: limit
             }
-          ]);
+        ]);
+        const totalCount = await rentalModel.countDocuments();
         if(!rentalData) {
             return {
                 status: statusCode.DATA_NOT_FOUND,
@@ -32,8 +42,14 @@ exports.rentalList = async () => {
             status: statusCode.OK,
             success: true,
             message: "Data Retrieved Successfully",
-            data: rentalData
-        }
+            data: rentalData,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalCount / limit),
+                totalCount: totalCount,
+                limit: limit
+            }
+        };
     } catch (error) {
         return {
             success: false,
