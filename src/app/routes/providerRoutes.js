@@ -13,4 +13,7 @@ router.get('/driverBlockList', verifyToken, responseHandler(controller.driverBlo
 router.post('/driverOnlineStatus/:id', verifyToken, responseHandler(controller.driverOnlineStatusController));
 router.post('/updateDrive/:id', verifyToken, upload.single('image'), responseHandler(controller.updateDriverController));
 
+//login route api for  providers
+router.post('/providerOtpGeneration', responseHandler(controller.providerLoginController));
+router.post('/providerOtpVerification',responseHandler(controller.providerOtpVerification));
 module.exports = router;

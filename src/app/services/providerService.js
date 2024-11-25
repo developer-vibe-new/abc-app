@@ -1,6 +1,7 @@
-const { statusCode, resMessage } = require('../../config/default.json');
+const { statusCode, resMessage} = require('../../config/default.json');
 const Provider = require('../../models/providerModel');
 const mongoose = require('mongoose');
+const jwt = require("jsonwebtoken");
 
 exports.addDriver = async (req) => {
     try {
@@ -201,6 +202,95 @@ exports.updateDriver = async (req) => {
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || 'Internal Server Error'
+        };
+    }
+};
+
+exports.providerlogin = async (req) => {
+    try {
+        const { mobile } = req.body;
+        const otp = 12345; // Static OTP to provide
+
+        // Check if the user exists in the database
+        let driverData = await Provider.findOne({ mobile });
+
+        // If the user does not exist, register them and provide the static OTP
+        if (!driverData) {
+            driverData = new Provider({ mobile, otp });
+            await driverData.save();
+            return {
+                statusCode: statusCode.OK,
+                success: true,
+                message: resMessage.Provider_Registered_Successfully,
+                data: { _id: driverData._id, otp: otp },
+            };
+        }
+
+        // If user account is blocked, return an error message
+        if (driverData.status === "block") {
+            return {
+                statusCode: statusCode.OK,
+                success: false,
+                message: resMessage.Your_Account_is_Blocked,
+            };
+        }
+
+        // If the user exists, provide the static OTP
+        driverData.otp = otp;
+        await driverData.save();
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.User_login_Successfully,
+            data: { _id: driverData._id, otp: otp },
+        };
+
+        // Leave the commented code as is
+    } catch (error) {
+        // Return an error message if something goes wrong
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message,
+        };
+    }
+};
+
+exports.providerOtpVerification = async (req) => {
+    try {
+        const { mobile, otp } = req.body;
+
+        // Find the driver by mobile and OTP
+        const driverData = await Provider.findOne({ mobile, otp });
+
+        // If driver does not exist, return an error
+        if (!driverData) {
+            return {
+                statusCode: statusCode.OK,
+                success: false,
+                message: resMessage.Data_Not_Found,
+            };
+        }
+
+        // If the driver exists, generate a JWT token
+        const token = jwt.sign(
+            { _id: driverData._id, mobile: driverData.mobile }, // Payload
+            process.env.SECRET_KEY, // Secret key
+            { expiresIn: "1h" } // Token expiration
+        );
+
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Otp_Verify_Successfully,
+            data: { _id: driverData._id, token },
+        };
+    } catch (error) {
+        // Return an error message if something goes wrong
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message,
         };
     }
 };

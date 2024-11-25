@@ -14,6 +14,7 @@
     },
     "resMessage": {
         "User_Deleted_Successfully": "User deleted successfully",
+        "User_Registered_Successfully":"User_registerd",
         "Provider_Not_Found": "Provider_Not_Found",
         "Status_Updated_Successfully": "Status_Updated_Successfully",
         "Invalid_Status": "Invalid_Status",

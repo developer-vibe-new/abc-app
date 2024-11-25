@@ -108,3 +108,28 @@ exports.updateDriverController = async (req) => {
         };
     }
 };
+
+exports.providerLoginController = async (req) => {
+    try {
+        return await service.providerlogin(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
+
+
+exports.providerOtpVerification = async (req) => {
+    try {
+        return await service.providerOtpVerification(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
