@@ -76,6 +76,7 @@ router.get('/vehicleTypeList', auth, responseHandler(vehicleController.vehicleTy
 router.post('/createVehicle', auth, responseHandler(vehicleController.createVehicle));
 router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
 router.get('/editVehicle/:id', auth, responseHandler(vehicleController.editVehicleController));
+router.post('/updateVehicle/:id', auth, responseHandler(vehicleController.updateVehicleController));
 
 // Export the router for use in the main application
 module.exports = router;

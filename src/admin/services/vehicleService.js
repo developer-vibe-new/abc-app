@@ -224,3 +224,32 @@ exports.editVehicle = async (req) => {
         };
     }
 }
+
+exports.updateVehicle = async (req) => {
+  try {
+    const { id } = req.params;
+    const { title, make, model } = req.body;
+    const data = await vehicleModel.findById(id);
+    if(!data) {
+      return {
+        statusCode: statusCode.DATA_NOT_FOUND,
+        success: false,
+        message: resMessage.Data_Not_Found
+      };
+    }
+    await vehicleModel.findByIdAndUpdate(id, 
+      { title, make, model }, 
+      { new: true });
+    return {
+      status: statusCode.OK,
+      success: true,
+      message: resMessage.Data_Updated_Successfully
+    };
+  } catch (error) {
+    return {
+      status: statusCode.INTERNAL_SERVER_ERROR,
+      success: false,
+      message: error.message
+  };
+  }
+}
