@@ -44,3 +44,15 @@ exports.createRental = async (req) => {
         };
     }
 };
+
+exports.viewRentalDataController = async (req) => {
+    try {
+        return await services.viewRentalData(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}

@@ -42,7 +42,7 @@ exports.rentalList = async (req) => {
         return {
             status: statusCode.OK,
             success: true,
-            message: "Data Retrieved Successfully",
+            message: resMessage.Data_Fetch_Successfully,
             data: rentalData,
             pagination: {
                 currentPage: page,
@@ -94,7 +94,6 @@ exports.addRental = async ({ body }) => {
         };
 
     } catch (error) {
-
         return {
             statusCode: 400,
             success: false,
@@ -102,3 +101,29 @@ exports.addRental = async ({ body }) => {
         };
     }
 };
+
+exports.viewRentalData = async (req) => {
+    try {
+        const { id } = req.params;
+        const data = await rentalModel.findById(id);
+        if(!data) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data
+        };
+    } catch (error) {
+        return {
+            statusCode: 400,
+            success: false,
+            message: error.message
+        };
+    }
+}
