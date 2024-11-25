@@ -13,15 +13,16 @@ exports.rentalList = async (req) => {
               }
             },
             {
-              $project: {
-                added_on: {
-                  $dateToString: {
-                    format: "%d-%m-%Y",
-                    date: "$created"
-                  }
-                },
-                packages: 1
-              }
+                $project: {
+                  added_on: {
+                    $dateToString: {
+                      format: "%d-%m-%Y",
+                      date: "$created"
+                    }
+                  },
+                  distance: "$packages.dis",
+                  hour: "$packages.hr"
+                }
             },
             {
                 $skip: skip
