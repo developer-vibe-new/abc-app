@@ -6,7 +6,7 @@ const { statusCode, resMessage } = require('../../config/default.json');
 exports.userListData = async (req) => {
     try {
         let pipeline = [];
-        let search = req.params.search;
+        let search = req.query.search;
         let page = parseInt(req.query.page) || 1;
         let limit = parseInt(req.query.limit) || 10;
 
