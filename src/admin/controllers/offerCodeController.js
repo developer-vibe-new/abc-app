@@ -13,3 +13,15 @@ exports.addOfferCodeController = async (req) => {
         };
     }
 }
+
+exports.viewOfferCodeController = async (req) => {
+    try {
+        return await service.viewOfferCode(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}
