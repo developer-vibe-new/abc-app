@@ -30,7 +30,7 @@ exports.addSubAdmin = async (req) => {
     }
 }
 
-exports.viewSubAdmin = async () => {
+exports.viewSubAdmin = async (req) => {
     try {
         let page = req.query.page || 1;
         let limit = parseInt(req.query.limit) || 10;
