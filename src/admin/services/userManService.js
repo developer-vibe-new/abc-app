@@ -28,7 +28,12 @@ exports.userListData = async (req) => {
             $project: {
               first_name: 1,
               last_name: 1,
-              profile_image: 1,
+              profile_image: {
+                $concat: [
+                  "http://192.168.0.18/user/",
+                  "$profile_image"
+                ]
+              },
               email: 1,
               mobile: 1,
               reg_date: {
