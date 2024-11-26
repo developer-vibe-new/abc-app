@@ -30,7 +30,7 @@ exports.userListData = async (req) => {
               last_name: 1,
               profile_image: {
                 $concat: [
-                  "http://192.168.0.18/user/",
+                  "http://192.168.0.18:6161/user/",
                   "$profile_image"
                 ]
               },
