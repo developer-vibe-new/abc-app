@@ -12,3 +12,15 @@ exports.addSubAdminController = async (req) => {
         };
     }
 }
+
+exports.viewSubAdminController = async () => {
+    try {
+        return await service.viewSubAdmin();
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
