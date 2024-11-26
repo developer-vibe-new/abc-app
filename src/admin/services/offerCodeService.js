@@ -88,3 +88,29 @@ exports.viewOfferCode = async (req) => {
         };
     }
 }
+
+exports.getEditOfferCode = async (req) => {
+    try {
+        const { id } = req.params;
+        const data = await OfferCode.findById(id);
+        if(!data) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Retrieved_Successfully,
+            data
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}

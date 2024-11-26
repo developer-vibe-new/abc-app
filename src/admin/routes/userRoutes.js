@@ -84,7 +84,8 @@ router.post('/updateVehicle/:id', auth, responseHandler(vehicleController.update
 
 // Offer Code
 router.post("/addOfferCode", auth, responseHandler(offerCodeController.addOfferCodeController));
-router.get('/viewOfferCode', responseHandler(offerCodeController.viewOfferCodeController));
+router.get('/viewOfferCode', auth, responseHandler(offerCodeController.viewOfferCodeController));
+router.get('/editOfferCode/:id', auth, responseHandler(offerCodeController.getEditOfferCodeController));
 
 // Export the router for use in the main application
 module.exports = router;
