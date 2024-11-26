@@ -15,6 +15,7 @@ const userManController = require('../controllers/userManController');
 const rentalController = require('../controllers/rentalController');
 const vehicleController = require('../controllers/vehicleController');
 const reportController = require('../controllers/reportsController');
+const offerCodeController = require('../controllers/offerCodeController');
 // const validation = require('../../validators/admin/userVal');
 
 router.get('/index', async (req, res) => {
@@ -80,6 +81,9 @@ router.post('/createVehicle', auth, responseHandler(vehicleController.createVehi
 router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
 router.get('/editVehicle/:id', auth, responseHandler(vehicleController.editVehicleController));
 router.post('/updateVehicle/:id', auth, responseHandler(vehicleController.updateVehicleController));
+
+// Offer Code
+router.post("/addOfferCode", responseHandler(offerCodeController.addOfferCodeController));
 
 // Export the router for use in the main application
 module.exports = router;
