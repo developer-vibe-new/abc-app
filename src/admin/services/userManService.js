@@ -82,19 +82,29 @@ exports.userListData = async (req) => {
 
 exports.updateUserStatus = async (req) => {
     try {
-        const updateData = await userModel.findByIdAndUpdate({ _id: req.body._id }, { is_active: false }, { new: true });
-        if (updateData) {
+        const { id } = req.body;
+        const data = await userModel.findById(id);
+        if(!data) {
             return {
-                success: true,
-                data: updateData
-            };
-        } else {
-            return {
-                success: false
-            };
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        let status = data.is_active === true ? false : true;
+        data.is_active = status;
+        await data.save();
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Status_Updated_Successfully,
         }
     } catch (error) {
-        console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
     }
 };
 
