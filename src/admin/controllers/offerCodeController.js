@@ -37,3 +37,15 @@ exports.getEditOfferCodeController = async (req) => {
         };
     }
 }
+
+exports.updateOfferCodeController = async (req) => {
+    try {
+        return await service.updateOfferCode(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}

@@ -114,3 +114,32 @@ exports.getEditOfferCode = async (req) => {
         };
     }
 }
+
+exports.updateOfferCode = async (req) => {
+    try {
+        const { id } = req.params;
+        const { offercode, description, start_date, end_date, ride_type, percentage, price, usedtimes } = req.body;
+        const data = await OfferCode.findById(id);
+        if(!data) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        await OfferCode.findByIdAndUpdate(id, {
+            offercode, description, start_date, end_date, ride_type, percentage, price, usedtimes
+        });
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Updated_Successfully
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}
