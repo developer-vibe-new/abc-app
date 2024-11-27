@@ -36,3 +36,15 @@ exports.editSubAdminController = async (req) => {
         };
     }
 }
+
+exports.updateSubAdminController = async (req) => {
+    try {
+        return await service.updateSubAdmin(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}

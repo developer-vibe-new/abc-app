@@ -131,3 +131,45 @@ exports.editSubAdmin = async (req) => {
         };
     }
 }
+
+exports.updateSubAdmin = async (req) => {
+    try {
+        const { id } = req.params;
+        const data = await Admin.findOne({ _id: id, role_type: 'manager' });
+        if(!data) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        const { first_name, last_name, email, mobile, password, permission } = req.body;
+        let passwordHash;
+        if(password) {
+            passwordHash = await bcrypt.hash(password, 10);
+        }
+        const updateData = await Admin.findByIdAndUpdate(id,
+            { 
+                first_name,
+                last_name,
+                email,
+                mobile,
+                password: passwordHash,
+                permission
+            },
+            { new: true }
+        );
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Updated_Successfully,
+            data: updateData
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}
