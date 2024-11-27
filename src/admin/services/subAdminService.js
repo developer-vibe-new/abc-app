@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
 const { statusCode, resMessage } = require('../../config/default.json');
 const Admin = require('../../models/adminModel');
 
@@ -80,6 +81,48 @@ exports.viewSubAdmin = async (req) => {
                 }
             }
         };
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}
+
+exports.editSubAdmin = async (req) => {
+    try {
+        const { id } = req.params;
+        const data = await Admin.aggregate([
+            {
+              $match: {
+                  _id: new mongoose.Types.ObjectId(id),
+                  role_type: "manager",
+              }
+            },
+            {
+              $project: {
+                first_name: 1,
+                last_name: 1,
+                email: 1,
+                mobile: 1,
+                permission: 1
+              }
+            }
+        ]);
+        if(data.length === 0) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data
+        }
     } catch (error) {
         return {
             success: false,

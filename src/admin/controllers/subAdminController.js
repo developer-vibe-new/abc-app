@@ -24,3 +24,15 @@ exports.viewSubAdminController = async (req) => {
         };
     }
 }
+
+exports.editSubAdminController = async (req) => {
+    try {
+        return await service.editSubAdmin(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}

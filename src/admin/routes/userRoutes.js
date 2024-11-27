@@ -92,6 +92,7 @@ router.post('/updateOfferCode/:id', auth, responseHandler(offerCodeController.up
 // Sub admin
 router.post('/addSubAdmin', auth, responseHandler(subAdminController.addSubAdminController));
 router.get('/viewSubAdmin', auth, responseHandler(subAdminController.viewSubAdminController));
+router.get('/editSubAdmin/:id', responseHandler(subAdminController.editSubAdminController));
 
 // Export the router for use in the main application
 module.exports = router;
