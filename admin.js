@@ -7,7 +7,8 @@ const app = express();
 require('dotenv').config();
 const devConfig = require('./src/config/dev.config');
 const session = require('express-session');
-require('./src/config/db.config');
+const connectDB = require('./src/config/db.config');
+connectDB();
 global.c = console.log.bind(console);
 
 app.use(cors({ origin: true }));

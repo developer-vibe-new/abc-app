@@ -6,6 +6,7 @@
     "typescript-eslint": "^8.14.0"
   },
   "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -15,6 +16,7 @@
     "express-validation": "^4.1.1",
     "express-validator": "^7.2.0",
     "fs": "^0.0.1-security",
+    "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",
     "mongoose": "^8.8.1",
@@ -22,11 +24,16 @@
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.7",
     "path": "^0.12.7",
+    "redis": "^4.7.0",
+    "redis-adapter": "^0.2.0",
+    "socket.io": "^4.8.1",
     "swagger-ui-express": "^5.0.1"
   },
   "scripts": {
     "lint": "eslint .",
     "preadmin": "eslint .",
-    "admin": "nodemon admin.js"
+    "admin": "nodemon admin.js",
+    "user_socket": "nodemon user_socket.js",
+    "provider_socket": "nodemon provider_socket.js"
   }
 }

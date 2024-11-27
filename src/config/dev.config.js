@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 module.exports = {
     APP_SHORT_NAME: process.env.APP_SHORT_NAME || 'PTP',
     JWT_KEY: process.env.JWT_KEY,
@@ -18,5 +20,9 @@ module.exports = {
     apk: '----',
     rapidApiKey: process.env.api_key,
     url: process.env.url || 'http://play2plus.prometteur.in:6262/',
-    PER_PAGE: process.env.PER_PAGE || 10
+    PER_PAGE: process.env.PER_PAGE || 10,
+    REDIS_HOST: process.env.REDIS_HOST,
+    REDIS_PORT: process.env.REDIS_PORT,
+    SOCKET_USER_PORT: process.env.SOCKET_USER_PORT,
+    SOCKET_DELIVERY_PORT: process.env.SOCKET_DELIVERY_PORT
 };
