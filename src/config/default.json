@@ -13,6 +13,7 @@
         "saltRounds": 10
     },
     "resMessage": {
+        "Id_is_required": "Id is Required",
         "Vehicle_Not_Created": "Vehicle Not Created",
         "User_Deleted_Successfully": "User deleted successfully",
         "Provider_Not_Found": "Provider_Not_Found",
@@ -36,7 +37,6 @@
         "Data_Already_Exist_For_this_rank": "Data already exist for this rank",
         "Captain_Not_A_Player": "Captain not a player",
         "Players_Is_Not_Allow_In_Substitute_Choice_Another_Players": "Players is not allow in substitute choice another players",
-        "Tournament_Id_Missing": "TournamentId Missing",
         "Tournament_Archived_Updated_Successfully": "Tournament archived added successfully",
         "Tournament_Not_Found": "Tournament not found",
         "Tournament_Join_Limit_Is_Full": "Tournament join limit is full",

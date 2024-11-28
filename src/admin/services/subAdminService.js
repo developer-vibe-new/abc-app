@@ -177,6 +177,14 @@ exports.updateSubAdmin = async (req) => {
 exports.deleteSubAdmin = async (req) => {
     try {
         const { id } = req.body;
+        if(!id) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Id_is_required
+            }
+        }
+        console.log(req.body, "fvev")
         const data = await Admin.findOne({ _id: id, role: "manager", is_active: true });
         if(data) {
             return {
