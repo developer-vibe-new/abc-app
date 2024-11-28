@@ -91,7 +91,7 @@ router.post('/updateOfferCode/:id', auth, responseHandler(offerCodeController.up
 
 // Sub admin
 router.post('/addSubAdmin', auth, responseHandler(subAdminController.addSubAdminController));
-router.get('/viewSubAdmin', auth, responseHandler(subAdminController.viewSubAdminController));
+router.get('/viewSubAdmin', responseHandler(subAdminController.viewSubAdminController));
 router.get('/editSubAdmin/:id', auth, responseHandler(subAdminController.editSubAdminController));
 router.post('/updateSubAdmin/:id', auth, responseHandler(subAdminController.updateSubAdminController));
 

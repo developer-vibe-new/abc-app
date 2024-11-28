@@ -71,14 +71,12 @@ exports.viewSubAdmin = async (req) => {
             status: statusCode.OK,
             success: true,
             message: resMessage.Data_Fetch_Successfully,
-            data: {
-                items: data,
-                meta: {
-                    currentPage: page,
-                    totalPages: totalPages,
-                    totalItems: totalDocuments,
-                    itemsPerPage: limit
-                }
+            data,
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+                totalItems: totalDocuments,
+                itemsPerPage: limit
             }
         };
     } catch (error) {
