@@ -145,7 +145,7 @@ exports.updateSubAdmin = async (req) => {
         }
         const { first_name, last_name, email, mobile, password, permission } = req.body;
         let passwordHash;
-        if(password !== "") {
+        if(password !== "" && password) {
             passwordHash = await bcrypt.hash(password, 10);
         }
         const updateData = await Admin.findByIdAndUpdate(id,
