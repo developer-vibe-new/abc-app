@@ -40,7 +40,8 @@ exports.viewSubAdmin = async (req) => {
         let pipeline = [];
         pipeline.push({
             $match: {
-              role_type: "manager"
+              role_type: "manager",
+              is_active: true
             }
           },
           {
@@ -96,6 +97,7 @@ exports.editSubAdmin = async (req) => {
               $match: {
                   _id: new mongoose.Types.ObjectId(id),
                   role_type: "manager",
+                  is_active: true
               }
             },
             {
@@ -133,7 +135,7 @@ exports.editSubAdmin = async (req) => {
 exports.updateSubAdmin = async (req) => {
     try {
         const { id } = req.params;
-        const data = await Admin.findOne({ _id: id, role_type: 'manager' });
+        const data = await Admin.findOne({ _id: id, role_type: 'manager', is_active: true });
         if(!data) {
             return {
                 status: statusCode.DATA_NOT_FOUND,
@@ -143,7 +145,7 @@ exports.updateSubAdmin = async (req) => {
         }
         const { first_name, last_name, email, mobile, password, permission } = req.body;
         let passwordHash;
-        if(password) {
+        if(password !== "") {
             passwordHash = await bcrypt.hash(password, 10);
         }
         const updateData = await Admin.findByIdAndUpdate(id,
@@ -162,6 +164,32 @@ exports.updateSubAdmin = async (req) => {
             success: true,
             message: resMessage.Data_Updated_Successfully,
             data: updateData
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}
+
+exports.deleteSubAdmin = async (req) => {
+    try {
+        const { id } = req.body;
+        const data = await Admin.findOne({ _id: id, role: "manager", is_active: true });
+        if(data) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        await Admin.findByIdAndUpdate(id, { is_active: false});
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Deleted_Successfully
         }
     } catch (error) {
         return {
