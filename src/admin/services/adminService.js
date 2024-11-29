@@ -1,14 +1,13 @@
 var bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { SECRET_Key } = process.env;
+const User = require('../../models/users');
+const Car = require('../../models/cars');
+const Taxitype = require('../../models/taxiTypeModel');
 const operatorModel = require('../../models/operatorModel');
 const adminRegisterModel = require('../../models/adminModel');
 const { statusCode, resMessage } = require('../../config/default.json');
-
-
-
-
-
+const Provider = require('../../models/providerModel');
 
 exports.adminRegister = async (req) => {
     try {
@@ -139,3 +138,29 @@ exports.updateOperator = async (req) => {
     }
 };
 
+exports.dashboardData = async (req, res) => {
+    try {
+        const totalProviders = await Provider.find().countDocuments();
+        const totalUsers = await User.find().countDocuments();
+        const totalCars = await Car.find().countDocuments();
+        const totalTaxiType = await Taxitype.find().countDocuments();
+        const onlineDriverList = await Provider.find({ is_online: true }).countDocuments();
+        return {
+            status: statusCode.OK,
+            success: true,
+            data: { 
+                totalProviders,
+                totalUsers,
+                totalCars,
+                totalTaxiType,
+                onlineDriverList
+            }
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}

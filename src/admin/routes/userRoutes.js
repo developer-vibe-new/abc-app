@@ -30,6 +30,9 @@ router.post('/login', validate(userVal.login), responseHandler(controllers.login
  * adminRegister
  */
 
+// Dashboard
+router.get('/dashboard', auth, responseHandler(adminController.dashboardDataController));
+
 router.post('/adminRegister', adminController.registerAdmin);
 router.post('/adminlogin', responseHandler(adminController.login));
 router.post('/stateCreate', auth, responseHandler(stateController.createState));

@@ -62,3 +62,16 @@ exports.operatorsUpdate = async (req) => {
         };
     }
 };
+
+exports.dashboardDataController = async (req, res) => {
+    try {
+        return await services.dashboardData(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}
