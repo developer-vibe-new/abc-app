@@ -12,3 +12,15 @@ exports.addNotificationController = async (req) => {
         };
     }
 }
+
+exports.viewNotificationController = async () => {
+    try {
+        return await services.viewNotification();
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}

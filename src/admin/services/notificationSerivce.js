@@ -20,3 +20,29 @@ exports.addNotification = async (req) => {
         };
     }
 }
+
+exports.viewNotification = async () => {
+    try {
+        const data = await Notification.find();
+        if(!data) {
+            return {
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data
+        }
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}
