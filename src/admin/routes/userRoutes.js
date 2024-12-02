@@ -17,6 +17,7 @@ const vehicleController = require('../controllers/vehicleController');
 const reportController = require('../controllers/reportsController');
 const offerCodeController = require('../controllers/offerCodeController');
 const subAdminController = require('../controllers/subAdminController');
+const notificationController = require('../controllers/notificationController');
 // const validation = require('../../validators/admin/userVal');
 
 router.get('/index', async (req, res) => {
@@ -96,8 +97,11 @@ router.post('/updateOfferCode/:id', auth, responseHandler(offerCodeController.up
 router.post('/addSubAdmin', auth, responseHandler(subAdminController.addSubAdminController));
 router.get('/viewSubAdmin', auth, responseHandler(subAdminController.viewSubAdminController));
 router.get('/editSubAdmin/:id', auth, responseHandler(subAdminController.editSubAdminController));
-router.post('/updateSubAdmin/:id', responseHandler(subAdminController.updateSubAdminController));
-router.post('/deleteSubAdmin', responseHandler(subAdminController.deleteSubAdminController));
+router.post('/updateSubAdmin/:id', auth, responseHandler(subAdminController.updateSubAdminController));
+router.post('/deleteSubAdmin', auth, responseHandler(subAdminController.deleteSubAdminController));
+
+// Notification manager
+router.post('/addNotification', auth, responseHandler(notificationController.addNotificationController));
 
 // Export the router for use in the main application
 module.exports = router;
