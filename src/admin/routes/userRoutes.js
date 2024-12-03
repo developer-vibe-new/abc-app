@@ -102,7 +102,7 @@ router.post('/deleteSubAdmin', auth, responseHandler(subAdminController.deleteSu
 
 // Notification manager
 router.post('/addNotification', auth, responseHandler(notificationController.addNotificationController));
-router.get("/viewNotification", auth, responseHandler(notificationController.viewNotificationController));
+router.get("/viewNotification", responseHandler(notificationController.viewNotificationController));
 
 // Export the router for use in the main application
 module.exports = router;

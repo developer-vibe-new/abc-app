@@ -21,22 +21,39 @@ exports.addNotification = async (req) => {
     }
 }
 
-exports.viewNotification = async () => {
+exports.viewNotification = async (req) => {
     try {
-        const data = await Notification.find();
-        if(!data) {
+        let search = req.query.search;
+        let pipeline = [];
+
+        if (search) {
+            pipeline.push({
+                $match: {
+                    message: { $regex: new RegExp(search, 'i') },
+                },
+            });
+        }
+
+        if (pipeline.length === 0) {
+            pipeline.push({ $match: {} });
+        }
+
+        const data = await Notification.aggregate(pipeline);
+
+        if (!data || data.length === 0) {
             return {
                 status: statusCode.NOT_FOUND,
                 success: false,
-                message: resMessage.Data_Not_Found
-            }
+                message: resMessage.Data_Not_Found,
+            };
         }
+
         return {
             status: statusCode.OK,
             success: true,
             message: resMessage.Data_Fetch_Successfully,
-            data
-        }
+            data,
+        };
     } catch (error) {
         return {
             statusCode: statusCode.BAD_REQUEST,
@@ -45,4 +62,4 @@ exports.viewNotification = async () => {
             error: error.message || "Internal Server Error",
         };
     }
-}
+};
