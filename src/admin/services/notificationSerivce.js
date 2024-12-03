@@ -23,7 +23,11 @@ exports.addNotification = async (req) => {
 
 exports.viewNotification = async (req) => {
     try {
-        let search = req.query.search;
+        let { search, page = 1, limit = 10 } = req.query;
+
+        page = parseInt(page);
+        limit = parseInt(limit);
+
         let pipeline = [];
 
         if (search) {
@@ -34,9 +38,10 @@ exports.viewNotification = async (req) => {
             });
         }
 
-        if (pipeline.length === 0) {
-            pipeline.push({ $match: {} });
-        }
+        pipeline.push(
+            { $skip: (page - 1) * limit },
+            { $limit: limit }
+        );
 
         const data = await Notification.aggregate(pipeline);
 
@@ -48,11 +53,19 @@ exports.viewNotification = async (req) => {
             };
         }
 
+        const totalCount = await Notification.countDocuments(search ? { message: { $regex: new RegExp(search, 'i') } } : {});
+
         return {
             status: statusCode.OK,
             success: true,
             message: resMessage.Data_Fetch_Successfully,
             data,
+            pagination: {
+                page,
+                limit,
+                totalCount,
+                totalPages: Math.ceil(totalCount / limit),
+            },
         };
     } catch (error) {
         return {
