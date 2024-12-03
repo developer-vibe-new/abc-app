@@ -53,7 +53,7 @@ exports.viewNotification = async (req) => {
 
         const data = await Notification.aggregate(pipeline);
 
-        if (!data || data.length === 0) {
+        if (!data) {
             return {
                 status: statusCode.NOT_FOUND,
                 success: false,

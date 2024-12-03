@@ -18,6 +18,7 @@ const reportController = require('../controllers/reportsController');
 const offerCodeController = require('../controllers/offerCodeController');
 const subAdminController = require('../controllers/subAdminController');
 const notificationController = require('../controllers/notificationController');
+const settingController = require('../controllers/settingController');
 // const validation = require('../../validators/admin/userVal');
 
 router.get('/index', async (req, res) => {
@@ -104,6 +105,9 @@ router.post('/deleteSubAdmin', auth, responseHandler(subAdminController.deleteSu
 router.post('/addNotification', auth, responseHandler(notificationController.addNotificationController));
 router.get("/viewNotification", auth, responseHandler(notificationController.viewNotificationController));
 router.post('/deleteNotification', auth, responseHandler(notificationController.deleteNotificationController));
+
+// Setting manager
+router.post('/addSetting', auth, responseHandler(settingController.addSettingController));
 
 // Export the router for use in the main application
 module.exports = router;
