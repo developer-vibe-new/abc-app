@@ -55,8 +55,9 @@ const providerSchema = new mongoose.Schema({
 	os: {
 		type: String
 	},
-	image: {
-		type: String
+	profile_image: {
+		type: String,
+		default: ""
 	},
 	arn_token: {
 		type: String

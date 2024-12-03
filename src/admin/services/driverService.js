@@ -6,9 +6,9 @@ const mongoose = require('mongoose');
 exports.driverCreate = async (req) => {
     try {
         const { first_name, last_name, mobile, email } = req.body;
-        let image;
+        let profile_image;
         if(req.file) {
-            image = `${req.body.typeName}/${req.file.filename}`;
+            profile_image = `${req.body.typeName}/${req.file.filename}`;
         }
         if (!first_name || !last_name || !mobile || !email) {
             return {
@@ -18,7 +18,7 @@ exports.driverCreate = async (req) => {
             };
         }
         const createdData = await driverModel.create({
-            first_name: first_name, last_name: last_name, full_name: first_name + " " + last_name, mobile: mobile, email: email, image: image
+            first_name: first_name, last_name: last_name, full_name: first_name + " " + last_name, mobile: mobile, email: email, profile_image: profile_image
         });
         return {
             statusCode: statusCode.OK,
@@ -115,10 +115,10 @@ exports.driverView = async (req) => {
         conditions.push({
             $addFields:
             {
-                image: {
+                profile_image: {
                     $concat: [
                         "http://192.168.0.18:6161/driver/",
-                        "$image"
+                        "$profile_image"
                     ]
                 },
                 taxitype: "$taxi_types.title",
@@ -138,7 +138,7 @@ exports.driverView = async (req) => {
             $project: {
                 first_name: 1,
                 last_name: 1,
-                image: 1,
+                profile_image: 1,
                 email: 1,
                 mobile: 1,
                 balance: 1,
@@ -224,10 +224,10 @@ exports.driverEdit = async (req) => {
             },
             {
               $addFields: {
-                image: {
+                profile_image: {
                   $concat: [
                     "http://192.168.0.18:6161/driver/",
-                    "$image"
+                    "$profile_image"
                   ]
                 }
               }
@@ -238,7 +238,7 @@ exports.driverEdit = async (req) => {
                 last_name: 1,
                 email: 1,
                 mobile: 1,
-                image: 1,
+                profile_image: 1,
                 status: 1
               }
             }
@@ -262,7 +262,7 @@ exports.driverEdit = async (req) => {
 exports.driverUpdate = async ({ body, file, params }) => {
     try {
         if (file) {
-            body.image = file.filename;
+            body.profile_image = file.filename;
         }
         if(body.first_name && body.last_name) {
             body.full_name = body.first_name + " " + body.last_name;
@@ -406,10 +406,10 @@ exports.blockedDriverList = async (req) => {
             },
             {
                 $addFields: {
-                    image: {
+                    profile_image: {
                         $concat: [
                             "http://192.168.0.18:6161/driver/",
-                            "$image"
+                            "$profile_image"
                           ]
                     },
                     taxitype: "$taxi_types.title"
@@ -441,7 +441,7 @@ exports.blockedDriverList = async (req) => {
                 $project: {
                     first_name: 1,
                     last_name: 1,
-                    image: 1,
+                    profile_image: 1,
                     email: 1,
                     mobile: 1,
                     balance: 1,
@@ -482,7 +482,7 @@ exports.blockedDriverList = async (req) => {
 
 exports.editBlockDriver = async (req) => {
     try {
-        const getData = await driverModel.findOne({ _id: req.params.id }, { first_name: 1, email: 1, mobile: 1, image: 1, last_name: 1 });
+        const getData = await driverModel.findOne({ _id: req.params.id }, { first_name: 1, email: 1, mobile: 1, profile_image: 1, last_name: 1 });
         return {
             statusCode: statusCode.OK,
             success: true,
@@ -503,7 +503,7 @@ exports.editBlockDriver = async (req) => {
 exports.blockedDriverUpdate = async ({ body, file, params }) => {
     try {
         if (file) {
-            body.image = file.filename;
+            body.profile_image = file.filename;
         }
         const updateData = await driverModel.findByIdAndUpdate(params.id, body, { new: true });
         if (!updateData) {
@@ -621,10 +621,10 @@ exports.onlineDriverList = async (req) => {
         conditions.push({
             $addFields:
             {
-                image: {
+                profile_image: {
                     $concat: [
                         "http://192.168.0.18:6161/",
-                        "$image"
+                        "$profile_image"
                     ]
                 },
                 taxitype: "$taxi_types.title"
@@ -645,7 +645,7 @@ exports.onlineDriverList = async (req) => {
                     first_name: 1,
                     last_name: 1,
 
-                    image: 1,
+                    profile_image: 1,
                     email: 1,
                     mobile: 1,
                     balance: 1,

@@ -180,7 +180,7 @@ exports.updateDriver = async (req) => {
                         last_name,
                         email,
                         mobile,
-                        image: imagePath
+                        profile_image: imagePath
                     }
                 }
             );
