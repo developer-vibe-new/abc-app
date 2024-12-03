@@ -24,7 +24,7 @@ require('./src/app/routes')(app);
 
 // set port, listen for request s
 const PORT = devConfig.PORT || 6262;
-
+console.log('port: ' + PORT);
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
 });

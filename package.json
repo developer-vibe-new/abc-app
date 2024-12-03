@@ -7,10 +7,12 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.4.6",
     "express": "^4.21.1",
     "path": "^0.12.7"
   },
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "start": "nodemon index.js"
   }
 }
