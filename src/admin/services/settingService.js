@@ -20,3 +20,29 @@ exports.addSetting = async (req) => {
         };
     }
 }
+
+exports.viewSetting = async (req) => {
+    try {
+        const data = await Setting.findOne({ _id: "674eca607641e2014a80a966" });
+        if(!data) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found,
+            }
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Retrieved_Successfully,
+            data,
+        }
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}
