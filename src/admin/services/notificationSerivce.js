@@ -87,7 +87,7 @@ exports.viewNotification = async (req) => {
 
 exports.deleteNotification = async (req) => {
     try {
-        const { id } = req.params;
+        const { id } = req.body;
         const data = await Notification.findById(id);
         if(!data) {
             return {
