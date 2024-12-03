@@ -30,6 +30,14 @@ exports.viewNotification = async (req) => {
 
         let pipeline = [];
 
+        pipeline.push(
+            {
+                $match: {
+                    is_active: true
+                }
+            }
+        );
+
         if (search) {
             pipeline.push({
                 $match: {
@@ -76,3 +84,30 @@ exports.viewNotification = async (req) => {
         };
     }
 };
+
+exports.deleteNotification = async (req) => {
+    try {
+        const { id } = req.params;
+        const data = await Notification.findById(id);
+        if(!data) {
+            return {
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found,
+            }
+        }
+        await Notification.findByIdAndUpdate(id, { is_active: false });
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Deleted_Successfully,
+        }
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}

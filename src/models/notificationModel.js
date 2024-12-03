@@ -8,7 +8,11 @@ const notificationSchema = new mongoose.Schema({
     message: {
         type: String,
         required: true
-    }
+    },
+	is_active: {
+		type: Boolean,
+        default: true
+	}
 }, {
 	timestamps: {
 		createdAt: 'created',

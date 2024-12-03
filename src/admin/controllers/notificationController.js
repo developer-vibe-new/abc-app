@@ -24,3 +24,15 @@ exports.viewNotificationController = async (req) => {
         };
     }
 }
+
+exports.deleteNotificationController = async (req) => {
+    try {
+        return await services.deleteNotification(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}
