@@ -24,3 +24,15 @@ exports.viewSettingController = async (req) => {
         };
     }
 }
+
+exports.updateSettingController = async (req) => {
+    try {
+        return await services.updateSetting(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}

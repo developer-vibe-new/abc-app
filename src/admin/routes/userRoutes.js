@@ -109,6 +109,7 @@ router.post('/deleteNotification', auth, responseHandler(notificationController.
 // Setting manager
 router.post('/addSetting', auth, responseHandler(settingController.addSettingController));
 router.get('/viewSetting', auth, responseHandler(settingController.viewSettingController));
+router.post('/updateSetting', auth, responseHandler(settingController.updateSettingController));
 
 // Export the router for use in the main application
 module.exports = router;
