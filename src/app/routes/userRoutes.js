@@ -1,18 +1,15 @@
 const express = require('express');
-const router = express.Router();
 const responseHandler = require('../../helpers/responseHandler');
-const controllers = require('../controllers/userController');
-const validate = require('../../helpers/validate');
-const userVal = require('../../validators/app/userVal');
-// const auth = require('../../middleware/auth');
-// const { upload } = require('../../helpers/multer');
+const controller = require('../controllers/userController');
+const { verifyToken } = require('../../middleware/auth');
+const { upload } = require('../../helpers/multer');
 
+const router = express.Router();
 
-router.get('/index', async (req, res) => {
-  res.send('api routes working properly ❤');
-});
-
-/* ___________________________ user sign up __________________________________ */
-router.post('/login', validate(userVal.login), responseHandler(controllers.login));
+router.post('/sendOtp', responseHandler(controller.sendOtpController));
+router.post('/verifyOtp', responseHandler(controller.verifyOtpController));
+router.post('/updateUser', verifyToken, upload.single('image'), responseHandler(controller.updateUserController));
+router.get('/userDetails', verifyToken, responseHandler(controller.userDetailsController));
+router.post('/deleteUser', verifyToken, responseHandler(controller.deleteUserController));
 
 module.exports = router;

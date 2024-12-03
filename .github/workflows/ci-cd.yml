@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "20"
-    # Step 3: Create .env file
+      # Step 3: Create .env file
       - name: Create .env file
         run: |
           echo "API_URL=${{ secrets.API_URL }}" >> .env
@@ -34,11 +34,11 @@ jobs:
       # Step 5: Start server (waits for completion)
       - name: Start server
         env:
-          PORT: 3030
+          PORT: 5050
         run: |
           npm start &
           sleep 10  # Ensure the server is up and running
-          curl -f http://159.89.164.11:3030/api/v1/user/index || exit 1  # Check if the server is responding
+          curl -f http://159.89.164.11:5050/api/v1/user/index || exit 1  # Check if the server is responding
 
   deploy:
     runs-on: ubuntu-latest

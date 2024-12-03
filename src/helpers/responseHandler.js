@@ -1,7 +1,8 @@
 const { default: mongoose } = require('mongoose');
 const fs = require('fs');
 const path = require('path');
-// const { autoSwagger } = require('./autoSwagger');
+// eslint-disable-next-line no-unused-vars
+const { autoSwagger } = require('./autoSwagger');
 
 /**
  * Middleware function to handle responses from controller functions and log requests and responses.

@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "playT-plus-admin",
+    "title": "taxi-ride-admin",
     "description": "Description of my API",
     "version": "1.0.0"
   },
@@ -44,6 +44,1120 @@
             "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/loginResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/createRental": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/createRental",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/createRental"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/createRentalResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/state-create": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/state-create",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/state-create"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/state-createResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/updateState": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/updateState",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/updateState"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/updateStateResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/deleteState/673c151f9c76d7b52a778983": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/deleteState/673c151f9c76d7b52a778983",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "please enter id",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673c151f9c76d7b52a778983Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/viewState": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/viewState",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/viewStateResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/createCity": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/createCity",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/createCity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/createCityResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/updateCity": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/updateCity",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/updateCity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/updateCityResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/createDriver": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/createDriver",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data; boundary=--------------------------537828218937131168782014"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter name",
+            "required": false,
+            "example": "rishika"
+          },
+          {
+            "name": "email",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter email",
+            "required": false,
+            "example": "rishika@gmail.com"
+          },
+          {
+            "name": "mobile",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter mobile",
+            "required": false,
+            "example": "9753264374"
+          },
+          {
+            "name": "type",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter type",
+            "required": false,
+            "example": "main"
+          },
+          {
+            "name": "typeName",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter typeName",
+            "required": false,
+            "example": "driver"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/createDriverResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/viewDriver": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/viewDriver",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "please enter search",
+            "example": "rishika",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/viewDriverResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/adminlogin": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/adminlogin",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/adminlogin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/adminloginResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/updateDriver/673c31dd6e5a2c7d14466353": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/updateDriver/673c31dd6e5a2c7d14466353",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data; boundary=--------------------------560040168347497074226308"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter name",
+            "required": false,
+            "example": "simran nodejs"
+          },
+          {
+            "name": "type",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter type",
+            "required": false,
+            "example": "main"
+          },
+          {
+            "name": "mobile",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter mobile",
+            "required": false,
+            "example": ""
+          },
+          {
+            "name": "email",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter email",
+            "required": false,
+            "example": ""
+          },
+          {
+            "name": "typeName",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter typeName",
+            "required": false,
+            "example": "admin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673c31dd6e5a2c7d14466353Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/deleteDriver/673c31dd6e5a2c7d14466353": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/deleteDriver/673c31dd6e5a2c7d14466353",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "_id",
+            "in": "path",
+            "description": "please enter _id",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673c31dd6e5a2c7d14466353Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/operators": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/operators",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/operatorsResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/operatorsUpdate/673ac0d52f258e38f1606e00": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/operatorsUpdate/673ac0d52f258e38f1606e00",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "please enter id",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673ac0d52f258e38f1606e00Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/viewTaxiType": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/viewTaxiType",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/viewTaxiTypeResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/deleteDriver/6736c98247b5ffdee7e3a560": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/deleteDriver/6736c98247b5ffdee7e3a560",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "please enter id",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/6736c98247b5ffdee7e3a560Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/updateDriver": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/updateDriver",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data; boundary=--------------------------121221477525815088947257"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter name",
+            "required": false,
+            "example": "ishmeetnodejs"
+          },
+          {
+            "name": "type",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter type",
+            "required": false,
+            "example": "operator"
+          },
+          {
+            "name": "id",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter id",
+            "required": false,
+            "example": "673acf4b460436797df7c98e"
+          },
+          {
+            "name": "email",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter email",
+            "required": false,
+            "example": ""
+          },
+          {
+            "name": "typeName",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter typeName",
+            "required": false,
+            "example": "admin"
+          },
+          {
+            "name": "image",
+            "in": "formData",
+            "type": "file",
+            "description": "please enter image",
+            "required": false,
+            "example": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/updateDriverResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/editDriver/673c832bf81c6e10129ff017": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/editDriver/673c832bf81c6e10129ff017",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "please enter id",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673c832bf81c6e10129ff017Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/updateDriver/673c832bf81c6e10129ff017": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/updateDriver/673c832bf81c6e10129ff017",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data; boundary=--------------------------770826490147187233799015"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "typeName",
+            "in": "formData",
+            "type": "string",
+            "description": "please enter typeName",
+            "required": false,
+            "example": "driver"
+          },
+          {
+            "name": "image",
+            "in": "formData",
+            "type": "file",
+            "description": "please enter image",
+            "required": false,
+            "example": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/673c832bf81c6e10129ff017Response"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/blockDriver": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/blockDriver",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "please enter code",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/blockDriver"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/blockDriverResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/user/blockedDriversList": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "fetch data by /user/blockedDriversList",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          null
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/blockedDriversListResponse"
             }
           },
           "400": {
@@ -107,6 +1221,779 @@
             "userId": "6479c2e393445893d7d4fa81",
             "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDc5YzJlMzkzNDQ1ODkzZDdkNGZhODEiLCJlbWFpbCI6InN1cGVyQWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzIwNTA4MTQ2fQ.j5RmlV_x_ODm-C_Osk3RNrlStaPYket8AJepYA1satE"
           }
+        }
+      }
+    },
+    "createRental": {
+      "type": "object",
+      "properties": {
+        "dis": {
+          "type": "string",
+          "description": "Enter dis",
+          "example": "10km"
+        },
+        "hr": {
+          "type": "string",
+          "description": "Enter hr",
+          "example": "3hr"
+        },
+        "suv": {
+          "type": "number",
+          "description": "Enter suv",
+          "example": 2000
+        },
+        "sedan": {
+          "type": "number",
+          "description": "Enter sedan",
+          "example": 1000
+        },
+        "primun": {
+          "type": "number",
+          "description": "Enter primun",
+          "example": 1999
+        },
+        "any": {
+          "type": "number",
+          "description": "Enter any",
+          "example": 1500
+        }
+      }
+    },
+    "createRentalResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data Created Successfully",
+          "example": "Data Created Successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "packages": {
+              "dis": "10km",
+              "hr": "3hr",
+              "suv": 2000,
+              "sedan": 1000,
+              "primun": 1999,
+              "any": 1500
+            },
+            "_id": "673b2f5d93c90afdf73d2fe4",
+            "created": "2024-11-18T12:13:17.075Z",
+            "updated": "2024-11-18T12:13:17.075Z",
+            "__v": 0
+          }
+        }
+      }
+    },
+    "state-create": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "type": "string",
+          "description": "Enter state",
+          "example": "j&K"
+        }
+      }
+    },
+    "state-createResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "state added successfully",
+          "example": "state added successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "state": "j&K",
+            "_id": "673c151f9c76d7b52a778983",
+            "created": "2024-11-19T04:33:35.833Z",
+            "updated": "2024-11-19T04:33:35.833Z"
+          }
+        }
+      }
+    },
+    "updateState": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Enter id",
+          "example": "673c151f9c76d7b52a778983"
+        },
+        "state": {
+          "type": "string",
+          "description": "Enter state",
+          "example": "rajasthan"
+        }
+      }
+    },
+    "updateStateResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "state updated successfully",
+          "example": "state updated successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673c151f9c76d7b52a778983",
+            "state": "rajasthan",
+            "created": "2024-11-19T04:33:35.833Z",
+            "updated": "2024-11-19T04:44:35.660Z"
+          }
+        }
+      }
+    },
+    "673c151f9c76d7b52a778983Response": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "state deleted successfully",
+          "example": "state deleted successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673c151f9c76d7b52a778983",
+            "state": "rajasthan",
+            "created": "2024-11-19T04:33:35.833Z",
+            "updated": "2024-11-19T04:44:35.660Z"
+          }
+        }
+      }
+    },
+    "viewStateResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": []
+        }
+      }
+    },
+    "createCity": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Enter name",
+          "example": "jaipur"
+        },
+        "city": {
+          "type": "string",
+          "description": "Enter city",
+          "example": "jaipur"
+        },
+        "state": {
+          "type": "string",
+          "description": "Enter state",
+          "example": "rajasthan"
+        },
+        "country": {
+          "type": "string",
+          "description": "Enter country",
+          "example": "india"
+        }
+      }
+    },
+    "createCityResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "City Created successfully",
+          "example": "City Created successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "name": "jaipur",
+            "city": "jaipur",
+            "state": "rajasthan",
+            "country": "india",
+            "coordinates": [
+              0,
+              0
+            ],
+            "is_active": true,
+            "_id": "673c1b01fa8abd83c55e7c53",
+            "created": "2024-11-19T04:58:41.171Z",
+            "updated": "2024-11-19T04:58:41.171Z",
+            "__v": 0
+          }
+        }
+      }
+    },
+    "updateCity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Enter id",
+          "example": "673c1b01fa8abd83c55e7c53"
+        },
+        "name": {
+          "type": "string",
+          "description": "Enter name",
+          "example": "delhi"
+        },
+        "city": {
+          "type": "string",
+          "description": "Enter city",
+          "example": "delhi"
+        },
+        "state": {
+          "type": "string",
+          "description": "Enter state",
+          "example": ""
+        },
+        "country": {
+          "type": "string",
+          "description": "Enter country",
+          "example": "india"
+        }
+      }
+    },
+    "updateCityResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "City updated successfully",
+          "example": "City updated successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673c1b01fa8abd83c55e7c53",
+            "name": "delhi",
+            "city": "delhi",
+            "state": "",
+            "country": "india",
+            "coordinates": [
+              0,
+              0
+            ],
+            "is_active": true,
+            "created": "2024-11-19T04:58:41.171Z",
+            "updated": "2024-11-19T05:13:40.394Z",
+            "__v": 0
+          }
+        }
+      }
+    },
+    "createDriverResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data created successfully",
+          "example": "Data created successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "name": "rishika",
+            "city_id": null,
+            "type": "main",
+            "email": "rishika@gmail.com",
+            "mobile": "9753264374",
+            "balance": 0,
+            "pending_balance": 0,
+            "image": "driver/1732018987407.jpg",
+            "fcm_token": "",
+            "is_active": true,
+            "ridereceive": true,
+            "profile_status": "registered",
+            "email_verified": false,
+            "is_notify": true,
+            "is_online": false,
+            "is_outstation": true,
+            "in_ride": false,
+            "goToHome": false,
+            "total_earnings": 0,
+            "total_rides": 0,
+            "pending_amount": 0,
+            "device_id": "",
+            "kycStatus": 0,
+            "vehicleStatus": 0,
+            "stripe_verified": false,
+            "is_delete": false,
+            "stripe_charges_enabled": false,
+            "status": "Unblock",
+            "_id": "673c832bf81c6e10129ff017",
+            "documents": [],
+            "bank_data": [],
+            "createdAt": "2024-11-19T12:23:07.417Z",
+            "updatedAt": "2024-11-19T12:23:07.417Z"
+          }
+        }
+      }
+    },
+    "viewDriverResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data fetch successfully",
+          "example": "Data fetch successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": [
+            {
+              "_id": "673c832bf81c6e10129ff017",
+              "name": "rishika",
+              "email": "rishika@gmail.com",
+              "mobile": "9753264374",
+              "balance": 0,
+              "image": "http://192.168.0.18:6161/1732075985038.jpg",
+              "is_online": false,
+              "pending_amount": 0,
+              "kycStatus": 0,
+              "vehicleStatus": 0,
+              "status": "Unblock"
+            }
+          ]
+        }
+      }
+    },
+    "adminlogin": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Enter email",
+          "example": "rishika@example.com"
+        },
+        "password": {
+          "type": "string",
+          "description": "Enter password",
+          "example": "securepassword"
+        }
+      }
+    },
+    "adminloginResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "User login Successfully.",
+          "example": "User login Successfully."
+        },
+        "token": {
+          "type": "string",
+          "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM0ODg2MjA3MmI4MWMyYjgxMDE5MDMiLCJpYXQiOjE3MzIwMTgyOTksImV4cCI6MTczMjEwNDY5OX0.pSUBzbn0Y7w1tm0G4ui83FXWD2ByIL-rZ1Q6tWMZmlQ",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM0ODg2MjA3MmI4MWMyYjgxMDE5MDMiLCJpYXQiOjE3MzIwMTgyOTksImV4cCI6MTczMjEwNDY5OX0.pSUBzbn0Y7w1tm0G4ui83FXWD2ByIL-rZ1Q6tWMZmlQ"
+        }
+      }
+    },
+    "673c31dd6e5a2c7d14466353Response": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data deleted successfully",
+          "example": "Data deleted successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673c31dd6e5a2c7d14466353",
+            "name": "simran",
+            "city_id": null,
+            "type": "main",
+            "email": "simran@gamail.com",
+            "mobile": "3423464435",
+            "balance": 0,
+            "pending_balance": 0,
+            "image": "1732012389494.jpg",
+            "fcm_token": "",
+            "is_active": true,
+            "ridereceive": true,
+            "profile_status": "registered",
+            "email_verified": false,
+            "is_notify": true,
+            "is_online": false,
+            "is_outstation": true,
+            "in_ride": false,
+            "goToHome": false,
+            "total_earnings": 0,
+            "total_rides": 0,
+            "pending_amount": 0,
+            "device_id": "",
+            "kycStatus": 0,
+            "vehicleStatus": 0,
+            "stripe_verified": false,
+            "is_delete": false,
+            "stripe_charges_enabled": false,
+            "status": "Unblock",
+            "documents": [],
+            "bank_data": [],
+            "createdAt": "2024-11-19T06:36:13.894Z",
+            "updatedAt": "2024-11-19T10:33:09.535Z"
+          }
+        }
+      }
+    },
+    "operatorsResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "operatorsData": [
+              {
+                "_id": "673ac0d52f258e38f1606e00",
+                "fullName": "Ishmeet",
+                "phone": 9588829249,
+                "city": "Jaipur",
+                "status": true,
+                "createdAt": "2024-11-18T04:21:42.010Z",
+                "updatedAt": "2024-11-18T04:48:29.517Z",
+                "otp": null,
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3M2FjMGQ1MmYyNThlMzhmMTYwNmUwMCIsImlhdCI6MTczMTkwNTMwOSwiZXhwIjoxNzMxOTA4OTA5fQ.acZaXeX_t3K5msYZrcqlkzYRHAoxlfpiRPcueWkczwE"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "673ac0d52f258e38f1606e00Response": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Status_Updated_Successfully",
+          "example": "Status_Updated_Successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "updateData": {
+              "_id": "673ac0d52f258e38f1606e00",
+              "fullName": "Ishmeet",
+              "phone": 9588829249,
+              "city": "Jaipur",
+              "status": false,
+              "createdAt": "2024-11-18T04:21:42.010Z",
+              "updatedAt": "2024-11-19T11:23:54.765Z",
+              "otp": null,
+              "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3M2FjMGQ1MmYyNThlMzhmMTYwNmUwMCIsImlhdCI6MTczMTkwNTMwOSwiZXhwIjoxNzMxOTA4OTA5fQ.acZaXeX_t3K5msYZrcqlkzYRHAoxlfpiRPcueWkczwE"
+            }
+          }
+        }
+      }
+    },
+    "viewTaxiTypeResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data fetch successfully",
+          "example": "Data fetch successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": [
+            {
+              "_id": "6735f37c0e57ce96e8f08564",
+              "type": "operator",
+              "title": "SUV",
+              "icon": "1731999935639.jpg",
+              "base_fare": 10,
+              "airportCharge": 0,
+              "fixed_fare": 0,
+              "distance_fare": 0,
+              "time_fare": 0,
+              "currency": "INR",
+              "is_active": true,
+              "createdAt": "2024-11-14T12:56:28.881Z",
+              "updatedAt": "2024-11-19T07:05:35.738Z"
+            }
+          ]
+        }
+      }
+    },
+    "6736c98247b5ffdee7e3a560Response": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data deleted successfully",
+          "example": "Data deleted successfully"
+        }
+      }
+    },
+    "updateDriverResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data updated successfully",
+          "example": "Data updated successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673acf4b460436797df7c98e",
+            "name": "ishmeetnodejs",
+            "city_id": null,
+            "type": "operator",
+            "email": "",
+            "mobile": "",
+            "balance": 0,
+            "pending_balance": 0,
+            "fcm_token": "",
+            "is_active": true,
+            "ridereceive": true,
+            "profile_status": "registered",
+            "email_verified": false,
+            "is_notify": true,
+            "is_online": false,
+            "is_outstation": true,
+            "in_ride": false,
+            "goToHome": false,
+            "total_earnings": 100,
+            "total_rides": 0,
+            "pending_amount": 0,
+            "device_id": "",
+            "kycStatus": 0,
+            "vehicleStatus": 0,
+            "stripe_verified": false,
+            "is_delete": false,
+            "stripe_charges_enabled": false,
+            "status": "blocked",
+            "documents": [],
+            "bank_data": [],
+            "createdAt": "2024-11-18T05:23:23.127Z",
+            "updatedAt": "2024-11-19T11:58:49.040Z",
+            "image": "1732017529007.jpg"
+          }
+        }
+      }
+    },
+    "673c832bf81c6e10129ff017Response": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data fetch successfully",
+          "example": "Data fetch successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673c832bf81c6e10129ff017",
+            "name": "rishika",
+            "email": "rishika@gmail.com",
+            "mobile": "9753264374",
+            "image": "1732075985038.jpg"
+          }
+        }
+      }
+    },
+    "blockDriverResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data updated successfully",
+          "example": "Data updated successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": {
+            "_id": "673c8284f81c6e10129ff015",
+            "name": "simran",
+            "city_id": null,
+            "type": "main",
+            "email": "simran@gmail.com",
+            "mobile": "9753264374",
+            "balance": 0,
+            "pending_balance": 0,
+            "image": "driver/1732018820157.jpg",
+            "fcm_token": "",
+            "is_active": true,
+            "ridereceive": true,
+            "profile_status": "registered",
+            "email_verified": false,
+            "is_notify": true,
+            "is_online": false,
+            "is_outstation": true,
+            "in_ride": false,
+            "goToHome": false,
+            "total_earnings": 0,
+            "total_rides": 0,
+            "pending_amount": 0,
+            "device_id": "",
+            "kycStatus": 0,
+            "vehicleStatus": 0,
+            "stripe_verified": false,
+            "is_delete": false,
+            "stripe_charges_enabled": false,
+            "status": "blocked",
+            "documents": [],
+            "bank_data": [],
+            "createdAt": "2024-11-19T12:20:20.216Z",
+            "updatedAt": "2024-11-20T04:46:01.662Z"
+          }
+        }
+      }
+    },
+    "blockDriver": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Enter id",
+          "example": "673c8284f81c6e10129ff015"
+        }
+      }
+    },
+    "blockedDriversListResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "true",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "description": "Data fetch successfully",
+          "example": "Data fetch successfully"
+        },
+        "data": {
+          "type": "object",
+          "description": "Successfully Data",
+          "example": [
+            {
+              "_id": "673acf4b460436797df7c98e",
+              "name": "ishmeetnodejs",
+              "email": "",
+              "mobile": "",
+              "balance": 0,
+              "is_online": false,
+              "pending_amount": 0,
+              "kycStatus": 0,
+              "vehicleStatus": 0,
+              "status": "blocked",
+              "image": "http://localhost:6161/1732017529007.jpg"
+            }
+          ]
         }
       }
     }

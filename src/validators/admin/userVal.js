@@ -1,14 +1,16 @@
 const { Joi } = require('express-validation');
 
-exports.signUp = Joi.object({
-    firstName: Joi.string().required(),
-    lastName: Joi.string().required(),
-    DOB: Joi.string().isoDate().required(),
-    email: Joi.string().required().email(),
-    countryId: Joi.string().min(24).max(24).required(),
-    password: Joi.string().required(),
-    confirmPassword: Joi.string().valid(Joi.ref('password')).required()
-});
+exports.signUp = {
+    body: Joi.object({
+        firstName: Joi.string().required(),
+        lastName: Joi.string().required(),
+        // DOB: Joi.string().isoDate().required(),
+        email: Joi.string().required().email(),
+        // countryId: Joi.string().min(24).max(24).required(),
+        password: Joi.string().required(),
+        // confirmPassword: Joi.string().valid(Joi.ref('password')).required()
+    })
+};
 
 
 exports.login = Joi.object({
@@ -28,9 +30,9 @@ exports.countriesList = Joi.object({
     name: Joi.string().optional(),
     code: Joi.string().optional()
 });
-exports.userDownloads = Joi.object({
-    type: Joi.string().valid('week', 'year', 'month').required()
-});
+// exports.userDownloads = Joi.object({
+//     type: Joi.string().valid('week', 'year', 'month').required()
+// });
 
 exports.updateUserProfile = Joi.object({
     typeName: Joi.string().valid('profile').required(),
@@ -58,4 +60,79 @@ exports.editAvatar = Joi.object({
 
 exports.deleteAvatar = Joi.object({
     _id: Joi.string().max(24).min(24).required()
+});
+
+
+//
+exports.createState = Joi.object({
+    state: Joi.string().required()
+});
+
+exports.updateState = Joi.object({
+    _id: Joi.string().max(24).min(24).required(),
+    state: Joi.string().required()
+});
+
+exports.deleteState = Joi.object({
+    _id: Joi.string().max(24).min(24).required(),
+});
+exports.createCity = Joi.object({
+    name: Joi.string(),
+    city: Joi.string(),
+    state: Joi.string(),
+    country: Joi.string()
+});
+exports.updateCity = Joi.object({
+    id: Joi.string().max(24).min(24).required(),
+    name: Joi.string(),
+    city: Joi.string(),
+    state: Joi.string(),
+    country: Joi.string()
+});
+
+exports.deleteCity = Joi.object({
+    _id: Joi.string().max(24).min(24).required(),
+});
+
+exports.updateOperator = Joi.object({
+    _id: Joi.string().max(24).min(24).required(),
+    status: Joi.boolean()
+});
+exports.createDriver = Joi.object({
+    name: Joi.string(),
+    mobile: Joi.string().min(5).max(20).optional(),
+    email: Joi.string().required().email(),
+    type: Joi.string(),
+});
+exports.updateDriver = Joi.object({
+    _id: Joi.string().max(24).min(24).required(),
+    name: Joi.string(),
+    mobile: Joi.string().min(5).max(20).optional(),
+    email: Joi.string().required().email(),
+    type: Joi.string(),
+});
+
+exports.deleteDriver = Joi.object({
+    _id: Joi.string().max(24).min(24).required(),
+});
+exports.updateTaxistatus = Joi.object({
+    _id: Joi.string().max(24).min(24).required(),
+    is_active: Joi.boolean()
+});
+exports.updateStatusUser = Joi.object({
+    _id: Joi.string().max(24).min(24).required(),
+    is_active: Joi.boolean()
+});
+exports.createRental = Joi.object({
+    packages: Joi.object()
+});
+exports.rentalEditData = Joi.object({
+    packages: Joi.object()
+});
+
+exports.createVehicle = Joi.object({
+    TaxiType: Joi.string(),
+    title: Joi.string(),
+    make: Joi.string(),
+    model: Joi.string(),
 });

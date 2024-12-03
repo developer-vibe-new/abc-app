@@ -1,14 +1,22 @@
 const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log('multer', req.body.typeName);
-        console.log('multer', req.body);
-        cb(null, `public/${req.body.typeName}`);
+        const folderName = req.body.typeName;
+        if (!folderName) {
+            return cb(new Error('typeName is required in the request body'));
+        }
+        const dir = path.join(__dirname, '../../public', folderName);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir);
     },
     filename: function (req, file, cb) {
-        let exe = file.originalname.split('.').pop();
-        let filename = `${Date.now()}.${exe}`;
+        const ext = file.originalname.split('.').pop();
+        const filename = `${Date.now()}.${ext}`;
         cb(null, filename);
     }
 });

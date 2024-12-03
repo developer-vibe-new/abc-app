@@ -1,21 +1,10 @@
-const services = require('../services/userService');
 const { statusCode } = require('../../config/default.json');
+const service = require('../services/userService');
 
-
-/**
- * Function to handle user login.
- *
- * @param {Object} param - The function parameter object.
- * @param {Object} param.body - The request body containing user credentials.
- * @returns {Object} - The response object containing status code, success flag, and message.
- * @throws Will throw an error if login fails.
- */
-exports.login = async ({ body }) => {
+exports.sendOtpController = async (req) => {
     try {
-        // Call the login service with the provided user credentials
-        return await services.login(body);
+        return await service.sendOtp(req);
     } catch (error) {
-        // If an error occurs during login, return a 400 status code, success flag as false, and the error message
         return {
             statusCode: statusCode.BAD_REQUEST,
             success: false,
@@ -23,3 +12,50 @@ exports.login = async ({ body }) => {
         };
     }
 };
+
+exports.verifyOtpController = async (req) => {
+    try {
+        return await service.verifyOtp(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
+exports.updateUserController = async (req) => {
+    try {
+        return await service.updateUser(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
+
+exports.userDetailsController = async (req) => {
+    try {
+        return await service.userDetails(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
+
+exports.deleteUserController = async (req) => {
+    try {
+        return await service.deleteUser(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
