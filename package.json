@@ -34,6 +34,7 @@
     "preadmin": "eslint .",
     "admin": "nodemon admin.js",
     "user_socket": "nodemon user_socket.js",
-    "provider_socket": "nodemon provider_socket.js"
+    "provider_socket": "nodemon provider_socket.js",
+    "start": "nodemon index.js"
   }
 }

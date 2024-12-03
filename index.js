@@ -4,7 +4,7 @@ const path = require('path');
 
 const app = express();
 require('dotenv').config();
-const devConfig = require('./src/config/dev.config');
+// const devConfig = require('./src/config/dev.config');
 require('./src/config/db.config');
 global.c = console.log.bind(console);
 
@@ -23,7 +23,7 @@ require('./src/app/routes')(app);
 // require('./src/admin/routes')(app);
 
 // set port, listen for request s
-const PORT = devConfig.PORT || 6262;
+const PORT = 5050;
 console.log('port: ' + PORT);
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
