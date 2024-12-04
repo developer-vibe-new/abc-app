@@ -13,6 +13,7 @@
         "saltRounds": 10
     },
     "resMessage": {
+        "Invalid_Sort_Parameter": "Invalid_Sort_Parameter",
         "Id_is_required": "Id is Required",
         "Vehicle_Not_Created": "Vehicle Not Created",
         "User_Deleted_Successfully": "User deleted successfully",
