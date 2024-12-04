@@ -445,14 +445,35 @@ exports.blockedDriverList = async (req) => {
             });
         }
 
+        let sortConditions = {};
+
+        if (req.query.sortByName) {
+            let sortOrder = req.query.sortByName === 'desc' ? -1 : 1;
+            sortConditions.first_name = sortOrder;
+        }
+
+        if (req.query.sortByEmail) {
+            let sortByEmail = req.query.sortByEmail === 'desc' ? -1 : 1;
+            sortConditions.email = sortByEmail;
+        }
+
+        if (req.query.sortByNo) {
+            let sortByNo = req.query.sortByNo === 'desc' ? -1 : 1;
+            sortConditions.mobile = sortByNo;
+        }
+
+        if (Object.keys(sortConditions).length > 0) {
+            pipeline.push({
+                $sort: sortConditions
+            });
+        }
+
         let countPipeline = [...pipeline];
         countPipeline.push({ $count: "totalCount" });
 
-        // Aggregate to get total count
         const countData = await driverModel.aggregate(countPipeline);
         const totalCount = countData.length > 0 ? countData[0].totalCount : 0;
 
-        // Add pagination to the original pipeline
         pipeline.push(
             { $skip: skip },
             { $limit: perPage }
