@@ -46,6 +46,29 @@ exports.userListData = async (req) => {
             }
         });
 
+        let sortConditions = {};
+
+        if (req.query.sortByName) {
+            let sortOrder = req.query.sortByName === 'desc' ? -1 : 1;
+            sortConditions.first_name = sortOrder;
+        }
+
+        if (req.query.sortByEmail) {
+            let sortByEmail = req.query.sortByEmail === 'desc' ? -1 : 1;
+            sortConditions.email = sortByEmail;
+        }
+
+        if (req.query.sortByNo) {
+            let sortByNo = req.query.sortByNo === 'desc' ? -1 : 1;
+            sortConditions.mobile = sortByNo;
+        }
+
+        if (Object.keys(sortConditions).length > 0) {
+            conditions.push({
+                $sort: sortConditions
+            });
+        }
+
         pipeline.push({
             $skip: skip
         });
