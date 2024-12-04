@@ -24,6 +24,19 @@ exports.updateTaxiType = async (req) => {
     }
 };
 
+exports.addTaxiTypeController = async (req) => {
+    try {
+        return await services.addTaxiType(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}
+
 exports.updateTaxiStatus = async (req) => {
     try {
         return await services.updateTaxiStatus(req);
