@@ -50,7 +50,7 @@ router.post('/operatorsUpdate/:id', auth, responseHandler(adminController.operat
 
 // driver 
 router.post('/createDriver', auth, upload.single('image'), responseHandler(driverController.createDriver));
-router.get('/viewDriver', responseHandler(driverController.viewDriver));
+router.get('/viewDriver', auth, responseHandler(driverController.viewDriver));
 router.get('/editDriver/:id', auth, responseHandler(driverController.editDriver));
 router.post('/updateDriver/:id', auth, upload.single('image'), responseHandler(driverController.updateDriver));
 router.post('/blockDriver', auth, responseHandler(driverController.blockDriver));
