@@ -18,8 +18,12 @@ const operatorSchema = new mongoose.Schema({
         trim: true
     },
     status: {
+        type: String,
+        default: "unblock"
+    },
+    is_active: {
         type: Boolean,
-        default: true
+        default: false
     },
     otp: {
         type: Number
