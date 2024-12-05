@@ -13,6 +13,9 @@
         "saltRounds": 10
     },
     "resMessage": {
+        "Incorrect_Old_Password": "Incorrect_Old_Password",
+        "Password_Changed_Successfully": "Password_Changed_Successfully",
+        "New_Password_Confirm_Password_Not_Matched": "New_Password_Confirm_Password_Not_Matched",
         "Invalid_Sort_Parameter": "Invalid_Sort_Parameter",
         "Id_is_required": "Id is Required",
         "Vehicle_Not_Created": "Vehicle Not Created",
@@ -74,7 +77,6 @@
         "Game_Add_Success": "Games Preference Added Successfully",
         "Community_Added_Successfully": "Community Added Successfully",
         "Your_Account_is_Blocked": "Your Account is Blocked...!",
-        "Incorrect_Username_Password": "Incorrect username or password",
         "User_login_Successfully": "User login Successfully.",
         "User_Not_Exist": "User does not exist",
         "User_Logout_Success": "User Logout Successfully",
@@ -123,11 +125,6 @@
         "User_Follow_Not_Found": "User to follow not found",
         "User_Not_Follow_Self": "Users cannot follow themselves",
         "Follower_Following_List_Success": "Follower Following List Found Successfully",
-        "Change_Password_Success": "Password changed successfully",
-        "New_Password_Not_Match": "New passwords do not match",
-        "Current_Password_Incorrect": "'Current password is incorrect",
-        "New_Password_Same_As_Current": "New Password and old password should not be same",
-        "Create_New_Password_Success": "Create New Password Successfully",
         "Avatar_Add_Success": "Avatar added successfully",
         "Avatar_Name_Required": "Avatar Name Required",
         "Avatar_Not_Found": "Avatar Not Found",
@@ -139,8 +136,7 @@
         "Team_Not_Found_In_This_Group": "Team not found in this group",
         "Admin_Not_Found": "Admin not found",
         "Admin_Logout_Success": "Admin Logout Successfully",
-        "Admin_Login_Success": "Admin login Successfully.",
-        "Incorrect_Email_Password": "Incorrect email or password"
+        "Admin_Login_Success": "Admin login Successfully."
     },
     "userRoles": {
         "WALLET": "wallet",

@@ -26,7 +26,8 @@ router.get('/index', async (req, res) => {
 });
 
 /* - admin routers - */
-router.post('/login', validate(userVal.login), responseHandler(controllers.login));
+router.post('/adminlogin', responseHandler(adminController.login));
+router.post('/changePassword', auth, responseHandler(adminController.changePasswordController));
 
 /**
  * adminRegister
@@ -36,7 +37,6 @@ router.post('/login', validate(userVal.login), responseHandler(controllers.login
 router.get('/dashboard', auth, responseHandler(adminController.dashboardDataController));
 
 router.post('/adminRegister', adminController.registerAdmin);
-router.post('/adminlogin', responseHandler(adminController.login));
 router.post('/stateCreate', auth, responseHandler(stateController.createState));
 router.post('/updateState', auth, responseHandler(stateController.updateState));
 router.post('/deleteState/:id', auth, responseHandler(stateController.deleteState));

@@ -27,7 +27,7 @@ exports.auth = async (req, res, next) => {
 
         }
         // console.log(jwt.verify(token, SECRET_Key), "decoded");
-        req._id = decoded._id;
+        req.auth = decoded;
 
         // console.log(req._id, "req._id");
         next();

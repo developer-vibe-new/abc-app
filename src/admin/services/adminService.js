@@ -8,6 +8,7 @@ const operatorModel = require('../../models/operatorModel');
 const adminRegisterModel = require('../../models/adminModel');
 const { statusCode, resMessage } = require('../../config/default.json');
 const Provider = require('../../models/providerModel');
+const adminModel = require('../../models/adminModel');
 
 exports.adminRegister = async (req) => {
     try {
@@ -161,6 +162,49 @@ exports.dashboardData = async (req, res) => {
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",
+        };
+    }
+}
+
+exports.changePassword = async (req) => {
+    try {
+        const { oldPassword, newPassword, confirmPassword } = req.body;
+        if(!oldPassword || !newPassword || !confirmPassword) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Required_Data
+            }
+        }
+        const user = await adminModel.findById(req.auth._id);
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if(isMatch === true) {
+            if(newPassword === confirmPassword) {
+                const hashedPassword = await bcrypt.hash(newPassword, 10);
+                await adminModel.findByIdAndUpdate(req.auth._id, { password: hashedPassword });
+                return {
+                    status: statusCode.OK,
+                    success: true,
+                    message: resMessage.Password_Changed_Successfully
+                }
+            } else {
+                return {
+                    status: statusCode.BAD_REQUEST,
+                    success: false,
+                    message: resMessage.New_Password_Confirm_Password_Not_Matched
+                }
+            }
+        }
+        return {
+            status: statusCode.BAD_REQUEST,
+            success: false,
+            message: resMessage.Incorrect_Old_Password
+        }
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
         };
     }
 }

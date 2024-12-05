@@ -75,3 +75,16 @@ exports.dashboardDataController = async (req, res) => {
         };
     }
 }
+
+exports.changePasswordController = async (req) => {
+    try {
+        return await services.changePassword(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
