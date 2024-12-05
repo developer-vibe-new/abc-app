@@ -64,7 +64,7 @@ exports.userListData = async (req) => {
         }
 
         if (Object.keys(sortConditions).length > 0) {
-            conditions.push({
+            pipeline.push({
                 $sort: sortConditions
             });
         }
