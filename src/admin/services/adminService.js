@@ -54,7 +54,7 @@ exports.login = async (req) => {
 
         if (!findData) {
             return {
-                statusCode: statusCode.BAD_REQUEST,
+                status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.User_Not_Found,
 
@@ -64,9 +64,9 @@ exports.login = async (req) => {
         const isPasswordMatch = await bcrypt.compare(req.body.password, findData.password);
         if (!isPasswordMatch) {
             return {
-                statusCode: statusCode.BAD_REQUEST,
+                status: statusCode.BAD_REQUEST,
                 success: false,
-                message: resMessage.Incorrect_Username_Password
+                message: resMessage.Invalid_Password
             };
         }
 
@@ -76,7 +76,7 @@ exports.login = async (req) => {
             { verification_token: auth_key }
         );
         return {
-            statusCode: statusCode.OK,
+            status: statusCode.OK,
             success: true,
             message: resMessage.User_login_Successfully,
             token: auth_key

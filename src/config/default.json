@@ -13,6 +13,7 @@
         "saltRounds": 10
     },
     "resMessage": {
+        "Invalid_Password": "Invalid Password",
         "Operator_Created_Successfully": "Operator created successfully.",
         "Phone_Already_Exist": "Mobile number already exists.",
         "Incorrect_Old_Password": "Incorrect old password.",
