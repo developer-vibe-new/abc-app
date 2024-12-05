@@ -9,8 +9,7 @@ const operatorSchema = new mongoose.Schema({
     phone: {
         type: Number,
         required: true,
-        trim: true,
-        unique: true
+        trim: true
     },
     city: {
         type: String,

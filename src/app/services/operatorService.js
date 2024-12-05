@@ -12,6 +12,14 @@ exports.registerOperator = async (req) => {
                 message: resMessage.Required_Data
             };
         }
+        const data = await Operator.findOne({ phone });
+        if(data !== null) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Phone_Already_Exist
+            }
+        }
         const operatorData = await Operator.create({ fullName, phone, city });
         return {
             statusCode: statusCode.OK,
