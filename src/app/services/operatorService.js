@@ -67,7 +67,7 @@ exports.verifyOtp = async (req) => {
         const { phone, otp } = req.body;
         if (!phone) {
             return {
-                statusCode: statusCode.BAD_REQUEST,
+                status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Required_Data
             };
@@ -75,7 +75,7 @@ exports.verifyOtp = async (req) => {
         const operatorData = await Operator.findOne({ phone });
         if (!operatorData) {
             return {
-                statusCode: statusCode.NOT_FOUND,
+                status: statusCode.NOT_FOUND,
                 success: false,
                 message: resMessage.Operator_Not_Exist
             };
@@ -91,21 +91,23 @@ exports.verifyOtp = async (req) => {
         );
         if (operatorData.otp === otp) {
             operatorData.otp = null;
+            operatorData.token = token;
             await operatorData.save();
             return {
-                statusCode: statusCode.OK,
+                status: statusCode.OK,
                 success: true,
                 message: resMessage.Otp_Verify_Successfully,
                 token
             };
         }
         return {
-            statusCode: statusCode.NOT_FOUND,
+            status: statusCode.NOT_FOUND,
             success: false,
             message: resMessage.Otp_Verify_Failed
         };
     } catch (error) {
         return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",
