@@ -33,23 +33,23 @@ exports.loginOperator = async (req) => {
         const { phone } = req.body;
         if (!phone) {
             return {
-                statusCode: statusCode.BAD_REQUEST,
+                status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Required_Data
             };
         }
-        const operatorData = await Operator.findOne({ phone, status: true });
+        const operatorData = await Operator.findOne({ phone, is_active: true, status: "unblock" });
         if (operatorData) {
             operatorData.otp = 1234;
             await operatorData.save();
             return {
-                statusCode: statusCode.OK,
+                status: statusCode.OK,
                 success: true,
                 message: resMessage.Otp_Send_Success
             };
         }
         return {
-            statusCode: statusCode.NOT_FOUND,
+            status: statusCode.NOT_FOUND,
             success: false,
             message: resMessage.Operator_Not_Exist
         };
