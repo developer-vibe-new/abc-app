@@ -27,7 +27,6 @@
         "Required_Data": "All fields are required",
         "REJECTION_REASON": "Please mention rejection reason",
         "Data_Not_Found": "Data not found",
-        "Team_Not_Found": "Team not found",
         "Story_Not_Found": "Story not found",
         "Data_Already_Exist": "Data already exist",
         "You_Are_Already_Login_With_this_Account": "You are already login with this account",

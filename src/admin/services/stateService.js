@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const stateModel = require('../../models/stateModel');
 const cityModel = require('../../models/city');
+const { statusCode, resMessage } = require('../../config/default.json');
 
 exports.stateCreate = async (req) => {
     try {
@@ -113,33 +114,34 @@ exports.stateView = async (req) => {
 
 exports.cityCreate = async (req) => {
     try {
-        const FindCity = await cityModel.findOne({ name: req.body.name });
+        const { name, city, state, country, coordinates } = req.body;
+        const FindCity = await cityModel.findOne({ city: req.body.city });
         if (FindCity) {
             return {
+                status: statusCode.BAD_REQUEST,
                 success: false,
-                message: "City Already Exits",
-                data: []
+                message: resMessage.Data_Already_Exist
             };
         }
-        const addCity = await cityModel.create({
-            name: req.body.name,
-            city: req.body.city,
-            state: req.body.state,
-            country: req.body.country
+        const newCity = new cityModel({
+            name,
+            city,
+            state,
+            country,
+            coordinates
         });
-
-        if (addCity) {
-            return {
-                success: true,
-                message: "City Created successfully",
-                data: addCity
-            };
+        await newCity.save();
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Created_Successfully,
+            data: newCity
         }
     } catch (error) {
-        console.log(error);
         return {
+            status: statusCode.Internal_Server_Error,
             success: false,
-            message: "An error occured while creating city data"
+            message: error.message
         };
     }
 };
