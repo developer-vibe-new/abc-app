@@ -666,7 +666,7 @@ exports.onlineDriverList = async (req) => {
             {
                 profile_image: {
                     $concat: [
-                        "http://192.168.0.18:6161/",
+                        "http://192.168.0.18:6161/driver/",
                         "$profile_image"
                     ]
                 },
