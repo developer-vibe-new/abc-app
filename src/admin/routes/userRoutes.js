@@ -54,9 +54,9 @@ router.get('/viewDriver', auth, responseHandler(driverController.viewDriver));
 router.get('/editDriver/:id', auth, responseHandler(driverController.editDriver));
 router.post('/updateDriver/:id', auth, upload.single('image'), responseHandler(driverController.updateDriver));
 router.post('/blockDriver', auth, responseHandler(driverController.blockDriver));
+router.get('/blockedDriversList', responseHandler(driverController.blockedDriversList));
 
 // router.post('/deleteDriver/:id', auth, responseHandler(driverController.deleteDriver));
-router.get('/blockedDriversList', responseHandler(driverController.blockedDriversList));
 router.get('/editBlockDriver/:id', auth, responseHandler(driverController.editBlockDriver));
 router.post('/blockedDriverUpdate/:id', auth, upload.single('image'), responseHandler(driverController.blockedDriverUpdate));
 router.post('/unblockDriver', auth, responseHandler(driverController.unblockDriver));
