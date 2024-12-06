@@ -86,15 +86,21 @@ exports.login = async (req) => {
     }
 };
 
-exports.operatorsList = async () => {
+exports.operatorsList = async (req) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const pageSize = parseInt(req.query.pageSize) || 10;
         const skip = (page - 1) * pageSize;
-        const data = await operatorModel.find({ is_active: true, status: "unblock" })
+        let searchCriteria = { is_active: true, status: "unblock" };
+        if (req.query.fullName) {
+            const fullNameSearch = new RegExp(req.query.fullName, 'i');
+            searchCriteria.fullName = fullNameSearch;
+        }
+        const data = await operatorModel.find(searchCriteria)
                                         .skip(skip)
-                                        .limit(pageSize);
-        const totalCount = await operatorModel.countDocuments({ is_active: true, status: "unblock" });
+                                        .limit(pageSize)
+                                        .select('fullName phone city status is_active');
+        const totalCount = await operatorModel.countDocuments(searchCriteria);
         if(!data) {
             return {
                 status: statusCode.NOT_FOUND,

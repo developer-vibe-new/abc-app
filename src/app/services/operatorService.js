@@ -24,7 +24,7 @@ exports.registerOperator = async (req) => {
         return {
             statusCode: statusCode.OK,
             success: true,
-            message: resMessage.Data_Created_Successfully,
+            message: resMessage.Operator_Created_successfully,
             data: operatorData
         };
     } catch (error) {

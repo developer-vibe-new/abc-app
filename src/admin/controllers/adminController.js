@@ -32,9 +32,9 @@ exports.login = async (req) => {
     }
 };
 
-exports.operatorListController = async () => {
+exports.operatorListController = async (req) => {
     try {
-        return await services.operatorsList();
+        return await services.operatorsList(req);
     } catch (error) {
         console.log(error);
         return {
