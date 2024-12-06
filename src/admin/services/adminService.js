@@ -245,13 +245,17 @@ exports.updateOperatorStatus = async (req) => {
         }
 
         const updatedStatus = operator.status === "unblock" ? "block" : "unblock";
-        
+
         const updateData = await operatorModel.findByIdAndUpdate(id, { status: updatedStatus }, { new: true });
-        
+
+        const responseMessage = updatedStatus === "block"
+            ? resMessage.Operator_Blocked_Successfully
+            : resMessage.Operator_Unblocked_Successfully;
+
         return {
             status: statusCode.OK,
             success: true,
-            message: resMessage.Status_Updated_Successfully,
+            message: responseMessage,
             data: { updateData }
         };
     } catch (error) {

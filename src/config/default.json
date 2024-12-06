@@ -13,6 +13,9 @@
         "saltRounds": 10
     },
     "resMessage": {
+        "Operator_Unblocked_Successfully": "Operator Unblocked Successfully",
+        "Operator_Blocked_Successfully": "Operator Blocked Successfully",
+        "Documents_Retrieved_Successfully": "Documents Retrieved Successfully",
         "Documents_Uploaded_Successfully": "Documents Uploaded Successfully",
         "Id_not_Active": "Your Id is not active. Contact Admin",
         "Invalid_Password": "Invalid Password",

@@ -180,7 +180,32 @@ exports.uploadDocuments = async (req) => {
             data: updatedDocument,
         };
     } catch (error) {
-        console.log(error.message, "===========");
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}
+
+exports.getDocuments = async (req) => {
+    try {
+        const data = await Operator.findOne({ _id: req.auth.id });
+        if (!data) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Data_Not_Found,
+            }
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Documents_Retrieved_Successfully,
+            data: data.documents,
+        }
+    } catch (error) {
         return {
             status: statusCode.INTERNAL_SERVER_ERROR,
             success: false,

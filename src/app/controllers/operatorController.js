@@ -48,3 +48,15 @@ exports.updateDocumentController = async (req) => {
         };
     }
 }
+
+exports.getdocumentsController = async (req) => {
+    try {
+        return await service.getDocuments(req);
+    } catch (error) {
+        return {
+            status: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}

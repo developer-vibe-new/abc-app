@@ -10,5 +10,6 @@ router.post('/register', validate.validateOperator, responseHandler(controller.r
 router.post('/login', validate.validateloginOperator, responseHandler(controller.loginOperatorController));
 router.post('/verifyOtp', validate.validateverifyOtpOperator, responseHandler(controller.verifyOtpController));
 router.post('/uploadDocument', verifyToken, responseHandler(controller.updateDocumentController));
+router.get('/getDocuments', verifyToken, responseHandler(controller.getdocumentsController));
 
 module.exports = router;
