@@ -162,7 +162,6 @@ exports.updateOperator = async (req) => {
     }
 };
 
-
 exports.dashboardData = async (req, res) => {
     try {
         const totalProviders = await Provider.find().countDocuments();
@@ -232,3 +231,36 @@ exports.changePassword = async (req) => {
         };
     }
 }
+
+exports.updateOperatorStatus = async (req) => {
+    try {
+        const { id } = req.body;
+        const operator = await operatorModel.findById(id);
+        if (!operator) {
+            return {
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.Operator_Not_Exist
+            };
+        }
+
+        const updatedStatus = operator.status === "unblock" ? "block" : "unblock";
+        
+        const updateData = await operatorModel.findByIdAndUpdate(id, { status: updatedStatus }, { new: true });
+        
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Status_Updated_Successfully,
+            data: { updateData }
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: "An error occurred",
+            data: null
+        };
+    }
+};

@@ -49,6 +49,7 @@ router.get('/viewCity', auth, responseHandler(stateController.viewCity));
 // Operator routes
 router.get('/operatorList', responseHandler(adminController.operatorListController));
 router.post('/operatorsCurrentStatus', responseHandler(adminController.operatorsUpdate));
+router.post('/operatorStatus', responseHandler(adminController.operatorsUpdateStatusController));
 
 // driver 
 router.post('/createDriver', auth, upload.single('image'), responseHandler(driverController.createDriver));
