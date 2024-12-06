@@ -147,7 +147,8 @@ exports.driverView = async (req) => {
                 vehicleStatus: 1,
                 status: 1,
                 pending_amount: 1,
-                full_name: 1
+                full_name: 1,
+                is_active: 1
             }
         });
 
