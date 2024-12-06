@@ -121,6 +121,7 @@ exports.verifyOtp = async (req) => {
                 status: statusCode.OK,
                 success: true,
                 message: resMessage.Otp_Verify_Successfully,
+                kycStatus: operatorData.kycStatus,
                 token
             };
         }
