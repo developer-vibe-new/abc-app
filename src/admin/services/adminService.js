@@ -131,17 +131,37 @@ exports.operatorsList = async (req) => {
 
 exports.updateOperator = async (req) => {
     try {
-        const updateData = await operatorModel.findByIdAndUpdate({ _id: req.params.id }, { status: false }, { new: true });
+        const { id } = req.body;
+        const operator = await operatorModel.findById(id);
+        if (!operator) {
+            return {
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.Operator_Not_Exist
+            };
+        }
+
+        const updatedStatus = operator.is_active === false ? true : false;
+        
+        const updateData = await operatorModel.findByIdAndUpdate(id, { is_active: updatedStatus }, { new: true });
+        
         return {
-            statusCode: statusCode.OK,
+            status: statusCode.OK,
             success: true,
             message: resMessage.Status_Updated_Successfully,
             data: { updateData }
         };
     } catch (error) {
         console.log(error);
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: "An error occurred",
+            data: null
+        };
     }
 };
+
 
 exports.dashboardData = async (req, res) => {
     try {
