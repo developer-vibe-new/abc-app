@@ -168,6 +168,31 @@ exports.driverView = async (req) => {
             sortConditions.mobile = sortByNo;
         }
 
+        if(req.query.sortByBalance) {
+            let sortByBalance = req.query.sortByBalance === 'desc'? -1 : 1;
+            sortConditions.balance = sortByBalance;
+        }
+
+        if(req.query.sortByPendingAmount) {
+            let sortByPendingAmount = req.query.sortByPendingAmount === 'desc'? -1 : 1;
+            sortConditions.pending_balance = sortByPendingAmount;
+        }
+
+        if(req.query.sortBycurrentStatus) {
+            let sortBycurrentStatus = req.query.sortBycurrentStatus === 'desc'? -1 : 1;
+            sortConditions.is_active = sortBycurrentStatus;
+        }
+
+        if(req.query.sortByKycStatus) {
+            let sortByKycStatus = req.query.sortByKycStatus === 'desc'? -1 : 1;
+            sortConditions.kycStatus = sortByKycStatus;
+        }
+
+        if(req.query.sortByVehicleStatus) {
+            let sortByVehicleStatus = req.query.sortByVehicleStatus === 'desc'? -1 : 1;
+            sortConditions.vehicleStatus = sortByVehicleStatus;
+        }
+
         if (Object.keys(sortConditions).length > 0) {
             conditions.push({
                 $sort: sortConditions
