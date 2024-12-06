@@ -88,6 +88,7 @@ exports.login = async (req) => {
 
 exports.operatorsList = async () => {
     try {
+        const page = parseInt(req.query.page) || 1;
         const data = await operatorModel.find({ is_active: true, status: "unblock" });
         if(!data) {
             return {

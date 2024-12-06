@@ -48,6 +48,15 @@ exports.loginOperator = async (req) => {
             };
         }
 
+        const operatorNo = await Operator.findOne({ phone });
+        if(!operatorNo) {
+            return {
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.Operator_Not_Exist,
+            }
+        }
+
         const operatorData = await Operator.findOne({ phone, is_active: true, status: "unblock" });
 
         if (operatorData) {
