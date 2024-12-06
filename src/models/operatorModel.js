@@ -1,5 +1,25 @@
 const mongoose = require('mongoose');
 
+const documentSchema = new mongoose.Schema({
+    pancard: {
+        name: { type: String, default: "" },
+        number: { type: Number, default: null },
+        status: { type: Number, default: 0 },
+    },
+    aadharcard: {
+        name: { type: String, default: "" },
+        number: { type: Number, default: null },
+        status: { type: Number, default: 0 },
+    },
+    bank: {
+        account_number: { type: Number, default: null },
+        ifsc_code: { type: String, default: "" },
+        bank_name: { type: String, default: "" },
+        account_holder_name: { type: String, default: "" },
+        status: { type: Number, default: 0 },
+    }
+});
+
 const operatorSchema = new mongoose.Schema({
     fullName: {
         type: String,
@@ -26,6 +46,11 @@ const operatorSchema = new mongoose.Schema({
     },
     otp: {
         type: Number
+    },
+    documents: documentSchema,
+    kycStatus: {
+        type: Number,
+        default: 0
     },
     type: {
         type: String,

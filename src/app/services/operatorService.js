@@ -138,3 +138,54 @@ exports.verifyOtp = async (req) => {
         };
     }
 };
+
+exports.uploadDocuments = async (req) => {
+    try {
+        const {
+            pancardName, pancardNumber,
+            aadharcardName, aadharcardNumber,
+            bankAccountNumber, ifscCode,
+            bankName, accountHolderName
+        } = req.body;
+
+        const documentData = {
+            pancard: {
+                name: pancardName || '',
+                number: pancardNumber || null,
+                status: 1,
+            },
+            aadharcard: {
+                name: aadharcardName || '',
+                number: aadharcardNumber || null,
+                status: 1,
+            },
+            bank: {
+                account_number: bankAccountNumber || null,
+                ifsc_code: ifscCode || '',
+                bank_name: bankName || '',
+                account_holder_name: accountHolderName || '',
+                status: 1,
+            }
+        };
+        const updatedDocument = await Operator.findByIdAndUpdate(
+            req.auth.id,
+            { $set: { documents: documentData } },
+            { new: true }
+        );
+
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Documents_Uploaded_Successfully,
+            data: updatedDocument,
+        };
+    } catch (error) {
+        console.log(error.message, "===========");
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}

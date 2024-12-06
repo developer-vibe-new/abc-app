@@ -36,3 +36,15 @@ exports.verifyOtpController = async (req) => {
         };
     }
 };
+
+exports.updateDocumentController = async (req) => {
+    try {
+        return await service.uploadDocuments(req);
+    } catch (error) {
+        return {
+            status: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}
