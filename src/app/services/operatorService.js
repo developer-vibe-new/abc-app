@@ -169,7 +169,7 @@ exports.uploadDocuments = async (req) => {
         };
         const updatedDocument = await Operator.findByIdAndUpdate(
             req.auth.id,
-            { $set: { documents: documentData } },
+            { $set: { documents: documentData, kycStatus: 1 } },
             { new: true }
         );
 

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const documentSchema = new mongoose.Schema({
     pancard: {
         name: { type: String, default: "" },
-        number: { type: Number, default: null },
+        number: { type: String, default: "" },
         status: { type: Number, default: 0 },
     },
     aadharcard: {
