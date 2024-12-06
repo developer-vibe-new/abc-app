@@ -92,8 +92,8 @@ exports.operatorsList = async (req) => {
         const pageSize = parseInt(req.query.pageSize) || 10;
         const skip = (page - 1) * pageSize;
         let searchCriteria = { is_active: true, status: "unblock" };
-        if (req.query.fullName) {
-            const fullNameSearch = new RegExp(req.query.fullName, 'i');
+        if (req.query.search) {
+            const fullNameSearch = new RegExp(req.query.search, 'i');
             searchCriteria.fullName = fullNameSearch;
         }
         const data = await operatorModel.find(searchCriteria)
