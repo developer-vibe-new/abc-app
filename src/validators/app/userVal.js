@@ -36,11 +36,11 @@ exports.verifyOtpOperator = Joi.object({
         'number.max': 'Phone number must be exactly 10 digits',
         'any.required': 'Phone number is required'
     }),
-    otp: Joi.number().integer().min(1000).max(9999).required().messages({
+    otp: Joi.number().integer().min(100000).max(999999).required().messages({
         'number.base': 'OTP must be a number',
         'number.integer': 'OTP must be an integer',
-        'number.min': 'OTP must be exactly 4 digits',
-        'number.max': 'OTP must be exactly 4 digits',
+        'number.min': 'OTP must be exactly 6 digits',
+        'number.max': 'OTP must be exactly 6 digits',
         'any.required': 'OTP is required'
     })
 });

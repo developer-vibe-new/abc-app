@@ -89,7 +89,12 @@ exports.login = async (req) => {
 exports.operatorsList = async () => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const data = await operatorModel.find({ is_active: true, status: "unblock" });
+        const pageSize = parseInt(req.query.pageSize) || 10;
+        const skip = (page - 1) * pageSize;
+        const data = await operatorModel.find({ is_active: true, status: "unblock" })
+                                        .skip(skip)
+                                        .limit(pageSize);
+        const totalCount = await operatorModel.countDocuments({ is_active: true, status: "unblock" });
         if(!data) {
             return {
                 status: statusCode.NOT_FOUND,
@@ -101,8 +106,14 @@ exports.operatorsList = async () => {
             status: statusCode.OK,
             success: true,
             message: resMessage.Data_Fetch_Successfully,
-            data
-        }
+            data,
+            pagination: {
+                currentPage: page,
+                pageSize: pageSize,
+                totalRecords: totalCount,
+                totalPages: Math.ceil(totalCount / pageSize)
+            }
+        };
     } catch (error) {
         return {
             status: statusCode.INTERNAL_SERVER_ERROR,

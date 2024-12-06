@@ -60,7 +60,7 @@ exports.loginOperator = async (req) => {
         const operatorData = await Operator.findOne({ phone, is_active: true, status: "unblock" });
 
         if (operatorData) {
-            operatorData.otp = 1234;
+            operatorData.otp = 123456;
             await operatorData.save(); 
 
             return {
