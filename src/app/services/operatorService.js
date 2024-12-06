@@ -39,30 +39,37 @@ exports.registerOperator = async (req) => {
 exports.loginOperator = async (req) => {
     try {
         const { phone } = req.body;
+
         if (!phone) {
             return {
                 status: statusCode.BAD_REQUEST,
                 success: false,
-                message: resMessage.Required_Data
+                message: resMessage.Required_Data,
             };
         }
+
         const operatorData = await Operator.findOne({ phone, is_active: true, status: "unblock" });
+
         if (operatorData) {
             operatorData.otp = 1234;
-            await operatorData.save();
+            await operatorData.save(); 
+
             return {
                 status: statusCode.OK,
                 success: true,
-                message: resMessage.Otp_Send_Success
+                message: resMessage.Otp_Send_Success,
             };
         }
+
         return {
-            status: statusCode.NOT_FOUND,
+            status: statusCode.UNAUTHORIZED,
             success: false,
-            message: resMessage.Operator_Not_Exist
+            message: resMessage.Id_not_Active,
         };
+        
     } catch (error) {
         return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",
@@ -80,7 +87,7 @@ exports.verifyOtp = async (req) => {
                 message: resMessage.Required_Data
             };
         }
-        const operatorData = await Operator.findOne({ phone });
+        const operatorData = await Operator.findOne({ phone, is_active: true, status: "unblock" });
         if (!operatorData) {
             return {
                 status: statusCode.NOT_FOUND,

@@ -86,42 +86,28 @@ exports.login = async (req) => {
     }
 };
 
-exports.operatorsList = async (req) => {
+exports.operatorsList = async () => {
     try {
-        let page = req.query.page || 1;
-        let pagesize = req.query.pagesize || 10;
-        let search_value = req.query.search || "";
-        var conditions = [];
-
-        // if (search_value) {
-        //     conditions = _.assign(conditions, { $or: [{ "fullName": { $regex: new RegExp(search_value, "gi") } }] });
-        // }
-        if (search_value) {
-            conditions.push({
-                $match: {
-                    fullName: { $regex: search_value }
-                }
-            });
-        }
-        conditions.push({ $sort: { fullName: 1 } }, { $skip: ((page - 1) * pagesize) },
-            { $limit: pagesize });
-        const operatorsData = await operatorModel.aggregate(conditions);
-        if (operatorsData.length == 0) {
+        const data = await operatorModel.find({ is_active: true, status: "unblock" });
+        if(!data) {
             return {
-                statusCode: statusCode.BAD_REQUEST,
+                status: statusCode.NOT_FOUND,
                 success: false,
-                message: resMessage.Data_Not_Found,
-
-            };
-        } else {
-            return {
-                statusCode: statusCode.OK,
-                success: true,
-                data: { operatorsData }
-            };
+                message: resMessage.Data_Not_Found
+            }
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data
         }
     } catch (error) {
-        console.log(error);
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        }
     }
 };
 

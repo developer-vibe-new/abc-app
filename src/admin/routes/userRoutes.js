@@ -45,7 +45,7 @@ router.post('/createCity', responseHandler(stateController.createCity));
 router.post('/updateCity', auth, responseHandler(stateController.updateCity));
 router.post('/deleteCity/:id', auth, responseHandler(stateController.deleteCity));
 router.get('/viewCity', auth, responseHandler(stateController.viewCity));
-router.get('/operators', auth, responseHandler(adminController.operators));
+router.get('/operatorList', responseHandler(adminController.operatorListController));
 router.post('/operatorsUpdate/:id', auth, responseHandler(adminController.operatorsUpdate));
 
 // driver 

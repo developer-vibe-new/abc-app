@@ -32,14 +32,13 @@ exports.login = async (req) => {
     }
 };
 
-exports.operators = async (req) => {
+exports.operatorListController = async () => {
     try {
-        return await services.operatorsList(req);
-
+        return await services.operatorsList();
     } catch (error) {
         console.log(error);
         return {
-            statusCode: statusCode.BAD_REQUEST,
+            status: statusCode.BAD_REQUEST,
             success: false,
             message: error.message
         };
