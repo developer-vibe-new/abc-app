@@ -1,16 +1,15 @@
 const service = require('../services/vehicleService');
+const { statusCode } = require('../../config/default.json');
 
-
-exports.viewVehicle = async (req, res) => {
+exports.viewVehicle = async (req) => {
     try {
         return await service.vehicleList(req);
-        // return res.status(200).json(Object.assign({ success: data.success }, data));
     } catch (error) {
-        console.error("Error in viewVehicle:", error);
-        return res.status(500).json({
+        return {
+            statusCode: statusCode.BAD_REQUEST,
             success: false,
-            message: "An internal server error occurred.",
-        });
+            message: error.message
+        };
     }
 };
 
@@ -30,12 +29,6 @@ exports.vehicleTypeList = async (req, res) => {
 exports.createVehicle = async (req, res) => {
     try {
         return await service.addVehicle(req);
-        // if (data.success == true) {
-
-        //     return res.status(200).json(Object.assign({ success: data.success }, data));
-        // } else {
-        //     return res.status(400).json(Object.assign({ success: data.success }, { message: data.message }));
-        // }
     } catch (error) {
         console.error("Error in createVehicle:", error);
         return res.status(500).json({
@@ -45,3 +38,38 @@ exports.createVehicle = async (req, res) => {
     }
 };
 
+exports.updateVehicleStatusController = async (req) => {
+    try {
+        return await service.updateVehicleStatus(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}
+
+exports.editVehicleController = async (req) => {
+    try {
+        return await service.editVehicle(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}
+
+exports.updateVehicleController = async (req) => {
+    try {
+        return await service.updateVehicle(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}

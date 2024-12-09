@@ -1,40 +1,82 @@
 const rentalModel = require("../../models/rentalModel");
+const { statusCode, resMessage } = require('../../config/default.json');
 
 exports.rentalList = async (req) => {
     try {
-
-        var page = req.query.page || 1;
-        let pagesize = req.query.pagesize || 10;
-        var conditions;
-
-        // let search_value = req.query.search || "";
-
-        // if (search_value) {
-        //     conditions = _.assign(conditions, { $or: [{ "state": { $regex: new RegExp(search_value, "gi") } }] });
-        // }
-
-        const rentalData = await rentalModel.find(conditions)
-            .sort({ createdAt: -1 })
-            .skip((page - 1) * pagesize).
-            limit(pagesize);
-
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        const rentalData = await rentalModel.aggregate([
+            {
+              $sort: {
+                created: -1
+              }
+            },
+            {
+                $project: {
+                  added_on: {
+                    $dateToString: {
+                      format: "%d-%m-%Y",
+                      date: "$created"
+                    }
+                  },
+                  distance: "$packages.dis",
+                  hour: "$packages.hr"
+                }
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: limit
+            }
+        ]);
+        const totalCount = await rentalModel.countDocuments();
+        if(!rentalData) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
         return {
+            status: statusCode.OK,
             success: true,
-            data: rentalData
+            message: resMessage.Data_Fetch_Successfully,
+            data: rentalData,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalCount / limit),
+                totalCount: totalCount,
+                limit: limit
+            }
         };
     } catch (error) {
-        console.log(error);
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
     }
 };
 
 exports.editRental = async (req) => {
     try {
-        const body = req.body;
-        const editRentalData = await rentalModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true });
+        const package = req.body;
+        const editRentalData = await rentalModel.findByIdAndUpdate({ _id: req.params.id }, { packages: package }, { new: true });
+        if(!editRentalData) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
         return {
+            status: statusCode.OK,
             success: true,
+            message: resMessage.Data_Updated_Successfully,
             data: editRentalData
-        };
+        }
     } catch (error) {
         console.log(error);
     }
@@ -61,7 +103,6 @@ exports.addRental = async ({ body }) => {
         };
 
     } catch (error) {
-
         return {
             statusCode: 400,
             success: false,
@@ -69,3 +110,29 @@ exports.addRental = async ({ body }) => {
         };
     }
 };
+
+exports.viewRentalData = async (req) => {
+    try {
+        const { id } = req.params;
+        const data = await rentalModel.findById(id);
+        if(!data) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data
+        };
+    } catch (error) {
+        return {
+            statusCode: 400,
+            success: false,
+            message: error.message
+        };
+    }
+}

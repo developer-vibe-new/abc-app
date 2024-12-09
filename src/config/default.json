@@ -13,6 +13,7 @@
         "saltRounds": 10
     },
     "resMessage": {
+        "Vehicle_Not_Created": "Vehicle Not Created",
         "User_Deleted_Successfully": "User deleted successfully",
         "User_Registered_Successfully":"User_registerd",
         "Provider_Not_Found": "Provider_Not_Found",

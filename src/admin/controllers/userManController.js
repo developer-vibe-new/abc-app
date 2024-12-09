@@ -1,28 +1,27 @@
 const services = require('../services/userManService');
+const { statusCode } = require('../../config/default.json');
 
 exports.userListing = async (req) => {
     try {
         return await services.userListData(req);
-        // if (data.success == true) {
-        //     return res.status(200).json(Object.assign({ status: data.success }));
-        // } else {
-        //     return res.status(400).json(Object.assign({ status: data.success }));
-        // }
     } catch (error) {
-        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
     }
 };
 
 exports.updateStatusUser = async (req) => {
     try {
         return await services.updateUserStatus(req);
-        // if (data.success == true) {
-        //     return res.status(200).json(Object.assign({ status: data.success }));
-        // } else {
-        //     return res.status(400).json(Object.assign({ status: data.success }));
-        // }
     } catch (error) {
-        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
     }
 };
 
