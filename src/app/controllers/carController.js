@@ -13,9 +13,9 @@ exports.addCarController = async (req) => {
     }
 };
 
-exports.carListcontroller = async (req) => {
+exports.carListcontroller = async () => {
     try {
-        return await service.carList(req);
+        return await service.carList();
     } catch (error) {
         return {
             statusCode: statusCode.BAD_REQUEST,
