@@ -30,9 +30,11 @@ exports.addCar = async (req) => {
     }
 };
 
-exports.carList = async () => {
+exports.carList = async (req) => {
     try {
-        const data = await Car.find({});
+        const title = req.query.title || '';
+        const filter = title ? { title: { $regex: title, $options: 'i' } } : {};
+        const data = await Car.find(filter);
         if (!data) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
