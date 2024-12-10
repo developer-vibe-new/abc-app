@@ -106,6 +106,28 @@ exports.updateTaxiTypeList = async (req) => {
     }
 };
 
+exports.addTaxiType = async (req, res) => {
+    try {
+        const body = req.body;
+        if (req.file) {
+            body.icon = req.file.filename;
+        }
+        const editData = await taxiTypeModel.create(body);
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Created_Successfully,
+            data: editData
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}
+
 exports.updateTaxiStatus = async (req) => {
     try {
         const updateData = await taxiTypeModel.findById(req.body.id);

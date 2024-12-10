@@ -36,3 +36,15 @@ exports.updateTaxiTypeController = async (req) => {
         };
     }
 };
+
+exports.taxiTypeList = async (req) => {
+    try {
+        return await service.taxiTypeList(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};

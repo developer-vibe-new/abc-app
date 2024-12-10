@@ -1,6 +1,6 @@
 const { statusCode, resMessage } = require('../../config/default.json');
 const Taxitype = require('../../models/taxiTypeModel');
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 exports.addTaxiType = async (req) => {
     try {
@@ -122,6 +122,34 @@ exports.updateTaxiType = async (req) => {
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || 'An error occurred while updating taxi status'
+        };
+    }
+};
+
+exports.taxiTypeList = async (req) => {
+    try {
+        // { operator_id: req.auth.id }
+        const data = await Taxitype.find();
+        if (!data) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Data_Not_Found
+            };
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data
+        };
+    }
+    catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
         };
     }
 };

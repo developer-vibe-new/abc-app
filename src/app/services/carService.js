@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 exports.addCar = async (req) => {
     try {
-        const car = req.body;
+        const car = req.body;        
         if (!car.taxi_type || !car.title || !car.make || !car.model) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
@@ -21,7 +21,7 @@ exports.addCar = async (req) => {
             success: true,
             message: resMessage.Data_Created_Successfully
         };
-    } catch (error) {
+    } catch (error) {        
         return {
             success: false,
             message: resMessage.Internal_Server_Error,

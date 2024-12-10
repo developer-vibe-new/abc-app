@@ -5,7 +5,7 @@ exports.verifyToken = async (req, res, next) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
-            return res.json({
+            return res.status(401).json({
                 statusCode: statusCode.UNAUTHORIZED,
                 success: false,
                 message: resMessage.Token_Required
@@ -13,7 +13,7 @@ exports.verifyToken = async (req, res, next) => {
         }
         jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
             if (err) {
-                return res.json({
+                return res.status(401).json({
                     statusCode: statusCode.UNAUTHORIZED,
                     success: false,
                     message: resMessage.Invalid_Token

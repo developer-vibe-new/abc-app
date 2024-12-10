@@ -8,4 +8,5 @@ module.exports = (app) => {
   app.use(`${apiV1Prefix}/user`, require('./userRoutes'));
   app.use(`${apiV1Prefix}/operator`, require('./operatorRoutes'));
   app.use(`${apiV1Prefix}/providerTaxi`, require('./providerTaxiRoutes'));
+  app.use(`${apiV1Prefix}/city`, require('./cityRoutes'));
 };

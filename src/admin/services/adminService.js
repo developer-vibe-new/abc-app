@@ -1,14 +1,14 @@
 var bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { SECRET_Key } = process.env;
+const User = require('../../models/users');
+const Car = require('../../models/cars');
+const Taxitype = require('../../models/taxiTypeModel');
 const operatorModel = require('../../models/operatorModel');
 const adminRegisterModel = require('../../models/adminModel');
 const { statusCode, resMessage } = require('../../config/default.json');
-
-
-
-
-
+const Provider = require('../../models/providerModel');
+const adminModel = require('../../models/adminModel');
 
 exports.adminRegister = async (req) => {
     try {
@@ -54,7 +54,7 @@ exports.login = async (req) => {
 
         if (!findData) {
             return {
-                statusCode: statusCode.BAD_REQUEST,
+                status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.User_Not_Found,
 
@@ -64,9 +64,9 @@ exports.login = async (req) => {
         const isPasswordMatch = await bcrypt.compare(req.body.password, findData.password);
         if (!isPasswordMatch) {
             return {
-                statusCode: statusCode.BAD_REQUEST,
+                status: statusCode.BAD_REQUEST,
                 success: false,
-                message: resMessage.Incorrect_Username_Password
+                message: resMessage.Invalid_Password
             };
         }
 
@@ -76,7 +76,7 @@ exports.login = async (req) => {
             { verification_token: auth_key }
         );
         return {
-            statusCode: statusCode.OK,
+            status: statusCode.OK,
             success: true,
             message: resMessage.User_login_Successfully,
             token: auth_key
@@ -88,54 +88,183 @@ exports.login = async (req) => {
 
 exports.operatorsList = async (req) => {
     try {
-        let page = req.query.page || 1;
-        let pagesize = req.query.pagesize || 10;
-        let search_value = req.query.search || "";
-        var conditions = [];
-
-        // if (search_value) {
-        //     conditions = _.assign(conditions, { $or: [{ "fullName": { $regex: new RegExp(search_value, "gi") } }] });
-        // }
-        if (search_value) {
-            conditions.push({
-                $match: {
-                    fullName: { $regex: search_value }
-                }
-            });
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 10;
+        const skip = (page - 1) * pageSize;
+        let searchCriteria = {};
+        if (req.query.search) {
+            const fullNameSearch = new RegExp(req.query.search, 'i');
+            searchCriteria.fullName = fullNameSearch;
         }
-        conditions.push({ $sort: { fullName: 1 } }, { $skip: ((page - 1) * pagesize) },
-            { $limit: pagesize });
-        const operatorsData = await operatorModel.aggregate(conditions);
-        if (operatorsData.length == 0) {
+        const data = await operatorModel.find(searchCriteria)
+                                        .skip(skip)
+                                        .limit(pageSize)
+                                        .select('fullName phone city status is_active');
+        const totalCount = await operatorModel.countDocuments(searchCriteria);
+        if(!data) {
             return {
-                statusCode: statusCode.BAD_REQUEST,
+                status: statusCode.NOT_FOUND,
                 success: false,
-                message: resMessage.Data_Not_Found,
-
-            };
-        } else {
-            return {
-                statusCode: statusCode.OK,
-                success: true,
-                data: { operatorsData }
-            };
+                message: resMessage.Data_Not_Found
+            }
         }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data,
+            pagination: {
+                currentPage: page,
+                pageSize: pageSize,
+                totalRecords: totalCount,
+                totalPages: Math.ceil(totalCount / pageSize)
+            }
+        };
     } catch (error) {
-        console.log(error);
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        }
     }
 };
 
 exports.updateOperator = async (req) => {
     try {
-        const updateData = await operatorModel.findByIdAndUpdate({ _id: req.params.id }, { status: false }, { new: true });
+        const { id } = req.body;
+        const operator = await operatorModel.findById(id);
+        if (!operator) {
+            return {
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.Operator_Not_Exist
+            };
+        }
+
+        const updatedStatus = operator.is_active === false ? true : false;
+        
+        const updateData = await operatorModel.findByIdAndUpdate(id, { is_active: updatedStatus }, { new: true });
+        
         return {
-            statusCode: statusCode.OK,
+            status: statusCode.OK,
             success: true,
             message: resMessage.Status_Updated_Successfully,
             data: { updateData }
         };
     } catch (error) {
         console.log(error);
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: "An error occurred",
+            data: null
+        };
     }
 };
 
+exports.dashboardData = async (req, res) => {
+    try {
+        const totalProviders = await Provider.find().countDocuments();
+        const totalUsers = await User.find().countDocuments();
+        const totalCars = await Car.find().countDocuments();
+        const totalTaxiType = await Taxitype.find().countDocuments();
+        const onlineDriverList = await Provider.find({ is_online: true }).countDocuments();
+        return {
+            status: statusCode.OK,
+            success: true,
+            data: { 
+                totalProviders,
+                totalUsers,
+                totalCars,
+                totalTaxiType,
+                onlineDriverList
+            }
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}
+
+exports.changePassword = async (req) => {
+    try {
+        const { oldPassword, newPassword, confirmPassword } = req.body;
+        if(!oldPassword || !newPassword || !confirmPassword) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Required_Data
+            }
+        }
+        const user = await adminModel.findById(req.auth._id);
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if(isMatch === true) {
+            if(newPassword === confirmPassword) {
+                const hashedPassword = await bcrypt.hash(newPassword, 10);
+                await adminModel.findByIdAndUpdate(req.auth._id, { password: hashedPassword });
+                return {
+                    status: statusCode.OK,
+                    success: true,
+                    message: resMessage.Password_Changed_Successfully
+                }
+            } else {
+                return {
+                    status: statusCode.BAD_REQUEST,
+                    success: false,
+                    message: resMessage.New_Password_Confirm_Password_Not_Matched
+                }
+            }
+        }
+        return {
+            status: statusCode.BAD_REQUEST,
+            success: false,
+            message: resMessage.Incorrect_Old_Password
+        }
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
+
+exports.updateOperatorStatus = async (req) => {
+    try {
+        const { id } = req.body;
+        const operator = await operatorModel.findById(id);
+        if (!operator) {
+            return {
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.Operator_Not_Exist
+            };
+        }
+
+        const updatedStatus = operator.status === "unblock" ? "block" : "unblock";
+
+        const updateData = await operatorModel.findByIdAndUpdate(id, { status: updatedStatus }, { new: true });
+
+        const responseMessage = updatedStatus === "block"
+            ? resMessage.Operator_Blocked_Successfully
+            : resMessage.Operator_Unblocked_Successfully;
+
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: responseMessage,
+            data: { updateData }
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: "An error occurred",
+            data: null
+        };
+    }
+};

@@ -1,117 +1,129 @@
-const { Joi } = require('express-validation');
+const Joi = require('joi');
 
-exports.login = Joi.object({
-    userName: Joi.string().required(),
-    password: Joi.string().required(),
-    fcmToken: Joi.string().required()
-});
-
-exports.loginByUserId = Joi.object({
-    deviceId: Joi.string().required(),
-    userId: Joi.string().min(24).max(24).required()
-});
-
-exports.signup = Joi.object({
-    countryId: Joi.string().min(24).max(24).required(),
-    phone: Joi.string().min(6).max(16).required()
-});
-
-exports.verifyOtp = Joi.object({
-    otp: Joi.string().min(6).required(),
-    userId: Joi.string().required()
-});
-exports.resendOtp = Joi.object({
-    userId: Joi.string().required()
-});
-exports.addCategory = Joi.object({
-    userId: Joi.string().required(),
-    categoryIds: Joi.array().items(Joi.string().required()).required()
-
-});
-exports.checkUserName = Joi.object({
-    userName: Joi.string().required()
-});
-exports.addGames = Joi.object({
-    userId: Joi.string().required(),
-    gameIds: Joi.array().items(Joi.string().required()).required()
-});
-exports.profile = Joi.object({
-    userId: Joi.string().required(),
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-    // appKey: Joi.string().required(),
-    userName: Joi.string().required(),
-    DOB: Joi.string().required(),
-    typeName: Joi.string().required().valid('profile_image'),
-    locationType: Joi.string(),
-    coordinates: Joi.array().items(Joi.number()).min(2),
-    address: Joi.string(),
-
-    // profile_image: Joi.string().required(),
-    fcmToken: Joi.string().optional().allow(''),
-    firstName: Joi.string().required(),
-    lastName: Joi.string().required()
-});
-
-exports.addRemoveFollower = Joi.object({
-    userId: Joi.string().min(24).max(24).required()
-});
-
-exports.followerFollowingListing = Joi.object({
-    userId: Joi.string().min(24).max(24).optional(),
-    skip: Joi.string().min(0).optional(),
-    limit: Joi.string().min(0).optional(),
-    type: Joi.string().valid('follower', 'following').required()
-});
-
-
-exports.editProfile = Joi.object({
-    typeName: Joi.string().valid('profile_image', 'avatar'),
-    avatarId: Joi.string().when('typeName', {
-        is: 'avatar',
-        then: Joi.string().min(24).max(24).required(),
-        otherwise: Joi.forbidden()
+exports.registerOperator = Joi.object({
+    fullName: Joi.string().required().messages({
+        'string.base': 'Full name must be a string',
+        'any.required': 'Full name is required'
     }),
-    firstName: Joi.string().optional(),
-    lastName: Joi.string().optional()
+    phone: Joi.number().integer().min(1000000000).max(9999999999).required().messages({
+        'number.base': 'Phone number must be a number',
+        'number.integer': 'Phone number must be an integer',
+        'number.min': 'Phone number must be exactly 10 digits',
+        'number.max': 'Phone number must be exactly 10 digits',
+        'any.required': 'Phone number is required'
+    }),
+    city: Joi.string().required().messages({
+        'string.base': 'City must be a string',
+        'any.required': 'City is required'
+    })
 });
 
-exports.addCommunity = Joi.object({
-    userId: Joi.string().required(),
-    communityId: Joi.string().min(24).max(24).required()
+exports.loginOperator = Joi.object({
+    phone: Joi.number().integer().min(1000000000).max(9999999999).required().messages({
+        'number.base': 'Phone number must be a number',
+        'number.integer': 'Phone number must be an integer',
+        'number.min': 'Phone number must be exactly 10 digits',
+        'number.max': 'Phone number must be exactly 10 digits',
+        'any.required': 'Phone number is required'
+    })
 });
 
-exports.totalPlayedTournament = Joi.object({
-    userId: Joi.string().optional()
+exports.verifyOtpOperator = Joi.object({
+    phone: Joi.number().integer().min(1000000000).max(9999999999).required().messages({
+        'number.base': 'Phone number must be a number',
+        'number.integer': 'Phone number must be an integer',
+        'number.min': 'Phone number must be exactly 10 digits',
+        'number.max': 'Phone number must be exactly 10 digits',
+        'any.required': 'Phone number is required'
+    }),
+    otp: Joi.number().integer().min(100000).max(999999).required().messages({
+        'number.base': 'OTP must be a number',
+        'number.integer': 'OTP must be an integer',
+        'number.min': 'OTP must be exactly 6 digits',
+        'number.max': 'OTP must be exactly 6 digits',
+        'any.required': 'OTP is required'
+    })
 });
 
-exports.userDetails = Joi.object({
-    userId: Joi.string().min(24).max(24).optional()
-});
 
-exports.saveAccount = Joi.object({
-    deviceId: Joi.string().required()
-});
-exports.changePassword = Joi.object({
-    currentPassword: Joi.string().required(),
-    newPassword: Joi.string().required(),
-    retypeNewPassword: Joi.string().required()
-
-});
-
-exports.createNewPassword = Joi.object({
-    newPassword: Joi.string().required(),
-    retypeNewPassword: Joi.string().required()
-});
-
-exports.sendOtp = Joi.object({
-    phone: Joi.string().optional(),
-    userId: Joi.string().optional()
-});
-
-exports.getWalletHistory = Joi.object({
-    date: Joi.date().iso().optional(),
-    id: Joi.string().min(24).max(24).optional(),
-    skip: Joi.string().optional(),
-    limit: Joi.string().optional()
+// Define the validation schema
+exports.validateDocumentsOperator = Joi.object({
+    pancardName: Joi.string()
+        .min(3)
+        .max(50)
+        .pattern(/^[a-zA-Z\s]*$/) // Only alphabets and spaces
+        .required()
+        .messages({
+            'string.empty': 'Pancard name is required',
+            'string.pattern.base': 'Pancard name should only contain alphabets and spaces',
+            'string.min': 'Pancard name must be at least 3 characters',
+            'string.max': 'Pancard name cannot exceed 50 characters',
+        }),
+    pancardNumber: Joi.string()
+        .pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/) // PAN card format (e.g., ABCDE1234F)
+        .required()
+        .messages({
+            'string.empty': 'Pancard number is required',
+            'string.pattern.base': 'Invalid pancard number format',
+        }),
+    aadharcardName: Joi.string()
+        .min(3)
+        .max(50)
+        .pattern(/^[a-zA-Z\s]*$/)
+        .required()
+        .messages({
+            'string.empty': 'Aadharcard name is required',
+            'string.pattern.base': 'Aadharcard name should only contain alphabets and spaces',
+            'string.min': 'Aadharcard name must be at least 3 characters',
+            'string.max': 'Aadharcard name cannot exceed 50 characters',
+        }),
+    aadharcardNumber: Joi.string()
+        .length(12) // Aadhaar is 12 digits long
+        .pattern(/^\d+$/) // Only digits allowed
+        .required()
+        .messages({
+            'string.empty': 'Aadharcard number is required',
+            'string.pattern.base': 'Aadharcard number must be numeric',
+            'string.length': 'Aadharcard number must be exactly 12 digits',
+        }),
+    bankAccountNumber: Joi.string()
+        .min(9)
+        .max(18) // Typical bank account numbers range between 9-18 digits
+        .pattern(/^\d+$/) // Only digits allowed
+        .required()
+        .messages({
+            'string.empty': 'Bank account number is required',
+            'string.pattern.base': 'Bank account number must be numeric',
+            'string.min': 'Bank account number must be at least 9 digits',
+            'string.max': 'Bank account number cannot exceed 18 digits',
+        }),
+    ifscCode: Joi.string()
+        .length(11) // Standard IFSC code length
+        .pattern(/^[A-Z]{4}0[A-Z0-9]{6}$/) // Format: 4 letters, 0, 6 alphanumeric
+        .required()
+        .messages({
+            'string.empty': 'IFSC code is required',
+            'string.pattern.base': 'Invalid IFSC code format',
+            'string.length': 'IFSC code must be exactly 11 characters',
+        }),
+    bankName: Joi.string()
+        .min(3)
+        .max(50)
+        .required()
+        .messages({
+            'string.empty': 'Bank name is required',
+            'string.min': 'Bank name must be at least 3 characters',
+            'string.max': 'Bank name cannot exceed 50 characters',
+        }),
+    accountHolderName: Joi.string()
+        .min(3)
+        .max(50)
+        .pattern(/^[a-zA-Z\s]*$/) // Only alphabets and spaces
+        .required()
+        .messages({
+            'string.empty': 'Account holder name is required',
+            'string.pattern.base': 'Account holder name should only contain alphabets and spaces',
+            'string.min': 'Account holder name must be at least 3 characters',
+            'string.max': 'Account holder name cannot exceed 50 characters',
+        }),
 });

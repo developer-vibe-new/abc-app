@@ -32,10 +32,21 @@ exports.login = async (req) => {
     }
 };
 
-exports.operators = async (req) => {
+exports.operatorListController = async (req) => {
     try {
         return await services.operatorsList(req);
-
+    } catch (error) {
+        console.log(error);
+        return {
+            status: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
+exports.operatorsUpdate = async (req) => {
+    try {
+        return await services.updateOperator(req);
     } catch (error) {
         console.log(error);
         return {
@@ -45,14 +56,36 @@ exports.operators = async (req) => {
         };
     }
 };
-exports.operatorsUpdate = async (req) => {
+
+exports.dashboardDataController = async (req, res) => {
     try {
-        return await services.updateOperator(req);
-        // if (data.success == true) {
-        //     return res
-        //         .status(200)
-        //         .json(Object.assign({ status: data.success }, data));
-        // }
+        return await services.dashboardData(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+}
+
+exports.changePasswordController = async (req) => {
+    try {
+        return await services.changePassword(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
+
+exports.operatorsUpdateStatusController = async (req) => {
+    try {
+        return await services.updateOperatorStatus(req);
     } catch (error) {
         console.log(error);
         return {

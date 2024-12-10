@@ -7,9 +7,11 @@ exports.vehicleList = async (req) => {
     try {
         let pipeline = [];
         let search = req.query.search;
-        if(search) {
+        let type = req.query.type;
+
+        if (search) {
             pipeline.push({
-                $match: { 
+                $match: {
                     $or: [
                         { title: { $regex: search, $options: "i" } },
                         { make: { $regex: search, $options: "i" } },
@@ -19,63 +21,86 @@ exports.vehicleList = async (req) => {
                 }
             });
         }
+
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
-        pipeline.push({
-            $addFields: {
-              added_on: {
-                $dateToString: {
-                  format: "%d-%m-%Y",
-                  date: "$created"
+
+        pipeline.push(
+            {
+                $addFields: {
+                    added_on: {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$created"
+                        }
+                    },
+                    vehicle_name: "$title"
                 }
-              },
-              vehicle_name: "$title"
+            },
+            {
+                $lookup: {
+                    from: "taxi_types",
+                    localField: "taxi_type",
+                    foreignField: "_id",
+                    as: "taxi_type"
+                }
+            },
+            {
+                $addFields: {
+                    type: { $arrayElemAt: ["$taxi_type.title", 0] }
+                }
+            },
+            {
+                $project: {
+                    added_on: 1,
+                    title: 1,
+                    make: 1,
+                    model: 1,
+                    type: 1,
+                    is_active: 1
+                }
             }
-          },
-          {
-            $lookup: {
-              from: "taxi_types",
-              localField: "taxi_type",
-              foreignField: "_id",
-              as: "taxi_type"
-            }
-          },
-          {
-            $addFields: {
-              type: {
-                $arrayElemAt: ["$taxi_type.title", 0]
-              }
-            }
-          },
-          {
-            $project: {
-              added_on: 1,
-              title: 1,
-              make: 1,
-              model: 1,
-              type: 1,
-              is_active: 1
-            }
-          },
-          { $skip: skip },
-          { $limit: limit }
         );
-        const vehicalView = await vehicleModel.aggregate(pipeline);
-        const totalVehicles = await vehicleModel.countDocuments();
+
+        if (type) {
+            pipeline.push({
+                $match: {
+                    type: type
+                }
+            });
+        }
+
+        pipeline.push(
+            { $skip: skip },
+            { $limit: limit }
+        );
+
+        const vehicleView = await vehicleModel.aggregate(pipeline);
+
+        let totalVehicles;
+        if (type) {
+            totalVehicles = await vehicleModel.countDocuments({ type: type });
+        } else {
+            totalVehicles = await vehicleModel.countDocuments();
+        }
+
         const totalPages = Math.ceil(totalVehicles / limit);
-        if(!vehicalView) {
+
+        if (!vehicleView || vehicleView.length === 0) {
             return {
-                statusCode: statusCode.NOT_FOUND,
+                status: statusCode.OK,
                 success: false,
-                message: resMessage.No_Data_Found
+                message: resMessage.Data_Not_Found,
+                data: []
             };
         }
+
         return {
             status: statusCode.OK,
             success: true,
             message: resMessage.Data_Retrieved_Successfully,
-            data: vehicalView,
+            data: vehicleView,
             pagination: {
                 currentPage: page,
                 totalPages: totalPages,

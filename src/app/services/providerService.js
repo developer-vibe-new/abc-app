@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 exports.addDriver = async (req) => {
     try {
         const driver = req.body;
-        if (!driver.first_name || !driver.last_name || !driver.mobile || !driver.email) {
+        if (!driver.first_name || !driver.last_name || !driver.mobile ) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
@@ -181,7 +181,7 @@ exports.updateDriver = async (req) => {
                         last_name,
                         email,
                         mobile,
-                        image: imagePath
+                        profile_image: imagePath
                     }
                 }
             );
@@ -259,9 +259,14 @@ exports.providerlogin = async (req) => {
 exports.providerOtpVerification = async (req) => {
     try {
         const { mobile, otp } = req.body;
-
+  
+         console.log(req.body , "DSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
+         
+         
         // Find the driver by mobile and OTP
         const driverData = await Provider.findOne({ mobile, otp });
+
+        console.log(driverData , "DSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
 
         // If driver does not exist, return an error
         if (!driverData) {
