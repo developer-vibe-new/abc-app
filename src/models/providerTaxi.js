@@ -16,25 +16,25 @@ const ProviderTaxiSchema = new mongoose.Schema({
 	}],
 	operator_id: {
 		type: mongoose.Schema.Types.ObjectId,
-        ref: 'Operator',
+		ref: 'Operator',
 		defaut: null
 	},
 	plateno: {
 		type: String,
 		required: false
 	},
-	engine: {
-		type: String,
-		default: ""
-	},
-	pst_no: {
-		type: String,
-		default: ""
-	},
-	gst_no: {
-		type: String,
-		default: ""
-	},
+	// engine: {
+	// 	type: String,
+	// 	default: ""
+	// },
+	// pst_no: {
+	// 	type: String,
+	// 	default: ""
+	// },
+	// gst_no: {
+	// 	type: String,
+	// 	default: ""
+	// },
 	year: {
 		type: String,
 		required: false

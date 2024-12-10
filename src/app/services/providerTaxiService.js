@@ -5,7 +5,7 @@ const ProviderTaxi = require('../../models/providerTaxi');
 exports.addProviderTaxi = async (req) => {
     try {
         const providerTaxi = req.body;
-        const { rc_photo, car_photo, carLeftImage, carRigthImage, carBackImage, carFrontImage } = req.files;
+        // const { rc_photo, car_photo, carLeftImage, carRigthImage, carBackImage, carFrontImage } = req.files;
         if (req.auth && req.auth.role === "operator") {
             providerTaxi.operator_id = req.auth.id;
         }
@@ -28,21 +28,21 @@ exports.addProviderTaxi = async (req) => {
             if (req.files.carFrontImage) {
                 providerTaxi.carFrontImage = req.files.carFrontImage[0].filename;
             }
-       }
-       
-        if(!providerTaxi.provider_id || !providerTaxi.car_id || !providerTaxi.type_ids) {
+        }
+
+        if (!providerTaxi.car_id || !providerTaxi.type_ids || !providerTaxi.plateno) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Required_Data,
-            }
+            };
         }
         await ProviderTaxi.create(providerTaxi);
         return {
             statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Created_Successfully,
-        }
+        };
     } catch (error) {
         return {
             success: false,
@@ -50,13 +50,13 @@ exports.addProviderTaxi = async (req) => {
             error: error.message || "Internal Server Error",
         };
     }
-}
+};
 
 exports.deleteProviderTaxi = async (req) => {
     try {
         const { id } = req.params;
         const data = await ProviderTaxi.findById(id);
-        if(!data) {
+        if (!data) {
             return {
                 statusCode: statusCode.DATA_NOT_FOUND,
                 success: false,
