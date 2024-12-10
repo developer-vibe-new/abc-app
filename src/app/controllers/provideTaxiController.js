@@ -11,7 +11,7 @@ exports.addProviderTaxiController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.deleteProviderTaxiController = async (req) => {
     try {
@@ -23,4 +23,16 @@ exports.deleteProviderTaxiController = async (req) => {
             message: error.message
         };
     }
-}
+};
+
+exports.providerTaxiListController = async (req) => {
+    try {
+        return await service.providerTaxiList(req);
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};

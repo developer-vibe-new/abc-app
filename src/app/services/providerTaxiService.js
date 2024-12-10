@@ -65,18 +65,18 @@ exports.deleteProviderTaxi = async (req) => {
         }
         const operatorId = new mongoose.Types.ObjectId(req.auth.id);
         if (data.operator_id && data.operator_id.equals(operatorId)) {
-            await ProviderTaxi.findByIdAndUpdate(id, { is_active: false })
+            await ProviderTaxi.findByIdAndUpdate(id, { is_active: false });
             return {
                 statusCode: statusCode.OK,
                 success: true,
                 message: resMessage.Data_Deleted_Successfully,
-            }
+            };
         }
         return {
             statusCode: statusCode.UNAUTHORIZED,
             success: false,
             message: resMessage.Unauthorized_Access,
-        }
+        };
     } catch (error) {
         return {
             success: false,
@@ -84,4 +84,72 @@ exports.deleteProviderTaxi = async (req) => {
             error: error.message || "Internal Server Error",
         };
     }
-}
+};
+
+exports.providerTaxiList = async (req) => {
+    try {
+        const data = await ProviderTaxi.aggregate([
+            {
+                $match: {
+                    operator_id: new mongoose.Types.ObjectId(req.auth.id)
+                }
+            },
+            {
+                $lookup: {
+                    from: "providers",
+                    localField: "operator_id",
+                    foreignField: "operator_id",
+                    as: "operator_id"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$operator_id",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    firstName: "$operator_id.first_name",
+                    lastName: "$operator_id.last_name",
+                    mobile: "$operator_id.mobile",
+                    kycStatus: "$operator_id.kycStatus",
+                    onlineStatus: "$operator_id.is_online",
+                    vehicleStatus: "$status",
+                    vehicleDetails: {
+                        $cond: {
+                            if: { $eq: ["$status", true] },
+                            then: {
+                                car_id: "$car_id",
+                                plateno: "$plateno",
+                                carType: "$type_ids",
+                                isActive: "$is_active"
+                            },
+                            else: null
+                        }
+                    }
+                }
+            }
+        ]);
+        if (!data) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found,
+            };
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data
+        };
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};

@@ -77,6 +77,10 @@ const ProviderTaxiSchema = new mongoose.Schema({
 	is_active: {
 		type: Boolean,
 		default: true
+	},
+	status: {
+		type: Boolean,
+		default: false
 	}
 }, {
 	timestamps: {

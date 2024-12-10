@@ -15,5 +15,6 @@ router.post('/addProviderTaxi', verifyToken, upload.fields([
     { name: "carFrontImage", maxCount: 1 }
 ]), responseHandler(controller.addProviderTaxiController));
 router.post('/deleteProviderTaxi/:id', verifyToken, responseHandler(controller.deleteProviderTaxiController));
+router.get('/providerTaxiList', verifyToken, responseHandler(controller.providerTaxiListController));
 
 module.exports = router;
