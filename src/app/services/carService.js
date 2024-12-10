@@ -32,9 +32,14 @@ exports.addCar = async (req) => {
 
 exports.carList = async (req) => {
     try {
-        const title = req.query.title || '';
-        const filter = title ? { title: { $regex: title, $options: 'i' } } : {};
-        const data = await Car.find(filter);
+        const { id } = req.query;
+        const data = await Car.aggregate([
+            {
+                $match: {
+                    taxi_type: new mongoose.Types.ObjectId(id)
+                }
+            }
+        ]);
         if (!data) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
