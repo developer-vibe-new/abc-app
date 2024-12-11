@@ -35,11 +35,6 @@ const CarSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    provider_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Provider',
-        default: null
-    }
 }, {
     timestamps: {
         createdAt: 'created',

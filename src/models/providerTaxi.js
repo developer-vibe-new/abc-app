@@ -70,7 +70,8 @@ const defaultDocuments = {
 const ProviderTaxiSchema = new mongoose.Schema({
 	provider_id: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Provider'
+		ref: 'Provider',
+		default: null
 	},
 
 	car_id: {
