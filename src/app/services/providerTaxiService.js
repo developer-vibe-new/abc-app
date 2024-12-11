@@ -163,6 +163,42 @@ exports.providerTaxiListAll = async (req) => {
                     operator_id: new mongoose.Types.ObjectId(req.auth.id)
                 }
             },
+            {
+                $lookup: {
+                    from: "providers",
+                    localField: "provider_id",
+                    foreignField: "_id",
+                    as: "provider_info"
+                }
+            },
+            {
+                $addFields: {
+                    provider_name: {
+                        $cond: {
+                            if: { $ne: ["$provider_id", null] },
+                            then: { $arrayElemAt: ["$provider_info.name", 0] },
+                            else: null
+                        }
+                    }
+                }
+            },
+            {
+                $unwind: {
+                    path: "$provider_info",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    providerFirstName: "$provider_info.first_name",
+                    providerLastName: "$provider_info.last_name"
+                }
+            },
+            {
+                $project: {
+                    provider_info: 0
+                }
+            }
         ]);
         if (!data) {
             return {
