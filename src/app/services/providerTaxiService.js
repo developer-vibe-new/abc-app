@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { statusCode, resMessage } = require('../../config/default.json');
 const ProviderTaxi = require('../../models/providerTaxi');
+const Provider = require('../../models/providerModel');
 
 exports.addProviderTaxi = async (req) => {
     try {
@@ -194,6 +195,9 @@ exports.assignProvider = async (req) => {
             { _id: providerTaxiId, operator_id: id },
             { provider_id: providerId, status: true },
             { new: true }
+        );
+        await Provider.findByIdAndUpdate(providerId,
+            { providerTaxi_id: providerTaxiId, vehicleStatus: 1 }
         );
         if (updateData === null) {
             return {

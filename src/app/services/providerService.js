@@ -1,4 +1,4 @@
-const { statusCode, resMessage} = require('../../config/default.json');
+const { statusCode, resMessage } = require('../../config/default.json');
 const Provider = require('../../models/providerModel');
 const mongoose = require('mongoose');
 const jwt = require("jsonwebtoken");
@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 exports.addDriver = async (req) => {
     try {
         const driver = req.body;
-        if (!driver.first_name || !driver.last_name || !driver.mobile ) {
+        if (!driver.first_name || !driver.last_name || !driver.mobile) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 success: false,
@@ -95,8 +95,42 @@ exports.driverBlockList = async (req) => {
 
 exports.driverList = async (req) => {
     try {
-        const data = await Provider.find({ operator_id: req.auth.id });
-        if (!data) {
+        const aggregationPipeline = [
+            {
+                $match: { operator_id: new mongoose.Types.ObjectId(req.auth.id) }
+            },
+            {
+                $lookup: {
+                    from: "provider_taxis",
+                    localField: "providerTaxi_id",
+                    foreignField: "_id",
+                    as: "providerTaxi_id"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$providerTaxi_id",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    vehicleDetails: {
+                        car_id: "$providerTaxi_id.car_id",
+                        plateno: "$providerTaxi_id.plateno",
+                        car_type: "$providerTaxi_id.type_ids",
+                        is_active: "$providerTaxi_id.is_active"
+                    }
+                }
+            },
+            {
+                $project: {
+                    providerTaxi_id: 0
+                }
+            }
+        ];
+        const data = await Provider.aggregate(aggregationPipeline);
+        if (data.length === 0) {
             return {
                 status: statusCode.BAD_REQUEST,
                 success: false,
@@ -109,8 +143,7 @@ exports.driverList = async (req) => {
             message: resMessage.Data_Fetch_Successfully,
             data
         };
-    }
-    catch (error) {
+    } catch (error) {
         return {
             status: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
@@ -119,6 +152,7 @@ exports.driverList = async (req) => {
         };
     }
 };
+
 
 exports.driverOninerStatus = async (req) => {
     try {
@@ -259,14 +293,14 @@ exports.providerlogin = async (req) => {
 exports.providerOtpVerification = async (req) => {
     try {
         const { mobile, otp } = req.body;
-  
-         console.log(req.body , "DSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
-         
-         
+
+        console.log(req.body, "DSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
+
+
         // Find the driver by mobile and OTP
         const driverData = await Provider.findOne({ mobile, otp });
 
-        console.log(driverData , "DSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
+        console.log(driverData, "DSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
 
         // If driver does not exist, return an error
         if (!driverData) {

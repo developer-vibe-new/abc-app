@@ -1,5 +1,4 @@
-const mongoose = require("mongoose"),
-ObjectId = mongoose.Types.ObjectId;
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 var OfferCodeSchema = new Schema({
@@ -12,7 +11,7 @@ var OfferCodeSchema = new Schema({
         type: String,
         default: ""
     },
-   
+
     start_date: {
         type: String,
     },

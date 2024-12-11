@@ -6,10 +6,15 @@ const providerSchema = new mongoose.Schema({
 		default: ""
 
 	},
+	providerTaxi_id: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'provider_taxi',
+		default: null
+	},
 	operator_id: {
 		type: mongoose.Schema.Types.ObjectId,
-        ref: 'Operator',
-        default: null
+		ref: 'Operator',
+		default: null
 	},
 	last_name: {
 		type: String,
