@@ -13,6 +13,7 @@
     "saltRounds": 10
   },
   "resMessage": {
+    "Provider_Deassigned_Successfully": "Provider Deassigned Successfully",
     "Provider_Assigned_Successfully": "Provider Assigned Successfully",
     "kyc_Verified_successfully": "operator kyc is verified",
     "Operator_Unblocked_Successfully": "Operator Unblocked Successfully",

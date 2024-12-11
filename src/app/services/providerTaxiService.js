@@ -257,3 +257,31 @@ exports.assignProvider = async (req) => {
         };
     }
 };
+
+exports.deassignProvider = async (req) => {
+    try {
+        const { providerId, providerTaxiId } = req.body;
+        const updateData = await ProviderTaxi.findOneAndUpdate(
+            { _id: providerTaxiId, operator_id: req.auth.id },
+            { provider_id: null, status: false },
+            { new: true }
+        );
+        await Provider.findOneAndUpdate(
+            { _id: providerId, operator_id: req.auth.id },
+            { providerTaxi_id: null, vehicleStatus: 0 }
+        );
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Provider_Deassigned_Successfully,
+            data: updateData,
+        };
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};

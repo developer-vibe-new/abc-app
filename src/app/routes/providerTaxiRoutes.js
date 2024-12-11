@@ -18,5 +18,6 @@ router.post('/deleteProviderTaxi/:id', verifyToken, responseHandler(controller.d
 router.get('/providerTaxiList', verifyToken, responseHandler(controller.providerTaxiListController));
 router.get('/providerTaxiListAll', verifyToken, responseHandler(controller.providerTaxiListAllController));
 router.post('/assignProvider', verifyToken, responseHandler(controller.assignProviderController));
+router.post('/deassignProvider', verifyToken, responseHandler(controller.deassignProviderController));
 
 module.exports = router;
