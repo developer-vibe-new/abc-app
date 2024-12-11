@@ -14,7 +14,7 @@ router.post('/addProviderTaxi', verifyToken, upload.fields([
     { name: "carBackImage", maxCount: 1 },
     { name: "carFrontImage", maxCount: 1 }
 ]), responseHandler(controller.addProviderTaxiController));
-router.post('/deleteProviderTaxi/:id', verifyToken, responseHandler(controller.deleteProviderTaxiController));
+router.post('/deleteProviderTaxi', verifyToken, responseHandler(controller.deleteProviderTaxiController));
 router.get('/providerTaxiList', verifyToken, responseHandler(controller.providerTaxiListController));
 router.get('/providerTaxiListAll', verifyToken, responseHandler(controller.providerTaxiListAllController));
 router.post('/assignProvider', verifyToken, responseHandler(controller.assignProviderController));

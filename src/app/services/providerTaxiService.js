@@ -55,7 +55,7 @@ exports.addProviderTaxi = async (req) => {
 
 exports.deleteProviderTaxi = async (req) => {
     try {
-        const { id } = req.params;
+        const { id } = req.body;
         const data = await ProviderTaxi.findById(id);
         if (!data) {
             return {
