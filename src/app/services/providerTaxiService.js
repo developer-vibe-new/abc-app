@@ -185,3 +185,35 @@ exports.providerTaxiListAll = async (req) => {
         };
     }
 };
+
+exports.assignProvider = async (req) => {
+    try {
+        const { providerTaxiId, providerId } = req.body;
+        const { id } = req.auth;
+        const updateData = await ProviderTaxi.findOneAndUpdate(
+            { _id: providerTaxiId, operator_id: id },
+            { provider_id: providerId },
+            { new: true }
+        );
+        if (updateData === null) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found,
+            };
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Provider_Assigned_Successfully,
+            data: updateData,
+        };
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
