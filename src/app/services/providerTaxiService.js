@@ -192,7 +192,7 @@ exports.assignProvider = async (req) => {
         const { id } = req.auth;
         const updateData = await ProviderTaxi.findOneAndUpdate(
             { _id: providerTaxiId, operator_id: id },
-            { provider_id: providerId },
+            { provider_id: providerId, status: true },
             { new: true }
         );
         if (updateData === null) {
