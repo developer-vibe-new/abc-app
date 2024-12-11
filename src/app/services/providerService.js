@@ -333,3 +333,33 @@ exports.providerOtpVerification = async (req) => {
         };
     }
 };
+
+exports.deleteDriver = async (req) => {
+    try {
+
+        const data = await Provider.findOneAndUpdate(
+            { _id: req.body.id, operator_id: req.auth.id, is_delete: false },
+            { is_delete: true },
+            { new: true }
+        );
+        if (data === null) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found,
+            };
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Deleted_Successfully,
+            data,
+        };
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message,
+        };
+    }
+};

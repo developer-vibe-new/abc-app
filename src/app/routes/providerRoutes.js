@@ -12,8 +12,9 @@ router.post('/updateDriverStatus/:id', verifyToken, responseHandler(controller.u
 router.get('/driverBlockList', verifyToken, responseHandler(controller.driverBlockListController));
 router.post('/driverOnlineStatus/:id', verifyToken, responseHandler(controller.driverOnlineStatusController));
 router.post('/updateDrive/:id', verifyToken, upload.single('image'), responseHandler(controller.updateDriverController));
+router.post('/deleteDriver', verifyToken, responseHandler(controller.deleteDriverController));
 
 //otp routes api for  providers
 router.post('/providerOtpGeneration', responseHandler(controller.providerLoginController));
-router.post('/providerOtpVerification',responseHandler(controller.providerOtpVerification));
+router.post('/providerOtpVerification', responseHandler(controller.providerOtpVerification));
 module.exports = router;
