@@ -150,3 +150,29 @@ exports.updateCar = async (req) => {
         };
     }
 };
+
+exports.allCarList = async (req) => {
+    try {
+        const data = await Car.find({ operator_id: req.auth.id });
+        if (!data) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            };
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data
+        };
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
