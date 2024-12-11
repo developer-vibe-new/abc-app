@@ -36,3 +36,15 @@ exports.providerTaxiListController = async (req) => {
         };
     }
 };
+
+exports.providerTaxiListAllController = async (req) => {
+    try {
+        return await service.providerTaxiListAll(req);
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};

@@ -153,3 +153,35 @@ exports.providerTaxiList = async (req) => {
         };
     }
 };
+
+exports.providerTaxiListAll = async (req) => {
+    try {
+        const data = await ProviderTaxi.aggregate([
+            {
+                $match: {
+                    operator_id: new mongoose.Types.ObjectId(req.auth.id)
+                }
+            },
+        ]);
+        if (!data) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found,
+            };
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data
+        };
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};

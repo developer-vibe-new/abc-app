@@ -1,5 +1,72 @@
 const mongoose = require("mongoose");
 
+const documentSchema = new mongoose.Schema({
+	rc: {
+		number_plate_front: { type: String, default: "" },
+		number_plate_back: { type: String, default: "" },
+		image: { type: String, default: "" },
+		status: { type: Number, default: -1 }
+	},
+	pollution_certificate: {
+		image: { type: String, default: "" },
+		expiry_date: { type: Date, default: null },
+		status: { type: Number, default: -1 }
+	},
+	vehicle_image: {
+		front_image: { type: String, default: "" },
+		left_image: { type: String, default: "" },
+		right_image: { type: String, default: "" },
+		back_image: { type: String, default: "" },
+		status: { type: Number, default: -1 }
+	},
+	vehicle_permit: {
+		type: { type: String, default: "" },
+		issue_date: { type: Date, default: null },
+		expiry_date: { type: Date, default: null },
+		image: { type: String, default: "" },
+		status: { type: Number, default: -1 }
+	},
+	insurance: {
+		image: { type: String, default: "" },
+		expiry_date: { type: Date, default: null },
+		status: { type: Number, default: -1 }
+	}
+});
+
+// Default value for `documents` field
+const defaultDocuments = {
+	rc: {
+		number_plate_front: "",
+		number_plate_back: "",
+		image: "",
+		status: -1
+	},
+	pollution_certificate: {
+		image: "",
+		expiry_date: null,
+		status: -1
+	},
+	vehicle_image: {
+		front_image: "",
+		left_image: "",
+		right_image: "",
+		back_image: "",
+		status: -1
+	},
+	vehicle_permit: {
+		type: "",
+		issue_date: null,
+		expiry_date: null,
+		image: "",
+		status: -1
+	},
+	insurance: {
+		image: "",
+		expiry_date: null,
+		status: -1
+	}
+};
+
 const ProviderTaxiSchema = new mongoose.Schema({
 	provider_id: {
 		type: mongoose.Schema.Types.ObjectId,
@@ -22,6 +89,10 @@ const ProviderTaxiSchema = new mongoose.Schema({
 	plateno: {
 		type: String,
 		required: false
+	},
+	documents: {
+		type: documentSchema,
+		default: defaultDocuments // Set default value for the entire `documents` field
 	},
 	// engine: {
 	// 	type: String,
@@ -46,33 +117,9 @@ const ProviderTaxiSchema = new mongoose.Schema({
 	color: {
 		type: String
 	},
-	rc_photo: {
-		type: String
-	},
-	car_photo: {
-		type: String
-	},
-	documents: [{
-		_id: mongoose.Schema.Types.ObjectId,
-		name: String,
-		date: String,
-		path: String
-	}],
 	city_id: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'City'
-	},
-	carLeftImage: {
-		type: String
-	},
-	carRigthImage: {
-		type: String
-	},
-	carBackImage: {
-		type: String
-	},
-	carFrontImage: {
-		type: String
 	},
 	is_active: {
 		type: Boolean,
