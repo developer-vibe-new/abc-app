@@ -3,6 +3,113 @@ const taxiTypeModel = require('../../models/taxiTypeModel');
 const { statusCode, resMessage } = require('../../config/default.json');
 const mongoose = require('mongoose');
 
+
+exports.driverDetailsService = async (req) => {
+    try {
+        const { id } = req.params;
+
+        //  aggregation pipeline
+        const aggregationPipeline = [
+            [
+                {
+                    $match: {
+                        _id: new mongoose.Types.ObjectId(id),  // Match by the driver's ID
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "provider_taxis",  // Join with the provider_taxis collection
+                        localField: "operator_id",  // Local field in the driver collection
+                        foreignField: "operator_id",  // Foreign field in the provider_taxis collection
+                        as: "taxis",  // Output array with the matched taxis
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "cars",  // Join with the cars collection to get car details
+                        localField: "taxis.car_id",  // Local field in the provider_taxis collection
+                        foreignField: "_id",  // Foreign field in the cars collection
+                        as: "car_details",  // Output array with the matched car details
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "taxi_types",  // Join with the taxi_types collection to get taxi type details
+                        localField: "taxis.type_ids",  // Local field in the provider_taxis collection
+                        foreignField: "_id",  // Foreign field in the taxi_types collection
+                        as: "taxi_type_details",  // Output array with the matched taxi types
+                    }
+                },
+                {
+                    $addFields: {
+                        "car_details": { $arrayElemAt: ["$car_details", 0] },  // Take the first element from car_details array
+                        "taxi_type_details": { $arrayElemAt: ["$taxi_type_details", 0] },  // Take the first element from taxi_type_details array
+                        "taxis":{
+                            $arrayElemAt: ["$taxis", 0],
+                          
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        first_name: 1,
+                        last_name: 1,
+                        email: 1,
+                        mobile: 1,
+                        profile_image: 1,
+                        is_active: 1,
+                        is_online: 1,
+                        documents: 1,
+                        "taxis._id": 1,
+                        "taxis.documents.rc": 1,
+                        "taxis.documents.pollution_certificate": 1,
+                        "taxis.documents.vehicle_permit": 1,
+                        "taxis.documents.insurance": 1,
+                        car_details :{
+                           name: "$car_details.title",  // Added car title
+                            make:"$car_details.make",   // Added car make
+                            model: "$car_details.model",  // Added car model
+                           plateno: "$taxis.plateno",
+                        } ,
+                        "taxi_type_details.title": 1,  // Added taxi type title
+                    }
+                }
+            ]
+              
+        ];
+
+        console.log(JSON.stringify(aggregationPipeline));
+        // Execute the aggregation pipeline
+        const data = await driverModel.aggregate(aggregationPipeline);
+
+        // Check if data is found
+        if (!data || data.length === 0) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Data_Not_Found,
+            };
+        }
+
+        // Return the response with the aggregated data
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data: data[0],  // Return the first (and only) result from the aggregation
+        };
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+
+
 exports.driverCreate = async (req) => {
     try {
         const { first_name, last_name, mobile, email } = req.body;

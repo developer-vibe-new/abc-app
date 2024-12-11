@@ -81,11 +81,50 @@ exports.changePasswordController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.operatorsUpdateStatusController = async (req) => {
     try {
         return await services.updateOperatorStatus(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
+
+exports.getOperatorDetailsContoller = async (req) => {
+    try {
+        return await services.getOperatorDetailsService(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
+
+exports.editOperatorDetailsController = async (req) => {
+    try {
+        return await services.editOperatorDetailsService(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
+
+exports.checkAuth = async (req) => {
+    try {
+        return await services.checkAuthService(req);
     } catch (error) {
         console.log(error);
         return {
