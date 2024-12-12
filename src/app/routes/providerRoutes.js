@@ -15,6 +15,6 @@ router.post('/updateDrive/:id', verifyToken, upload.single('image'), responseHan
 router.post('/deleteDriver', verifyToken, responseHandler(controller.deleteDriverController));
 
 //otp routes api for  providers
-router.post('/providerOtpGeneration', responseHandler(controller.providerLoginController));
+router.post('/login', responseHandler(controller.providerLoginController));
 router.post('/providerOtpVerification', responseHandler(controller.providerOtpVerification));
 module.exports = router;

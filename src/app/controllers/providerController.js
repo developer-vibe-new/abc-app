@@ -114,7 +114,7 @@ exports.providerLoginController = async (req) => {
         return await service.providerlogin(req);
     } catch (error) {
         return {
-            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            status: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
             message: error.message
         };

@@ -13,6 +13,7 @@
     "saltRounds": 10
   },
   "resMessage": {
+    "Provider_Registered_Successfully": "Provider Registered Successfully",
     "Provider_taxi_not_found": "Provider taxi not found for this operator",
     "Invalid_document_type": "Invalid document type provided",
     "Provider_Deassigned_Successfully": "Provider Deassigned Successfully",

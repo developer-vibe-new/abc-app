@@ -243,24 +243,21 @@ exports.updateDriver = async (req) => {
 exports.providerlogin = async (req) => {
     try {
         const { mobile } = req.body;
-        const otp = 12345; // Static OTP to provide
+        const otp = 123456;
 
-        // Check if the user exists in the database
         let driverData = await Provider.findOne({ mobile });
 
-        // If the user does not exist, register them and provide the static OTP
         if (!driverData) {
             driverData = new Provider({ mobile, otp });
             await driverData.save();
             return {
-                statusCode: statusCode.OK,
+                status: statusCode.OK,
                 success: true,
                 message: resMessage.Provider_Registered_Successfully,
                 data: { _id: driverData._id, otp: otp },
             };
         }
 
-        // If user account is blocked, return an error message
         if (driverData.status === "block") {
             return {
                 statusCode: statusCode.OK,
@@ -269,7 +266,6 @@ exports.providerlogin = async (req) => {
             };
         }
 
-        // If the user exists, provide the static OTP
         driverData.otp = otp;
         await driverData.save();
         return {
@@ -279,11 +275,9 @@ exports.providerlogin = async (req) => {
             data: { _id: driverData._id, otp: otp },
         };
 
-        // Leave the commented code as is
     } catch (error) {
-        // Return an error message if something goes wrong
         return {
-            statusCode: statusCode.BAD_REQUEST,
+            status: statusCode.BAD_REQUEST,
             success: false,
             message: error.message,
         };
