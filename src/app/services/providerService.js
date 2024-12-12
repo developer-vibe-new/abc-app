@@ -351,9 +351,8 @@ exports.deleteDriver = async (req) => {
 
 exports.updateDocuments = async (req) => {
     try {
+        const { _id } = req.auth;
         const { documentType, documentData } = req.body;
-        const { id } = req.auth;
-        console.log(id, "-----------")
         const validDocumentTypes = ['driving_license', 'aadhaar_card'];
         if (!validDocumentTypes.includes(documentType)) {
             return {
@@ -362,8 +361,7 @@ exports.updateDocuments = async (req) => {
                 message: resMessage.Invalid_document_type
             };
         }
-
-        const provider = await Provider.finById(id);
+        const provider = await Provider.findById(_id);
         if (!provider) {
             return {
                 status: statusCode.NOT_FOUND,
@@ -372,12 +370,27 @@ exports.updateDocuments = async (req) => {
             };
         }
 
-        const documentKey = documentType;
-        if (provider.documents[documentKey]) {
-            provider.documents[documentKey] = {
-                ...provider.documents[documentKey],
-                ...documentData,
-            };
+        switch (documentType) {
+            case 'driving_license':
+                provider.documents.driving_license = {
+                    ...provider.documents.driving_license,
+                    ...documentData,
+                    status: 0
+                };
+                break;
+            case 'aadhaar_card':
+                provider.documents.aadhaar_card = {
+                    ...provider.documents.aadhaar_card,
+                    ...documentData,
+                    status: 0
+                };
+                break;
+            default:
+                return {
+                    status: statusCode.BAD_REQUEST,
+                    success: false,
+                    message: resMessage.Invalid_document_type,
+                };
         }
 
         await provider.save();

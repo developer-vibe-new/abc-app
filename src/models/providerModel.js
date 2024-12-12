@@ -178,13 +178,6 @@ const providerSchema = new mongoose.Schema({
 	otp: {
 		type: Number
 	},
-
-	documents: [{
-		_id: mongoose.Schema.Types.ObjectId,
-		name: String,
-		date: String,
-		path: String
-	}],
 	zone_id: {
 		type: mongoose.Schema.Types.ObjectId
 	},
