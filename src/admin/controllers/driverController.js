@@ -1,6 +1,20 @@
 const services = require('../services/driverService');
 const { statusCode } = require('../../config/default.json');
 
+
+exports.getDriverDetails = async (req) =>{
+    try {
+        return await services.driverDetailsService(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
+
 exports.createDriver = async (req) => {
     try {
         return await services.driverCreate(req);

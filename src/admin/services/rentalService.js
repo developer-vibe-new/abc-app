@@ -69,7 +69,7 @@ exports.editRental = async (req) => {
                 status: statusCode.DATA_NOT_FOUND,
                 success: false,
                 message: resMessage.Data_Not_Found
-            }
+            };
         }
         return {
             status: statusCode.OK,
@@ -120,7 +120,7 @@ exports.viewRentalData = async (req) => {
                 status: statusCode.DATA_NOT_FOUND,
                 success: false,
                 message: resMessage.Data_Not_Found
-            }
+            };
         }
         return {
             status: statusCode.OK,
@@ -135,4 +135,4 @@ exports.viewRentalData = async (req) => {
             message: error.message
         };
     }
-}
+};

@@ -26,13 +26,24 @@ exports.auth = async (req, res, next) => {
             });
 
         }
-        // console.log(jwt.verify(token, SECRET_Key), "decoded");
+        console.log(jwt.verify(token, SECRET_Key), "decoded");
         req.auth = decoded;
-
+        
         // console.log(req._id, "req._id");
         next();
 
     } catch (error) {
+
+      
+        if (error instanceof jwt.TokenExpiredError) {
+            return res.json({
+                statusCode: statusCode.UNAUTHORIZED,
+                success: false,
+                message: "Token Expired",
+                error: error.message || "Token has expired"
+            });
+        }
+
         return res.json({
             statusCode: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
