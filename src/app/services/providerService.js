@@ -288,40 +288,31 @@ exports.providerOtpVerification = async (req) => {
     try {
         const { mobile, otp } = req.body;
 
-        console.log(req.body, "DSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
-
-
-        // Find the driver by mobile and OTP
         const driverData = await Provider.findOne({ mobile, otp });
 
-        console.log(driverData, "DSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
-
-        // If driver does not exist, return an error
         if (!driverData) {
             return {
-                statusCode: statusCode.OK,
+                status: statusCode.OK,
                 success: false,
                 message: resMessage.Data_Not_Found,
             };
         }
 
-        // If the driver exists, generate a JWT token
         const token = jwt.sign(
-            { _id: driverData._id, mobile: driverData.mobile }, // Payload
-            process.env.SECRET_KEY, // Secret key
-            { expiresIn: "1h" } // Token expiration
+            { _id: driverData._id, mobile: driverData.mobile },
+            process.env.SECRET_KEY,
+            { expiresIn: "1h" }
         );
 
         return {
-            statusCode: statusCode.OK,
+            status: statusCode.OK,
             success: true,
             message: resMessage.Otp_Verify_Successfully,
             data: { _id: driverData._id, token },
         };
     } catch (error) {
-        // Return an error message if something goes wrong
         return {
-            statusCode: statusCode.BAD_REQUEST,
+            status: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
             message: error.message,
         };

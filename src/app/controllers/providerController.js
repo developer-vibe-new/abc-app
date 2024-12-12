@@ -127,7 +127,7 @@ exports.providerOtpVerification = async (req) => {
         return await service.providerOtpVerification(req);
     } catch (error) {
         return {
-            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            status: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
             message: error.message
         };
