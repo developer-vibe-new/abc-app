@@ -145,3 +145,15 @@ exports.deleteDriverController = async (req) => {
         };
     }
 };
+
+exports.updateDocumentsController = async (req) => {
+    try {
+        return await service.updateDocuments(req);
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}

@@ -348,3 +348,54 @@ exports.deleteDriver = async (req) => {
         };
     }
 };
+
+exports.updateDocuments = async (req) => {
+    try {
+        const { documentType, documentData } = req.body;
+        const { id } = req.auth;
+        console.log(id, "-----------")
+        const validDocumentTypes = ['driving_license', 'aadhaar_card'];
+        if (!validDocumentTypes.includes(documentType)) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Invalid_document_type
+            };
+        }
+
+        const provider = await Provider.finById(id);
+        if (!provider) {
+            return {
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.Provider_taxi_not_found,
+            };
+        }
+
+        const documentKey = documentType;
+        if (provider.documents[documentKey]) {
+            provider.documents[documentKey] = {
+                ...provider.documents[documentKey],
+                ...documentData,
+            };
+        }
+
+        await provider.save();
+
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Documents_Uploaded_Successfully,
+            data: provider,
+        };
+
+    } catch (error) {
+        console.error(error);
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || 'Internal Server Error',
+        };
+    }
+};

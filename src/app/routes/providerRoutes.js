@@ -13,6 +13,7 @@ router.get('/driverBlockList', verifyToken, responseHandler(controller.driverBlo
 router.post('/driverOnlineStatus/:id', verifyToken, responseHandler(controller.driverOnlineStatusController));
 router.post('/updateDrive/:id', verifyToken, upload.single('image'), responseHandler(controller.updateDriverController));
 router.post('/deleteDriver', verifyToken, responseHandler(controller.deleteDriverController));
+router.post('/uploadDocuments', verifyToken, responseHandler(controller.updateDocumentsController));
 
 //otp routes api for  providers
 router.post('/login', responseHandler(controller.providerLoginController));

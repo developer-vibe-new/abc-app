@@ -1,10 +1,46 @@
 const mongoose = require('mongoose');
 
+const documentSchema = new mongoose.Schema({
+	driving_license: {
+		number: { type: String, default: "" },
+		expiry_date: { type: Date, default: null },
+		front_image: { type: String, default: "" },
+		back_image: { type: String, default: "" },
+		status: { type: Number, default: -1 }
+	},
+	aadhaar_card: {
+		number: { type: Number, default: "" },
+		front_image: { type: String, default: "" },
+		back_image: { type: String, default: "" },
+		status: { type: Number, default: -1 }
+	}
+});
+
+const defaultDocuments = {
+	driving_license: {
+		number: "",
+		expiry_date: null,
+		front_image: "",
+		back_image: "",
+		status: -1 
+	},
+	aadhaar_card: {
+		number: "",
+		front_image: "",
+		back_image: "",
+		status: -1
+	}
+};
+
 const providerSchema = new mongoose.Schema({
 	first_name: {
 		type: String,
 		default: ""
 
+	},
+	documents: {
+		type: documentSchema,
+		default: defaultDocuments
 	},
 	providerTaxi_id: {
 		type: mongoose.Schema.Types.ObjectId,
