@@ -288,43 +288,12 @@ exports.updateDocuments = async (req) => {
             };
         }
 
-        switch (documentType) {
-            case 'rc':
-                providerTaxi.documents.rc = {
-                    ...providerTaxi.documents.rc,
-                    ...documentData,
-                };
-                break;
-            case 'pollution_certificate':
-                providerTaxi.documents.pollution_certificate = {
-                    ...providerTaxi.documents.pollution_certificate,
-                    ...documentData,
-                };
-                break;
-            case 'vehicle_image':
-                providerTaxi.documents.vehicle_image = {
-                    ...providerTaxi.documents.vehicle_image,
-                    ...documentData,
-                };
-                break;
-            case 'vehicle_permit':
-                providerTaxi.documents.vehicle_permit = {
-                    ...providerTaxi.documents.vehicle_permit,
-                    ...documentData,
-                };
-                break;
-            case 'insurance':
-                providerTaxi.documents.insurance = {
-                    ...providerTaxi.documents.insurance,
-                    ...documentData,
-                };
-                break;
-            default:
-                return {
-                    status: statusCode.BAD_REQUEST,
-                    success: false,
-                    message: resMessage.Invalid_document_type,
-                };
+        const documentKey = documentType;
+        if (providerTaxi.documents[documentKey]) {
+            providerTaxi.documents[documentKey] = {
+                ...providerTaxi.documents[documentKey],
+                ...documentData,
+            };
         }
 
         await providerTaxi.save();
