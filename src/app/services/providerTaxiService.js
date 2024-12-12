@@ -6,29 +6,8 @@ const Provider = require('../../models/providerModel');
 exports.addProviderTaxi = async (req) => {
     try {
         const providerTaxi = req.body;
-        // const { rc_photo, car_photo, carLeftImage, carRigthImage, carBackImage, carFrontImage } = req.files;
         if (req.auth && req.auth.role === "operator") {
             providerTaxi.operator_id = req.auth.id;
-        }
-        if (req.files) {
-            if (req.files.rc_photo) {
-                providerTaxi.rc_photo = req.files.rc_photo[0].filename;
-            }
-            if (req.files.car_photo) {
-                providerTaxi.car_photo = req.files.car_photo[0].filename;
-            }
-            if (req.files.carLeftImage) {
-                providerTaxi.carLeftImage = req.files.carLeftImage[0].filename;
-            }
-            if (req.files.carRigthImage) {
-                providerTaxi.carRigthImage = req.files.carRigthImage[0].filename;
-            }
-            if (req.files.carBackImage) {
-                providerTaxi.carBackImage = req.files.carBackImage[0].filename;
-            }
-            if (req.files.carFrontImage) {
-                providerTaxi.carFrontImage = req.files.carFrontImage[0].filename;
-            }
         }
 
         if (!providerTaxi.car_id || !providerTaxi.type_ids || !providerTaxi.plateno) {
@@ -282,6 +261,88 @@ exports.deassignProvider = async (req) => {
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",
+        };
+    }
+};
+ 
+exports.updateDocuments = async (req) => {
+    try {
+        const { taxiProviderId, documentType, documentData } = req.body;
+        const { id } = req.auth;
+
+        const validDocumentTypes = ['rc', 'pollution_certificate', 'vehicle_image', 'vehicle_permit', 'insurance'];
+        if (!validDocumentTypes.includes(documentType)) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Invalid_document_type
+            };
+        }
+
+        const providerTaxi = await ProviderTaxi.findOne({ _id: taxiProviderId, operator_id: id });
+        if (!providerTaxi) {
+            return {
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.Provider_taxi_not_found,
+            };
+        }
+
+        switch (documentType) {
+            case 'rc':
+                providerTaxi.documents.rc = {
+                    ...providerTaxi.documents.rc,
+                    ...documentData,
+                };
+                break;
+            case 'pollution_certificate':
+                providerTaxi.documents.pollution_certificate = {
+                    ...providerTaxi.documents.pollution_certificate,
+                    ...documentData,
+                };
+                break;
+            case 'vehicle_image':
+                providerTaxi.documents.vehicle_image = {
+                    ...providerTaxi.documents.vehicle_image,
+                    ...documentData,
+                };
+                break;
+            case 'vehicle_permit':
+                providerTaxi.documents.vehicle_permit = {
+                    ...providerTaxi.documents.vehicle_permit,
+                    ...documentData,
+                };
+                break;
+            case 'insurance':
+                providerTaxi.documents.insurance = {
+                    ...providerTaxi.documents.insurance,
+                    ...documentData,
+                };
+                break;
+            default:
+                return {
+                    status: statusCode.BAD_REQUEST,
+                    success: false,
+                    message: resMessage.Invalid_document_type,
+                };
+        }
+
+        await providerTaxi.save();
+
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Documents_Uploaded_Successfully,
+            data: providerTaxi,
+        };
+
+    } catch (error) {
+        console.error(error);
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || 'Internal Server Error',
         };
     }
 };
