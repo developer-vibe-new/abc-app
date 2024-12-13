@@ -303,12 +303,17 @@ exports.providerOtpVerification = async (req) => {
             process.env.SECRET_KEY,
             { expiresIn: "1h" }
         );
-
+        
         return {
             status: statusCode.OK,
             success: true,
             message: resMessage.Otp_Verify_Successfully,
-            data: { _id: driverData._id, token },
+            data: { 
+                _id: driverData._id,
+                token,
+                operator_id: driverData.operator_id,
+                kycStatus: driverData.kycStatus
+            },
         };
     } catch (error) {
         return {
@@ -409,6 +414,40 @@ exports.updateDocuments = async (req) => {
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || 'Internal Server Error',
+        };
+    }
+};
+
+exports.register = async (req) => {
+    try {
+        const { first_name, last_name, mobile, city_id } = req.body;
+        if (!first_name || !last_name || !mobile || !city_id) {
+            return {
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Required_Data
+            };
+        }
+        const data = await Provider.findOne({ mobile });
+        if(data !== null) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Phone_Already_Exist
+            };
+        }
+        const providerData = await Provider.create({ first_name, last_name, mobile, city_id });
+        return {
+            statusCode: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Created_Successfully,
+            data: providerData
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
         };
     }
 };
