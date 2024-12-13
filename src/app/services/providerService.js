@@ -365,7 +365,7 @@ exports.updateDocuments = async (req) => {
     try {
         const { _id } = req.auth;
         const { documentType, documentData } = req.body;
-        const validDocumentTypes = ['driving_license', 'aadhaar_card'];
+        const validDocumentTypes = ['driving_license', 'aadhaar_card', 'pan_card', 'bank_details'];
         if (!validDocumentTypes.includes(documentType)) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -397,6 +397,20 @@ exports.updateDocuments = async (req) => {
                     status: 0
                 };
                 break;
+            case 'pan_card':
+                provider.documents.pan_card = {
+                    ...provider.documents.pan_card,
+                    ...documentData,
+                    status: 0
+                };
+                break;
+            case 'bank_details':
+                provider.documents.bank_details = {
+                    ...provider.documents.bank_details,
+                    ...documentData,
+                    status: 0
+                };
+                break;    
             default:
                 return {
                     status: statusCode.BAD_REQUEST,

@@ -1,5 +1,38 @@
 const mongoose = require('mongoose');
 
+const providerTaxiSchema = new mongoose.Schema({
+	rc: {
+		number_plate_front: { type: String, default: "" },
+		number_plate_back: { type: String, default: "" },
+		image: { type: String, default: "" },
+		status: { type: Number, default: -1 }
+	},
+	pollution_certificate: {
+		image: { type: String, default: "" },
+		expiry_date: { type: Date, default: null },
+		status: { type: Number, default: -1 }
+	},
+	vehicle_image: {
+		front_image: { type: String, default: "" },
+		left_image: { type: String, default: "" },
+		right_image: { type: String, default: "" },
+		back_image: { type: String, default: "" },
+		status: { type: Number, default: -1 }
+	},
+	vehicle_permit: {
+		type: { type: String, default: "" },
+		issue_date: { type: Date, default: null },
+		expiry_date: { type: Date, default: null },
+		image: { type: String, default: "" },
+		status: { type: Number, default: -1 }
+	},
+	insurance: {
+		image: { type: String, default: "" },
+		expiry_date: { type: Date, default: null },
+		status: { type: Number, default: -1 }
+	}
+});
+
 const documentSchema = new mongoose.Schema({
 	driving_license: {
 		number: { type: String, default: "" },
@@ -10,9 +43,20 @@ const documentSchema = new mongoose.Schema({
 	},
 	aadhaar_card: {
 		number: { type: Number, default: "" },
-		front_image: { type: String, default: "" },
-		back_image: { type: String, default: "" },
+		name: { type: String, default: "" },
 		status: { type: Number, default: -1 }
+	},
+	pan_card: {
+		name: { type: String, default: "" },
+		number: { type: String, default: "" },
+		status: { type: Number, default: -1 }
+	},
+	bank_details: {
+		account_number: { type: Number, default: null },
+        ifsc_code: { type: String, default: "" },
+        bank_name: { type: String, default: "" },
+        account_holder_name: { type: String, default: "" },
+        status: { type: Number, default: -1 }
 	}
 });
 
@@ -41,6 +85,9 @@ const providerSchema = new mongoose.Schema({
 	documents: {
 		type: documentSchema,
 		default: defaultDocuments
+	},
+	providerTaxiDocuments: {
+		type: providerTaxiSchema
 	},
 	providerTaxi_id: {
 		type: mongoose.Schema.Types.ObjectId,
@@ -184,19 +231,6 @@ const providerSchema = new mongoose.Schema({
 	subzone_id: {
 		type: mongoose.Schema.Types.ObjectId
 	},
-	bank_data: [{
-		_id: mongoose.Schema.Types.ObjectId,
-		account_holder_type: String,
-		account_holder_name: String,
-		routing_number: String,
-		accountNumber: String,
-		bank_name: String,
-		bank_id: String,
-		is_default: {
-			type: Boolean,
-			default: false
-		},
-	}],
 	stripe_id: {
 		type: String
 	},
