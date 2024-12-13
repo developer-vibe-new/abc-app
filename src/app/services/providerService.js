@@ -251,7 +251,7 @@ exports.providerlogin = async (req) => {
             return {
                 status: statusCode.DATA_NOT_FOUND,
                 success: false,
-                message: resMessage.Data_Not_Found,
+                message: resMessage.Not_Registered,
             }
         }
 
