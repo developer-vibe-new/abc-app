@@ -13,6 +13,7 @@
     "saltRounds": 10
   },
   "resMessage": {
+    "Document_status_updated": "Document status updated",
     "Not_Registered": "You are not Registered with us.",
     "Provider_Registered_Successfully": "Provider Registered Successfully",
     "Provider_taxi_not_found": "Provider taxi not found for this operator",

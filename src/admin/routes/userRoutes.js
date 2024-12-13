@@ -63,6 +63,7 @@ router.post('/updateDriver/:id', auth, upload.single('image'), responseHandler(d
 router.post('/blockDriver', auth, responseHandler(driverController.blockDriver));
 router.get('/blockedDriversList', responseHandler(driverController.blockedDriversList));
 router.get('/onlineDriverList', auth, responseHandler(driverController.onlineDriverList));
+router.post('/updateDocumentStatus/:id', auth, responseHandler(driverController.updateDocumentStatusController));
 
 // router.post('/deleteDriver/:id', auth, responseHandler(driverController.deleteDriver));
 router.get('/editBlockDriver/:id', auth, responseHandler(driverController.editBlockDriver));

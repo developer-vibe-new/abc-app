@@ -879,16 +879,42 @@ exports.onlineDriverList = async (req) => {
     }
 };
 
-// exports.editDriver = async (req) => {
-//     try {
-
-//     } catch (error) {
-//         console.log(error);
-//         return {
-//             statusCode: statusCode.BAD_REQUEST,
-//             success: false,
-//             message: resMessage.Internal_Server_Error,
-//             error: error.message || "Internal Server Error",
-//         };
-//     }
-// }
+exports.updateDocumentStatus = async (req) => {
+    try {
+        const { id } = req.params;
+        const { document_type, status } = req.body
+        const data = await driverModel.findById(id);
+        if(!data) {
+            return {
+                statusCode: statusCode.NOT_FOUND,
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found,
+            };
+        }
+        if(!data.documents[document_type]) {
+            return {
+                statusCode: statusCode.BAD_REQUEST,
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Invalid_document_type,
+            };
+        }
+        data.documents[document_type].status = status;
+        return {
+            statusCode: statusCode.OK,
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Document_status_updated,
+            data: data,
+        }
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}

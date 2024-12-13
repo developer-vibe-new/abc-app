@@ -178,3 +178,16 @@ exports.taxiTypeDropDown = async (req) => {
         };
     }
 };
+
+exports.updateDocumentStatusController = async (req) => {
+    try {
+        return await services.updateDocumentStatus(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
