@@ -284,14 +284,22 @@ exports.providerOtpVerification = async (req) => {
     try {
         const { mobile, otp } = req.body;
 
-        const driverData = await Provider.findOne({ mobile, otp });
+        const driverData = await Provider.findOne({ mobile });
 
         if (!driverData) {
             return {
-                status: statusCode.OK,
+                status: statusCode.DATA_NOT_FOUND,
                 success: false,
                 message: resMessage.Data_Not_Found,
             };
+        }
+
+        if(otp !== driverData.otp) {
+            return {
+                status: statusCode.OK,
+                success: false,
+                message: resMessage.Otp_Verify_Failed
+            }
         }
 
         const token = jwt.sign(
@@ -299,6 +307,9 @@ exports.providerOtpVerification = async (req) => {
             process.env.SECRET_KEY,
             { expiresIn: "1h" }
         );
+
+        driverData.otp = null;
+        await driverData.save();
         
         return {
             status: statusCode.OK,
