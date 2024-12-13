@@ -248,14 +248,11 @@ exports.providerlogin = async (req) => {
         let driverData = await Provider.findOne({ mobile });
 
         if (!driverData) {
-            driverData = new Provider({ mobile, otp });
-            await driverData.save();
             return {
-                status: statusCode.OK,
-                success: true,
-                message: resMessage.Provider_Registered_Successfully,
-                data: { _id: driverData._id, otp: otp },
-            };
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found,
+            }
         }
 
         if (driverData.status === "block") {
@@ -269,10 +266,9 @@ exports.providerlogin = async (req) => {
         driverData.otp = otp;
         await driverData.save();
         return {
-            statusCode: statusCode.OK,
+            status: statusCode.OK,
             success: true,
-            message: resMessage.User_login_Successfully,
-            data: { _id: driverData._id, otp: otp },
+            message: resMessage.Otp_Send_Success
         };
 
     } catch (error) {
