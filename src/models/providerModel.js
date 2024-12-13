@@ -33,6 +33,39 @@ const providerTaxiSchema = new mongoose.Schema({
 	}
 });
 
+const defaultproviderTaxiDocuments = {
+	rc: {
+		number_plate_front: "",
+		number_plate_back: "",
+		image: "",
+		status: -1
+	},
+	pollution_certificate: {
+		image: "",
+		expiry_date: null,
+		status: -1
+	},
+	vehicle_image: {
+		front_image: "",
+		left_image: "",
+		right_image: "",
+		back_image: "",
+		status: -1
+	},
+	vehicle_permit: {
+		type: "",
+		issue_date: null,
+		expiry_date: null,
+		image: "",
+		status: -1
+	},
+	insurance: {
+		image: "",
+		expiry_date: null,
+		status: -1
+	}
+};
+
 const documentSchema = new mongoose.Schema({
 	driving_license: {
 		number: { type: String, default: "" },
@@ -42,7 +75,7 @@ const documentSchema = new mongoose.Schema({
 		status: { type: Number, default: -1 }
 	},
 	aadhaar_card: {
-		number: { type: Number, default: "" },
+		number: { type: String, default: "" },
 		name: { type: String, default: "" },
 		status: { type: Number, default: -1 }
 	},
@@ -87,7 +120,8 @@ const providerSchema = new mongoose.Schema({
 		default: defaultDocuments
 	},
 	providerTaxiDocuments: {
-		type: providerTaxiSchema
+		type: providerTaxiSchema,
+		default: defaultproviderTaxiDocuments
 	},
 	providerTaxi_id: {
 		type: mongoose.Schema.Types.ObjectId,

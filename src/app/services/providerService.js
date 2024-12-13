@@ -365,7 +365,9 @@ exports.updateDocuments = async (req) => {
     try {
         const { _id } = req.auth;
         const { documentType, documentData } = req.body;
-        const validDocumentTypes = ['driving_license', 'aadhaar_card', 'pan_card', 'bank_details'];
+        let validDocumentTypes = ['insurance', 'vehicle_permit', 'vehicle_image', 'driving_license', 'aadhaar_card', 'pan_card', 'bank_details', 'rc', 'pollution_certificate'];
+
+        // Check if the document type is valid
         if (!validDocumentTypes.includes(documentType)) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -373,6 +375,7 @@ exports.updateDocuments = async (req) => {
                 message: resMessage.Invalid_document_type
             };
         }
+
         const provider = await Provider.findById(_id);
         if (!provider) {
             return {
@@ -382,7 +385,52 @@ exports.updateDocuments = async (req) => {
             };
         }
 
+        // Check if the provider has an operator_id and deny access if set
+        if (provider.operator_id !== null) {
+            return {
+                status: statusCode.UNAUTHORIZED,
+                success: false,
+                message: resMessage.Unauthorized_Access,
+            };
+        }
+
+        // Handling other documents
         switch (documentType) {
+            case 'rc':
+                    provider.providerTaxiDocuments.rc = {
+                        ...provider.providerTaxiDocuments.rc,
+                        ...documentData,
+                        status: 0
+                    };
+                    break;
+            case 'pollution_certificate':
+                    provider.providerTaxiDocuments.pollution_certificate = {
+                        ...provider.providerTaxiDocuments.pollution_certificate,
+                        ...documentData,
+                        status: 0
+                    };
+                    break;        
+            case 'vehicle_image':
+                    provider.providerTaxiDocuments.vehicle_image = {
+                        ...provider.providerTaxiDocuments.vehicle_image,
+                        ...documentData,
+                        status: 0
+                    };
+                    break;
+            case 'vehicle_permit':
+                    provider.providerTaxiDocuments.vehicle_permit = {
+                        ...provider.providerTaxiDocuments.vehicle_permit,
+                        ...documentData,
+                        status: 0
+                    };
+                    break;
+            case 'insurance':
+                    provider.providerTaxiDocuments.insurance = {
+                        ...provider.providerTaxiDocuments.insurance,
+                        ...documentData,
+                        status: 0
+                    };
+                    break;
             case 'driving_license':
                 provider.documents.driving_license = {
                     ...provider.documents.driving_license,
@@ -410,7 +458,7 @@ exports.updateDocuments = async (req) => {
                     ...documentData,
                     status: 0
                 };
-                break;    
+                break;
             default:
                 return {
                     status: statusCode.BAD_REQUEST,
@@ -419,6 +467,7 @@ exports.updateDocuments = async (req) => {
                 };
         }
 
+        // Save the provider after modifying the documents
         await provider.save();
 
         return {
@@ -479,10 +528,22 @@ exports.getDocuments = async (req) => {
         const data = await Provider.findById(_id);
         if(!data) {
             return {
-                status: statusCode.DATA_NOT_FOUND,
+                statusCode: statusCode.UNAUTHORIZED,
+                status: statusCode.UNAUTHORIZED,
                 success: false,
-                message: resMessage.Data_Not_Found
+                message: resMessage.Unauthorized_Access
             };
+        }
+        if(data.providerTaxi_id === null) {
+            return {
+                status: statusCode.OK,
+                success: true,
+                message: resMessage.Documents_Retrieved_Successfully,
+                data: {
+                    documents: data.documents,
+                    providerTaxiDocuments: data.providerTaxiDocuments
+                }
+            }
         }
         return {
             status: statusCode.OK,
