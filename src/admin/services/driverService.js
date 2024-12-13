@@ -155,7 +155,7 @@ exports.driverView = async (req) => {
         if (search_value) {
             conditions.push({
                 $match: {
-                    full_name: { $regex: search_value, $options: "i" }
+                    first_name: { $regex: search_value, $options: "i" }
                 }
             });
         }
