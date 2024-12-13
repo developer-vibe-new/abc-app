@@ -458,3 +458,30 @@ exports.register = async (req) => {
         };
     }
 };
+
+exports.getDocuments = async (req) => {
+    try {
+        const { _id } = req.auth;
+        const data = await Provider.findById(_id);
+        if(!data) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            };
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Documents_Retrieved_Successfully,
+            data: data.documents
+        }
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+}

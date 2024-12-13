@@ -169,3 +169,15 @@ exports.registerController = async (req) => {
         };
     }
 }
+
+exports.getDocumentsController = async (req) => {
+    try {
+        return await service.getDocuments(req);
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
