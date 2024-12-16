@@ -301,6 +301,7 @@ exports.providerOtpVerification = async (req) => {
         );
 
         driverData.otp = null;
+        driverData.login_token = token;
         await driverData.save();
         
         return {
