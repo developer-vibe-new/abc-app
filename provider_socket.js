@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require('http');
+const mongoose = require('mongoose');
 const moment = require('moment');
 const { initializeSocket, getIO } = require('./socket');
 const { SOCKET_DELIVERY_PORT } = require('./src/config/dev.config');
@@ -9,8 +10,9 @@ const { setRedis, getRedis, removeOrderFromAllPartners, sendNotification, payDel
 const Provider = require('./src/models/providerModel');
 const connectDB = require('./src/config/db.config');
 const User = require('./src/models/users');
-const redisKeyPrefixVendorSocket = 'ProviderSocket:';
-const redisKeyPrefixUserSocket = 'UserSocket:';
+const Location = require('./src/models/locationModel')
+// const redisKeyPrefixVendorSocket = 'ProviderSocket:';
+// const redisKeyPrefixUserSocket = 'UserSocket:';
 const providerSocket = 'ProviderSocket:';
 connectDB();
 
@@ -53,9 +55,12 @@ async function runServer() {
               if (providerDetail) {
                 socket.providerDetail = {
                   _id: providerDetail._id,
-                  is_active: providerDetail.is_active
+                  is_active: providerDetail.is_active,
+                  is_online: providerDetail.is_online,
+                  first_name: providerDetail.first_name,
+                  last_name: providerDetail.last_name
                 }
-                // await setRedis(providerSocket + providerDetail._id.toString(), socket.id);
+                await setRedis(providerSocket + providerDetail._id.toString(), socket.id);
                 socket.emit('authenticationSuccess', {
                   status: 200,
                   message: 'Authentication successful',
@@ -89,55 +94,29 @@ async function runServer() {
   
           switch (event) {
             case "updateLocation":
-              console.log('=================================LOCATION UPDATE=================================');
-              // const now_date = moment().toDate();
-  
-              // let locations = data.locations;
-              // // const locs = data.locations;
-              // const locs = JSON.parse(JSON.stringify(data.locations));
-              // locations.forEach(location => {
-              //   location.coordinates = [location.coordinates[1], location.coordinates[0]];
-              // });
-              // const locationData = {
-              //   bearing: data.bearing,
-              //   speed: data.speed,
-              //   locations: locations,
-              //   lastupdatedlocation: now_date
-              // };
-              // await Delieverypartnerlocation.updateOne(
-              //   { userid: socket.userData._id.toString() },
-              //   { $set: locationData },
-              //   { upsert: true }
-              // );
-  
-              // const location_packet = {
-              //   _id: socket.userData._id.toString(),
-              //   longitude: data.longitude,
-              //   latitude: data.latitude,
-              //   bearing: data.bearing,
-              //   speed: data.speed,
-              //   name: socket.userData.name,
-              //   locations: locs,
-              // };
-              // console.log("location_packet", locs);
-              // socket.emit('locationUpdate', location_packet);
-              // const orders = await Order.find({
-              //   deliveryPartner: socket.userData._id,
-              //   deliveryStatus: { $in: ["Accepted", "PickedUp", "Reached", "Returned"] }
-              // });
-              // if (orders.length > 0) {
-              //   for (const order of orders) {
-              //     const userSocketSent = await getRedis(redisKeyPrefixUserSocket + order.userId.toString());
-              //     if (userSocketSent) {
-              //       io.to(userSocketSent).emit('locationUpdate', {
-              //         success: true,
-              //         data: location_packet,
-              //         message: 'Location Update',
-              //       });
-              //     }
-              //   }
-              // }
-  
+              console.log("=====Update Location =====");
+              var now_date = moment().toDate();
+              await Location.findOneAndUpdate(
+                { provider_id: socket.providerDetail._id },
+                {
+                  $set: {
+                    location: [data.longitude, data.latitude],
+                    bearing: data.bearing,
+                    lastupdatedlocation: now_date,
+                  }
+                },
+                { upsert: true }
+              )
+
+              const location_packet = {
+                _id: socket.providerDetail._id.toString(),
+                longitude: data.longitude,
+                latitude: data.latitude,
+                firstName: socket.providerDetail.first_name,
+                lastName: socket.providerDetail.last_name
+              };
+
+              socket.emit('location_update', location_packet);
               break;
   
             case "acceptOrder":

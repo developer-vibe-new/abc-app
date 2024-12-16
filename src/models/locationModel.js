@@ -1,11 +1,6 @@
 const mongoose = require("mongoose"),
 	ObjectId = mongoose.Types.ObjectId;
 const Schema = mongoose.Schema;
-const MODALFUNC = require('./model_functions').functions;
-
-var Provider = require('./Provider').Provider;
-var TaxiType = require('./TaxiType').TaxiType;
-var Zone = require('./Zone').Zone;
 
 var LocationSchema = new Schema({
 
@@ -26,12 +21,13 @@ var LocationSchema = new Schema({
 	// array for ['longitude', 'latitude']
 	// searching uses mangodb 2dsphere indexing so longitude must be saved as first element of array
 	location: {
-		type: [Number]
+		type: [Number],
+		default: null
 	},
 
 	gotohomelocation: {
 		type: [Number],
-		default:""
+		default: null
 	},
 
 	bearing: {
@@ -83,15 +79,12 @@ var LocationSchema = new Schema({
 	}
 });
 
-
-
-LocationSchema.path('created').get(MODALFUNC.string_ts);
-LocationSchema.path('updated').get(MODALFUNC.string_ts);
-
 LocationSchema.index({
 	"location": '2dsphere',
 	"gotohomelocation":'2dsphere',
 });
 
 //make this available to our users in Node applications
-module.exports.Location = mongoose.model('Location', LocationSchema);
+const locationModel = mongoose.model('Location', LocationSchema);
+
+module.exports = locationModel;

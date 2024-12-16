@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { statusCode, resMessage } = require('../../config/default.json');
 const ProviderTaxi = require('../../models/providerTaxi');
 const Provider = require('../../models/providerModel');
+const Location = require('../../models/locationModel');
 
 exports.addProviderTaxi = async (req) => {
     try {
@@ -18,6 +19,10 @@ exports.addProviderTaxi = async (req) => {
             };
         }
         await ProviderTaxi.create(providerTaxi);
+        await Location.create({
+            provider_id: providerTaxi.providerId,
+            type_ids: providerTaxi.type_ids
+        })
         return {
             statusCode: statusCode.OK,
             success: true,
