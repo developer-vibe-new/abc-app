@@ -883,9 +883,11 @@ exports.onlineDriverList = async (req) => {
 exports.updateDocumentStatus = async (req) => {
     try {
         const { id } = req.params;
-        const { document_type, status } = req.body
+        const { document_type, status } = req.body;
+
         const data = await driverModel.findById(id);
-        if(!data) {
+        
+        if (!data) {
             return {
                 statusCode: statusCode.NOT_FOUND,
                 status: statusCode.NOT_FOUND,
@@ -893,7 +895,11 @@ exports.updateDocumentStatus = async (req) => {
                 message: resMessage.Data_Not_Found,
             };
         }
-        if(!data.documents[document_type]) {
+
+        if (
+            (!data.documents || !data.documents[document_type]) &&
+            (!data.providerTaxiDocuments || !data.providerTaxiDocuments[document_type])
+        ) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
                 status: statusCode.BAD_REQUEST,
@@ -901,14 +907,24 @@ exports.updateDocumentStatus = async (req) => {
                 message: resMessage.Invalid_document_type,
             };
         }
-        data.documents[document_type].status = status;
+
+        if (data.documents && data.documents[document_type]) {
+            data.documents[document_type].status = status;
+        }
+
+        if (data.providerTaxiDocuments && data.providerTaxiDocuments[document_type]) {
+            data.providerTaxiDocuments[document_type].status = status;
+        }
+
+        await data.save();
+
         return {
             statusCode: statusCode.OK,
             status: statusCode.OK,
             success: true,
             message: resMessage.Document_status_updated,
             data: data,
-        }
+        };
     } catch (error) {
         return {
             statusCode: statusCode.INTERNAL_SERVER_ERROR,
@@ -918,4 +934,4 @@ exports.updateDocumentStatus = async (req) => {
             error: error.message || "Internal Server Error",
         };
     }
-}
+};
