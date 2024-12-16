@@ -16,14 +16,14 @@ connectDB();
 
 const app = express();
 const server = http.createServer(app);
-let totalDeliveryPartner = 0;
+let totalProviders = 0;
 
 async function runServer() {
     await initializeSocket(server);
     const io = getIO();
   
     io.on('connection', (socket) => {
-      console.log(`====================== Delivery (${++totalDeliveryPartner}) Partner CONNECTED ======================`, socket?.id);
+      console.log(`====================== Providers (${++totalProviders}) Partner CONNECTED ======================`, socket?.id);
   
       const onevent = socket.onevent;
       socket.onevent = function (packet) {
@@ -42,57 +42,22 @@ async function runServer() {
   
           if (event === "authenticate") {
             try {
-              const userDetails = await Delieverypartner.aggregate([
+              const providerDetails = await Provider.aggregate([
                 {
                   $match: {
-                    loginToken: data.loginToken
-                  }
-                },
-                {
-                  $lookup: {
-                    from: "delieverypartnerlocations",
-                    localField: "_id",
-                    foreignField: "userid",
-                    as: "locationData"
-                  }
-                },
-                {
-                  $addFields: {
-                    locationData: {
-                      $arrayElemAt: ["$locationData", 0]
-                    }
+                    login_token: data.loginToken
                   }
                 }
               ]);
-              const userData = userDetails[0];
-              if (userData) {
-                socket.userData = {
-                  _id: userData?._id,
-                  name: userData?.name,
-                  isOnline: userData?.locationData?.isOnline,
-                  bearing: userData?.locationData?.bearing,
-                  speed: userData?.locationData?.speed,
-                  locations: userData?.locationData?.locations,
-                  isAvailable: userData?.locationData?.isAvailable,
-                };
+              const providerDetail = providerDetails[0];
+              if (providerDetail) {
                 await setRedis(redisKeyPrefixDelieverypartnerSocket + userData._id.toString(), socket.id);
-                const orders = await Order.find({
-                  deliveryPartner: socket.userData._id,
-                  deliveryStatus: { $in: ["Accepted", "PickedUp", "Reached", "Returned"] }
-                });
   
                 socket.emit('authenticationSuccess', {
                   status: 200,
                   message: 'Authentication successful',
                   data: {
-                    _id: userData?._id,
-                    name: userData?.name,
-                    isOnline: userData?.locationData?.isOnline,
-                    bearing: userData?.locationData?.bearing,
-                    speed: userData?.locationData?.speed,
-                    locations: userData?.locationData?.locations,
-                    isAvailable: userData?.locationData?.isAvailable,
-                    orders: orders?.length ? orders : []
+                    is_active: providerDetail?.is_active
                   }
                 });
               } else {

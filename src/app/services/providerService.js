@@ -172,7 +172,9 @@ exports.driverOninerStatus = async (req) => {
             status: statusCode.OK,
             success: true,
             message: resMessage.Status_Updated_Successfully,
-            data: driverData
+            data: {
+                is_online: onlineStatus
+            }
         };
     } catch (error) {
         return {
