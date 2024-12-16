@@ -96,14 +96,20 @@ async function runServer() {
             case "updateLocation":
               console.log("=====Update Location =====");
               var now_date = moment().toDate();
+              let locations = data.locations;
+              locations.forEach(location => {
+                location.coordinates = [location.coordinates[1], location.coordinates[0]];
+              });
+              const locationData = {
+                bearing: data.bearing,
+                speed: data.speed,
+                locations: locations,
+                lastupdatedlocation: now_date
+              };
               await Location.findOneAndUpdate(
                 { provider_id: socket.providerDetail._id },
                 {
-                  $set: {
-                    location: [data.longitude, data.latitude],
-                    bearing: data.bearing,
-                    lastupdatedlocation: now_date,
-                  }
+                  $set: locationData
                 },
                 { upsert: true }
               )
@@ -324,8 +330,9 @@ async function runServer() {
       });
   
       socket.on("disconnect", function () {
-        --totalDeliveryPartner;
-        console.log(`====================== Delivery (${totalDeliveryPartner}) Partner DISCONNECTED ======================`, socket?.id);
+        console.log("disconnectMessage")
+        --totalProviders;
+        console.log(`====================== Providers (${totalProviders}) Partner DISCONNECTED ======================`, socket?.id);
       });
     });
   

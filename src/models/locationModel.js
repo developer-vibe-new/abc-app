@@ -6,7 +6,8 @@ var LocationSchema = new Schema({
 
     provider_id: {
         type: mongoose.Schema.Types.ObjectId,
-		ref: 'Provider'
+		ref: 'Provider',
+		unique: true
     },
     
 	type_ids: [{
@@ -20,11 +21,20 @@ var LocationSchema = new Schema({
     },
 	// array for ['longitude', 'latitude']
 	// searching uses mangodb 2dsphere indexing so longitude must be saved as first element of array
-	location: {
-		type: [Number],
-		default: null
-	},
-
+	locations: [
+		{
+		  type: {
+			type: String,
+			enum: ['Point'],
+			default: 'Point'
+		  },
+		  coordinates: {
+			type: [Number],
+			required: true,
+			index: '2dsphere'
+		  }
+		}
+	],
 	gotohomelocation: {
 		type: [Number],
 		default: null
