@@ -10,7 +10,7 @@ router.post('/addDriver', verifyToken, responseHandler(controller.addDriverContr
 router.get('/driverList', verifyToken, responseHandler(controller.driverListController));
 router.post('/updateDriverStatus/:id', verifyToken, responseHandler(controller.updateDriverStatusController));
 router.get('/driverBlockList', verifyToken, responseHandler(controller.driverBlockListController));
-router.post('/driverOnlineStatus/:id', verifyToken, responseHandler(controller.driverOnlineStatusController));
+router.post('/driverOnlineStatus', verifyToken, responseHandler(controller.driverOnlineStatusController));
 router.post('/updateDrive/:id', verifyToken, upload.single('image'), responseHandler(controller.updateDriverController));
 router.post('/deleteDriver', verifyToken, responseHandler(controller.deleteDriverController));
 router.post('/uploadDocuments', verifyToken, responseHandler(controller.updateDocumentsController));

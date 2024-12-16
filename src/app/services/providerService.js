@@ -156,8 +156,8 @@ exports.driverList = async (req) => {
 
 exports.driverOninerStatus = async (req) => {
     try {
-        const { id } = req.params;
-        const driverData = await Provider.findOne({ _id: id });
+        const { _id } = req.auth;
+        const driverData = await Provider.findOne({ _id });
         if (!driverData) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -165,22 +165,14 @@ exports.driverOninerStatus = async (req) => {
                 message: resMessage.Data_Not_Found
             };
         }
-        const operatorId = new mongoose.Types.ObjectId(req.auth.id);
-        if (driverData.operator_id && driverData.operator_id.equals(operatorId)) {
-            const onlineStatus = driverData.is_online === true ? false : true;
-            driverData.is_online = onlineStatus;
-            await driverData.save();
-            return {
-                status: statusCode.OK,
-                success: true,
-                message: resMessage.Status_Updated_Successfully,
-                data: driverData
-            };
-        }
+        const onlineStatus = driverData.is_online === true ? false : true;
+        driverData.is_online = onlineStatus;
+        await driverData.save();
         return {
-            status: statusCode.UNAUTHORIZED,
-            success: false,
-            message: resMessage.Unauthorized_Access
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Status_Updated_Successfully,
+            data: driverData
         };
     } catch (error) {
         return {
