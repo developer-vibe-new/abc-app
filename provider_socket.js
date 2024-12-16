@@ -11,7 +11,7 @@ const connectDB = require('./src/config/db.config');
 const User = require('./src/models/users');
 const redisKeyPrefixVendorSocket = 'ProviderSocket:';
 const redisKeyPrefixUserSocket = 'UserSocket:';
-const redisKeyPrefixDelieverypartnerSocket = 'DelieverypartnerSocket:';
+const providerSocket = 'ProviderSocket:';
 connectDB();
 
 const app = express();
@@ -51,8 +51,8 @@ async function runServer() {
               ]);
               const providerDetail = providerDetails[0];
               if (providerDetail) {
-                await setRedis(redisKeyPrefixDelieverypartnerSocket + userData._id.toString(), socket.id);
-  
+                console.log("bhvhfbrvbr");
+                await setRedis(providerSocket + providerDetail._id.toString(), socket.id);
                 socket.emit('authenticationSuccess', {
                   status: 200,
                   message: 'Authentication successful',
