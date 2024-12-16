@@ -311,4 +311,3 @@ module.exports = userModel;
 
 //make this available to our users in Node applications
 module.exports.User = mongoose.model('User', UserSchema);
-module.exports.Loc = mongoose.model('Loc', LocSchema);

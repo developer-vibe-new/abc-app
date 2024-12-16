@@ -13,37 +13,37 @@ exports.driverDetailsService = async (req) => {
             [
                 {
                     $match: {
-                        _id: new mongoose.Types.ObjectId(id),  // Match by the driver's ID
+                        _id: new mongoose.Types.ObjectId(id),
                     }
                 },
                 {
                     $lookup: {
-                        from: "provider_taxis",  // Join with the provider_taxis collection
-                        localField: "operator_id",  // Local field in the driver collection
-                        foreignField: "operator_id",  // Foreign field in the provider_taxis collection
-                        as: "taxis",  // Output array with the matched taxis
+                        from: "provider_taxis",
+                        localField: "operator_id",
+                        foreignField: "operator_id",
+                        as: "taxis",
                     }
                 },
                 {
                     $lookup: {
-                        from: "cars",  // Join with the cars collection to get car details
-                        localField: "taxis.car_id",  // Local field in the provider_taxis collection
-                        foreignField: "_id",  // Foreign field in the cars collection
-                        as: "car_details",  // Output array with the matched car details
+                        from: "cars",
+                        localField: "taxis.car_id",
+                        foreignField: "_id",
+                        as: "car_details",
                     }
                 },
                 {
                     $lookup: {
-                        from: "taxi_types",  // Join with the taxi_types collection to get taxi type details
-                        localField: "taxis.type_ids",  // Local field in the provider_taxis collection
-                        foreignField: "_id",  // Foreign field in the taxi_types collection
-                        as: "taxi_type_details",  // Output array with the matched taxi types
+                        from: "taxi_types",
+                        localField: "taxis.type_ids",
+                        foreignField: "_id",
+                        as: "taxi_type_details",
                     }
                 },
                 {
                     $addFields: {
-                        "car_details": { $arrayElemAt: ["$car_details", 0] },  // Take the first element from car_details array
-                        "taxi_type_details": { $arrayElemAt: ["$taxi_type_details", 0] },  // Take the first element from taxi_type_details array
+                        "car_details": { $arrayElemAt: ["$car_details", 0] },
+                        "taxi_type_details": { $arrayElemAt: ["$taxi_type_details", 0] },
                         "taxis":{
                             $arrayElemAt: ["$taxis", 0],
                           
@@ -67,12 +67,13 @@ exports.driverDetailsService = async (req) => {
                         "taxis.documents.vehicle_permit": 1,
                         "taxis.documents.insurance": 1,
                         car_details :{
-                           name: "$car_details.title",  // Added car title
-                            make:"$car_details.make",   // Added car make
-                            model: "$car_details.model",  // Added car model
+                           name: "$car_details.title",
+                            make:"$car_details.make",
+                            model: "$car_details.model",
                            plateno: "$taxis.plateno",
                         } ,
-                        "taxi_type_details.title": 1,  // Added taxi type title
+                        "taxi_type_details.title": 1,
+                        providerTaxiDocuments: 1
                     }
                 }
             ]

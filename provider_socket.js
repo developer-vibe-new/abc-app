@@ -51,8 +51,11 @@ async function runServer() {
               ]);
               const providerDetail = providerDetails[0];
               if (providerDetail) {
-                console.log("bhvhfbrvbr");
-                await setRedis(providerSocket + providerDetail._id.toString(), socket.id);
+                socket.providerDetail = {
+                  _id: providerDetail._id,
+                  is_active: providerDetail.is_active
+                }
+                // await setRedis(providerSocket + providerDetail._id.toString(), socket.id);
                 socket.emit('authenticationSuccess', {
                   status: 200,
                   message: 'Authentication successful',
@@ -76,7 +79,7 @@ async function runServer() {
             return;
           }
   
-          if (!socket.userData) {
+          if (!socket.providerDetail) {
             socket.emit('error', {
               status: 401,
               message: 'Authentication required',
@@ -87,53 +90,53 @@ async function runServer() {
           switch (event) {
             case "updateLocation":
               console.log('=================================LOCATION UPDATE=================================');
-              const now_date = moment().toDate();
+              // const now_date = moment().toDate();
   
-              let locations = data.locations;
-              // const locs = data.locations;
-              const locs = JSON.parse(JSON.stringify(data.locations));
-              locations.forEach(location => {
-                location.coordinates = [location.coordinates[1], location.coordinates[0]];
-              });
-              const locationData = {
-                bearing: data.bearing,
-                speed: data.speed,
-                locations: locations,
-                lastupdatedlocation: now_date
-              };
-              await Delieverypartnerlocation.updateOne(
-                { userid: socket.userData._id.toString() },
-                { $set: locationData },
-                { upsert: true }
-              );
+              // let locations = data.locations;
+              // // const locs = data.locations;
+              // const locs = JSON.parse(JSON.stringify(data.locations));
+              // locations.forEach(location => {
+              //   location.coordinates = [location.coordinates[1], location.coordinates[0]];
+              // });
+              // const locationData = {
+              //   bearing: data.bearing,
+              //   speed: data.speed,
+              //   locations: locations,
+              //   lastupdatedlocation: now_date
+              // };
+              // await Delieverypartnerlocation.updateOne(
+              //   { userid: socket.userData._id.toString() },
+              //   { $set: locationData },
+              //   { upsert: true }
+              // );
   
-              const location_packet = {
-                _id: socket.userData._id.toString(),
-                longitude: data.longitude,
-                latitude: data.latitude,
-                bearing: data.bearing,
-                speed: data.speed,
-                name: socket.userData.name,
-                locations: locs,
-              };
-              console.log("location_packet", locs);
-              socket.emit('locationUpdate', location_packet);
-              const orders = await Order.find({
-                deliveryPartner: socket.userData._id,
-                deliveryStatus: { $in: ["Accepted", "PickedUp", "Reached", "Returned"] }
-              });
-              if (orders.length > 0) {
-                for (const order of orders) {
-                  const userSocketSent = await getRedis(redisKeyPrefixUserSocket + order.userId.toString());
-                  if (userSocketSent) {
-                    io.to(userSocketSent).emit('locationUpdate', {
-                      success: true,
-                      data: location_packet,
-                      message: 'Location Update',
-                    });
-                  }
-                }
-              }
+              // const location_packet = {
+              //   _id: socket.userData._id.toString(),
+              //   longitude: data.longitude,
+              //   latitude: data.latitude,
+              //   bearing: data.bearing,
+              //   speed: data.speed,
+              //   name: socket.userData.name,
+              //   locations: locs,
+              // };
+              // console.log("location_packet", locs);
+              // socket.emit('locationUpdate', location_packet);
+              // const orders = await Order.find({
+              //   deliveryPartner: socket.userData._id,
+              //   deliveryStatus: { $in: ["Accepted", "PickedUp", "Reached", "Returned"] }
+              // });
+              // if (orders.length > 0) {
+              //   for (const order of orders) {
+              //     const userSocketSent = await getRedis(redisKeyPrefixUserSocket + order.userId.toString());
+              //     if (userSocketSent) {
+              //       io.to(userSocketSent).emit('locationUpdate', {
+              //         success: true,
+              //         data: location_packet,
+              //         message: 'Location Update',
+              //       });
+              //     }
+              //   }
+              // }
   
               break;
   
