@@ -157,7 +157,8 @@ exports.driverList = async (req) => {
 exports.driverOninerStatus = async (req) => {
     try {
         const { _id } = req.auth;
-        const driverData = await Provider.findOne({ _id });
+        const { is_online } = req.body;
+        const driverData = await Provider.findByIdAndUpdate({ _id }, { is_online }, { new: true });
         if (!driverData) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -165,15 +166,12 @@ exports.driverOninerStatus = async (req) => {
                 message: resMessage.Data_Not_Found
             };
         }
-        const onlineStatus = driverData.is_online === true ? false : true;
-        driverData.is_online = onlineStatus;
-        await driverData.save();
         return {
             status: statusCode.OK,
             success: true,
             message: resMessage.Status_Updated_Successfully,
             data: {
-                is_online: onlineStatus
+                is_online: driverData.is_online
             }
         };
     } catch (error) {
