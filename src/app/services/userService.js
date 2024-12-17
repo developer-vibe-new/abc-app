@@ -55,6 +55,9 @@ exports.verifyOtp = async (req) => {
                 expiresIn: '1h'
             }
         );
+        user.otp = null;
+        user.login_token = token;
+        await user.save();
         return {
             status: statusCode.OK,
             success: true,
