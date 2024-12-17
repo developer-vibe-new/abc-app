@@ -16,6 +16,7 @@ exports.sendOtp = async (req) => {
             };
         }
         register.otp = 1234;
+        await register.save();
         return {
             status: statusCode.Ok,
             success: true,
