@@ -5,9 +5,10 @@ const http = require('http');
 const { initializeSocket, getIO } = require('./socket');
 const { setRedis, getRedis } = require('./src/utils/functions');
 const User = require('./src/models/users');
-const redisKeyPrefix = 'UserSocket:';
+// const redisKeyPrefix = 'UserSocket:';
 const connectDB = require('./src/config/db.config');
 const { ObjectId } = require('mongoose').Types;
+const Location = require('./src/models/locationModel');
 connectDB();
 const app = express();
 const server = http.createServer(app);
@@ -71,62 +72,44 @@ async function runServer() {
           }
   
           switch (event) {
-            case "update_location":
-              console.log('================================= LOCATION UPDATE =================================');
-              const now_date = moment().toDate();
-  
-              let locations = [{
-                coordinates: [data.latitude, data.longitude]
-              }];
-              const locationData = {
-                locations,
-                "lastupdatedlocation": now_date
-              };
-              await setRedis(redisKey, locationData);
-              await User.updateOne(
-                { _id: socket.user_data._id.toString() },
-                { $set: locationData },
-                { upsert: true }
-              );
-  
-              const location_packet = {
-                _id: socket.user_data._id.toString(),
-                longitude: data.longitude,
-                latitude: data.latitude,
-                name: socket.user_data.name,
-              };
 
-              io.emit('location_update', location_packet);
-  
-              break;
-  
-            case "get_location":
-              const redisLocation = await getRedis(fetchRedisKey);
-  
-              if (redisLocation && Object.keys(redisLocation).length > 0) {
-                socket.emit('location_data', {
-                  success: true,
-                  data: redisLocation,
-                  message: 'Location found in Redis',
-                });
-              } else {
-                const dbLocation = await Delieverypartnerlocation.findOne({ userid: new ObjectId(data.user_id) });
-                if (dbLocation) {
-                  await setRedis(fetchRedisKey, dbLocation);
-                  socket.emit('location_data', {
-                    success: true,
-                    data: dbLocation,
-                    message: 'Location fetched from database',
-                  });
-                } else {
-                  socket.emit('location_data', {
-                    success: false,
-                    message: 'Location not found',
-                  });
+            case "search_taxi": 
+
+            var source = {
+              "longitude": data.longitude,
+              "latitude": data.latitude
+            };
+
+            const location_query = [
+              {
+                $geoNear: {
+                  near: { type: "Point", coordinates: [source.longitude, source.latitude] },
+                  distanceField: "distance",
+                  maxDistance: 4000,
+                  minDistance: 0,
+                  // spherical: true,
+                  query: {
+                    ...(Array.isArray(data.category_id) && data.category_id.length > 0 ? { type_ids: data.category_id } : {}),
+                    available: true,
+                    blocked: false
+                  },
+                  hint: { 'locations.coordinates': '2dsphere' },
                 }
               }
-              break;
-  
+            ];
+            
+            const locationData = await Location.aggregate(location_query);
+
+            if(locationData.length > 0) {
+              socket.emit('provider_location', {
+                status: 200,
+                message: 'Taxi found',
+                data: locationData
+              });
+            }
+
+            break;
+            
             default:
               socket.emit('unknown_event', {
                 success: false,

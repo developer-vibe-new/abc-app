@@ -35,6 +35,7 @@ var LocationSchema = new Schema({
 		  }
 		}
 	],
+	
 	gotohomelocation: {
 		type: [Number],
 		default: null
@@ -87,11 +88,6 @@ var LocationSchema = new Schema({
 		getters: true,
 		virtuals: true
 	}
-});
-
-LocationSchema.index({
-	"location": '2dsphere',
-	"gotohomelocation":'2dsphere',
 });
 
 //make this available to our users in Node applications
