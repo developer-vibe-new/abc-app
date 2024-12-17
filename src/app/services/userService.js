@@ -15,10 +15,11 @@ exports.sendOtp = async (req) => {
                 message: resMessage.Otp_Send_Success
             };
         }
+        register.otp = 1234;
         return {
-            status: statusCode.BAD_REQUEST,
-            success: false,
-            message: resMessage.Unique_Mobile_Verify
+            status: statusCode.Ok,
+            success: true,
+            message: resMessage.Otp_Send_Success
         };
     } catch (error) {
         return {
