@@ -31,7 +31,6 @@ async function runServer() {
       socket.on("*", async function (event, data) {
          
         try {
-            console.log('event--------'+event, data)
           if (event === "test_socket") {
             
             io.to(data.socket_id).emit(data.event, data.message);
@@ -39,11 +38,10 @@ async function runServer() {
           }
           if (event === "authenticate") {
             try {
-              const userData = await User.findOne({ loginToken: data.loginToken }).exec();
+              const userData = await User.findOne({ login_token: data.loginToken, is_active: true });
               if (userData) {
-                console.log(userData);
                 socket.user_data = userData;
-                await setRedis(redisKeyPrefix + userData._id.toString(), socket.id);
+                // await setRedis(redisKeyPrefix + userData._id.toString(), socket.id);
                 socket.emit('authenticationSuccess', {
                   status: 200,
                   message: 'Authentication successful',
