@@ -36,10 +36,20 @@ var LocationSchema = new Schema({
 		}
 	],
 	
-	gotohomelocation: {
-		type: [Number],
-		default: null
-	},
+	gotohomelocation: [
+		{
+		  type: {
+			type: String,
+			enum: ['Point'],
+			default: 'Point'
+		  },
+		  coordinates: {
+			type: [Number],
+			required: true,
+			index: '2dsphere'
+		  }
+		}
+	],
 
 	bearing: {
 		type: Number

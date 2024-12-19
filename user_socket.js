@@ -87,13 +87,13 @@ async function runServer() {
                   distanceField: "distance",
                   maxDistance: 4000,
                   minDistance: 0,
-                  // spherical: true,
+                  spherical: true,
                   query: {
                     ...(Array.isArray(data.category_id) && data.category_id.length > 0 ? { type_ids: data.category_id } : {}),
                     available: true,
                     blocked: false
                   },
-                  hint: { 'locations.coordinates': '2dsphere' },
+                  key: 'locations.coordinates'
                 }
               }
             ];
