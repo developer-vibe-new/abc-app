@@ -175,7 +175,8 @@ const providerSchema = new mongoose.Schema({
 		default: 0
 	},
 	os: {
-		type: String
+		type: String,
+		default: ""
 	},
 	profile_image: {
 		type: String,
