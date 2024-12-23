@@ -525,23 +525,23 @@ const RideSchema = new mongoose.Schema({
 // 	}
 // });
 
-RideSchema.pre('save', function (next) {
-	var ride = this;
+// RideSchema.pre('save', function (next) {
+// 	var ride = this;
 
-	// eslint-disable-next-line no-undef
-	Sequence.getNext("ride", function (err, seqObj) {
-		if (err) {
-			if (err) return next(err);
-		} else {
+// 	// eslint-disable-next-line no-undef
+// 	Sequence.getNext("ride", function (err, seqObj) {
+// 		if (err) {
+// 			if (err) return next(err);
+// 		} else {
 
 
-			var str = seqObj.seq;
-			ride.invoice_no = str;
+// 			var str = seqObj.seq;
+// 			ride.invoice_no = str;
 
-			next();
-		}
-	});
-});
+// 			next();
+// 		}
+// 	});
+// });
 
 //make this available to our users in Node applications
 module.exports = mongoose.model('Ride', RideSchema);
