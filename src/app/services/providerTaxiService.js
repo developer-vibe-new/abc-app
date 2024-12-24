@@ -18,11 +18,15 @@ exports.addProviderTaxi = async (req) => {
                 message: resMessage.Required_Data,
             };
         }
-        await ProviderTaxi.create(providerTaxi);
+        const providerData = await ProviderTaxi.create(providerTaxi);
         await Location.create({
             provider_id: providerTaxi.providerId,
             type_ids: providerTaxi.type_ids
-        })
+        });
+        await Provider.findByIdAndUpdate(providerTaxi.providerId,
+            { online_taxi: providerData._id },
+            { new: true }
+        );
         return {
             statusCode: statusCode.OK,
             success: true,
