@@ -1,4 +1,9 @@
 const express = require('express');
+var redis = require("redis"),
+	client = redis.createClient({
+		port: process.env.REDIS_PORT
+	});
+const RequestRide = require('./src/models/RequestRide');
 const { SOCKET_USER_PORT } = require('./src/config/dev.config');
 const moment = require('moment');
 const http = require('http');
@@ -239,7 +244,79 @@ async function runServer() {
                     ride_id: NewRide._id
                   }
                 });
+
+                var request_data = {};
+                var ride_id = NewRide._id.toString();
+                request_data.ride_id = ride_id;
+                request_data.ride_status = NewRide.basic.ride_status;
+                request_data.ride_edit_status = NewRide.basic.ride_edit_status;
+                request_data.ride_type = NewRide.basic.ride_type;
+                request_data.ridestationtype = NewRide.basic.ridestationtype;
+                request_data.planId = NewRide.basic.planId;
+                request_data.way = NewRide.basic.way;
+                request_data.start_on = moment().unix();
+                request_data.user_name = socket.user_data.full_name;
+                request_data.user_mobile = socket.user_data.mobile;
+                request_data.source = source;
+                request_data.distance = distance;
+                request_data.duration = duration;
+                request_data.destination = destination;
+                request_data.stops = stops;
+                request_data.payment_type = payment_type;
+                request_data.razorpay_orderId = razorpay_orderId;
+                request_data.razorpay_paymentId = razorpay_paymentId;
+                request_data.fare_estimate = fare_estimate;
+                request_data.airportcharge = airportcharge;
+                request_data.airportstatus = airportstatus;
+                request_data.base_fixed_fare = base_fixed_fare;
+                request_data.per_km = per_km;
+                request_data.instructions = "";
               }
+
+              const processProviders = async () => {
+                try {
+                  for (let provider of allProviders) {
+                    await new Promise((resolve, reject) => {
+                      client.rPush("request_queue:" + ride_id, provider.provider_id._id.toString(), (err, result) => {
+                        if (err) reject(err);
+                        resolve(result);
+                      });
+                    });
+              
+                    await RequestRide.create({ ride_id: ride_id, provider_id: provider.provider_id._id });
+                  }
+              
+                  await new Promise((resolve, reject) => {
+                    client.set("request_data:" + ride_id, JSON.stringify(request_data), (err, result) => {
+                      if (err) reject(err);
+                      resolve(result);
+                    });
+                  });
+              
+                  await new Promise((resolve, reject) => {
+                    client.set("ride_attempt:" + ride_id, appSettings.ride_settings.ride_attempt, (err, result) => {
+                      if (err) reject(err);
+                      resolve(result);
+                    });
+                  });
+              
+                  await FUNC.send_request(ride_id, io, appSettings);
+              
+                } catch (err) {
+                  const rideDetails = await Ride.findOneAndUpdate(
+                    { _id: ObjectId(ride_id), "basic.ride_status": "requested" },
+                    { $set: { "basic.ride_status": "declined" } },
+                    { new: true }
+                  );
+              
+                  if (rideDetails) {
+                    socket.emit('ride_declined', { ride_id: ride_id });
+                  }
+                }
+              };
+              
+              processProviders();
+              
             }
             break;
 
