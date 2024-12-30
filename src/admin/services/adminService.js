@@ -75,7 +75,7 @@ exports.login = async (req) => {
     // const auth_key = jwt.sign({ _id: findData._id }, SECRET_Key, {
     //   expiresIn: "24h",
     // });
-    const auth_key = jwt.sign({ _id: findData._id, city: findData.city_id }, SECRET_Key, {
+    const auth_key = jwt.sign({ _id: findData._id }, SECRET_Key, {
       expiresIn: "24h", // Token will expire in 1 day
     });
     await adminRegisterModel.updateOne(
@@ -365,6 +365,8 @@ exports.checkAuthService = async (req) => {
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, SECRET_Key);
 
+    const adminData = await adminModel.findById(decoded._id);
+
     if (!decoded) {
       return {
         statusCode: statusCode.UNAUTHORIZED,
@@ -372,11 +374,12 @@ exports.checkAuthService = async (req) => {
         message: resMessage.Invalid_Token,
       };
     }
+    decoded.cityId = adminData.city_id;
     return {
       status: statusCode.OK,
       success: true,
       message: resMessage.Data_Fetch_Successfully,
-      decoded
+      decoded: decoded
     };
   
   } catch (error) {
@@ -388,3 +391,25 @@ exports.checkAuthService = async (req) => {
     };
   }
 };
+
+exports.updateAdminCity = async (req) => {
+  try {
+    const { _id } = req.auth;
+    const { cityId } = req.body;
+    await adminModel.findByIdAndUpdate(_id,
+      { city_id: cityId }
+    );
+    return {
+      status: statusCode.OK,
+      statusCode: statusCode.OK,
+      success: true,
+      message: resMessage.City_Updated_Successfully
+    }
+  } catch (error) {
+    return {
+      status: statusCode.INTERNAL_SERVER_ERROR,
+      success: false,
+      message: error.message
+    };
+  }
+}

@@ -134,3 +134,16 @@ exports.checkAuth = async (req) => {
         };
     }
 };
+
+exports.updateAdminCityController = async (req) => {
+    try {
+        return await services.updateAdminCity(req);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
