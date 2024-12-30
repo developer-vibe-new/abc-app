@@ -134,7 +134,7 @@ exports.cityCreate = async (req) => {
         return {
             status: statusCode.OK,
             success: true,
-            message: resMessage.Data_Created_Successfully,
+            message: resMessage.City_created_successfully,
             data: newCity
         }
     } catch (error) {

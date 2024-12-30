@@ -13,6 +13,7 @@
     "saltRounds": 10
   },
   "resMessage": {
+    "City_created_successfully": "City Created Successfully",
     "City_Updated_Successfully": "City Updated Successfully",
     "Admin_registered_successfully": "Admin Registered Successfully",
     "Document_status_updated": "Document status updated",
