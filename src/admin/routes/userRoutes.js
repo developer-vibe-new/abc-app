@@ -28,7 +28,7 @@ router.get('/index', async (req, res) => {
 /* - admin routers - */
 router.post('/adminlogin', responseHandler(adminController.login));
 router.post('/changePassword', auth, responseHandler(adminController.changePasswordController));
-router.get('/adminAuthCheck', responseHandler(adminController.checkAuth));
+router.get('/adminAuthCheck', auth, responseHandler(adminController.checkAuth));
 
 /**
  * adminRegister

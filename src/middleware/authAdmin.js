@@ -5,7 +5,6 @@ const { statusCode, resMessage } = require('../config/default.json');
 exports.auth = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
-        // console.log(authHeader,"oooooooooooooo")
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return res.json({
                 statusCode: statusCode.UNAUTHORIZED,
@@ -24,12 +23,8 @@ exports.auth = async (req, res, next) => {
                 message: resMessage.Invalid_Token,
 
             });
-
         }
-        console.log(jwt.verify(token, SECRET_Key), "decoded");
         req.auth = decoded;
-        
-        // console.log(req._id, "req._id");
         next();
 
     } catch (error) {

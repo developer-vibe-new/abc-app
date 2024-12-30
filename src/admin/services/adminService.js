@@ -75,7 +75,7 @@ exports.login = async (req) => {
     // const auth_key = jwt.sign({ _id: findData._id }, SECRET_Key, {
     //   expiresIn: "24h",
     // });
-    const auth_key = jwt.sign({ _id: findData._id }, SECRET_Key, {
+    const auth_key = jwt.sign({ _id: findData._id, city: findData.city_id }, SECRET_Key, {
       expiresIn: "24h", // Token will expire in 1 day
     });
     await adminRegisterModel.updateOne(
@@ -354,7 +354,6 @@ exports.editOperatorDetailsService = async (req) => {
 exports.checkAuthService = async (req) => {
   try {
     const authHeader = req.headers.authorization;
-    // console.log(authHeader,"oooooooooooooo")
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return {
         statusCode: statusCode.UNAUTHORIZED,
@@ -373,18 +372,11 @@ exports.checkAuthService = async (req) => {
         message: resMessage.Invalid_Token,
       };
     }
-    const admin = await adminModel.findById(decoded._id).select("_id first_name last_name permission");
-
     return {
       status: statusCode.OK,
       success: true,
       message: resMessage.Data_Fetch_Successfully,
-      data: {
-        _id: admin._id,
-        first_name: admin.first_name,
-        last_name: admin.last_name,
-        permission: admin.permission,
-      },
+      decoded
     };
   
   } catch (error) {
