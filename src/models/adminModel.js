@@ -39,6 +39,12 @@ const adminRegisterSchema = new mongoose.Schema({
 		select: false
 	},
 
+	city_id: {
+		type: mongoose.Schema.Types.ObjectId,
+        ref: 'City',
+		default: null
+	},
+
 	// Basic details of user name, email
 	first_name: {
 		type: String,

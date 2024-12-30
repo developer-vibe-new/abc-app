@@ -13,7 +13,7 @@ const adminModel = require("../../models/adminModel");
 
 exports.adminRegister = async (req) => {
   try {
-    const findEmail = await adminRegisterModel.findone({
+    const findEmail = await adminRegisterModel.findOne({
       email: req.body.email,
     });
     if (findEmail) {
@@ -34,7 +34,7 @@ exports.adminRegister = async (req) => {
       return {
         statusCode: statusCode.OK,
         success: true,
-        message: resMessage.User_login_Successfully,
+        message: resMessage.Admin_registered_successfully,
       };
     }
     return {
