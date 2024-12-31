@@ -148,12 +148,17 @@ exports.cityCreate = async (req) => {
 
 exports.cityUpdate = async (req) => {
     try {
-        const body = req.body;
-        const updateCity = await cityModel.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(req.body.id) }, body, { new: true });
+        const { id } = req.params;
+        const { name, city, state, country, coordinates } = req.body;
+        const updateCity = await cityModel.findByIdAndUpdate(id,
+            { name: name, city: city, state: state, country: country, coordinates: coordinates },
+            { new: true }
+        );
         if (updateCity) {
             return {
+                status: statusCode.OK,
                 success: true,
-                message: "City updated successfully",
+                message: resMessage.City_Updated_Successfully,
                 data: updateCity
             };
         }

@@ -78,9 +78,6 @@ exports.createCity = async (req, res) => {
 exports.updateCity = async (req, res) => {
     try {
         return await services.cityUpdate(req);
-        // if (cityData) {
-        //     return res.status(200).json(Object.assign({ status: cityData.success }, cityData));
-        // }
     } catch (error) {
         console.error("Error in updateCity:", error);
         return res.status(500).json({

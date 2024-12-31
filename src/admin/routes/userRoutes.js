@@ -44,7 +44,7 @@ router.post('/updateState', auth, responseHandler(stateController.updateState));
 router.post('/deleteState/:id', auth, responseHandler(stateController.deleteState));
 router.get('/viewState', auth, responseHandler(stateController.viewState));
 router.post('/createCity', responseHandler(stateController.createCity));
-router.post('/updateCity', auth, responseHandler(stateController.updateCity));
+router.post('/updateCity/:id', responseHandler(stateController.updateCity));
 router.post('/deleteCity/:id', auth, responseHandler(stateController.deleteCity));
 router.get('/viewCity', responseHandler(stateController.viewCity));
 
