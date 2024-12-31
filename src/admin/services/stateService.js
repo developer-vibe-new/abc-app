@@ -184,6 +184,7 @@ exports.cityDelete = async (req) => {
         };
     }
 };
+
 exports.cityView = async (req) => {
     try {
         var page = req.query.page || 1;

@@ -46,7 +46,7 @@ router.get('/viewState', auth, responseHandler(stateController.viewState));
 router.post('/createCity', responseHandler(stateController.createCity));
 router.post('/updateCity', auth, responseHandler(stateController.updateCity));
 router.post('/deleteCity/:id', auth, responseHandler(stateController.deleteCity));
-router.get('/viewCity', auth, responseHandler(stateController.viewCity));
+router.get('/viewCity', responseHandler(stateController.viewCity));
 
 // Operator routes
 router.get('/operatorList', auth,responseHandler(adminController.operatorListController));
