@@ -150,10 +150,13 @@ exports.cityUpdate = async (req) => {
     try {
         const { id } = req.params;
         const { name, city, state, country, coordinates } = req.body;
-        const updateCity = await cityModel.findByIdAndUpdate(id,
-            { name: name, city: city, state: state, country: country, coordinates: coordinates },
+
+        const updateCity = await cityModel.findOneAndUpdate(
+            { _id: id, is_active: true },
+            { name, city, state, country, coordinates },
             { new: true }
         );
+
         if (updateCity) {
             return {
                 status: statusCode.OK,
@@ -161,23 +164,35 @@ exports.cityUpdate = async (req) => {
                 message: resMessage.City_Updated_Successfully,
                 data: updateCity
             };
+        } else {
+            return {
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.City_not_found
+            };
         }
     } catch (error) {
         console.log(error);
         return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
-            message: "An error occured while Upadeting city data"
+            message: error.message
         };
     }
 };
 
 exports.cityDelete = async (req) => {
     try {
-        const deleteData = await cityModel.findByIdAndDelete({ _id: req.params.id });
+        const { id } = req.params;
+        const deleteData = await cityModel.findByIdAndUpdate(id,
+            { is_active: false },
+            { new: true }
+        );
         if (deleteData) {
             return {
+                status: statusCode.OK,
                 success: true,
-                message: "City Deleted successfully",
+                message: resMessage.City_Deleted_Successfully,
                 data: deleteData
             };
         }
@@ -205,6 +220,9 @@ exports.cityView = async (req) => {
                 }
             });
         }
+        conditions.push(
+            { $match: { is_active: true } }
+        );
         conditions.push(
             { $sort: { name: 1 } },
             { $skip: (page - 1) * pagesize },
