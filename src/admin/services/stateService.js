@@ -206,13 +206,12 @@ exports.cityView = async (req) => {
             { $limit: pagesize }
         );
         const allData = await cityModel.aggregate(conditions);
-        // .sort({name:1})
-        // .skip((page - 1) * pagesize).
-        // limit(pagesize);
 
         if (allData) {
             return {
+                status: statusCode.OK,
                 success: true,
+                message: resMessage.Data_Fetch_Successfully,
                 data: allData
             };
         }
