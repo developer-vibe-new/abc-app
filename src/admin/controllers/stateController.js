@@ -112,3 +112,15 @@ exports.viewCity = async (req, res) => {
         });
     }
 };
+
+exports.viewCityByIdController = async (req, res) => {
+    try {
+        return await services.viewCityById(req);
+    } catch (error) {
+        console.error("Error in viewCity:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An internal server error occurred.",
+        });
+    }
+};

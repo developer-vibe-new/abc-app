@@ -246,3 +246,30 @@ exports.cityView = async (req) => {
         };
     }
 };
+
+exports.viewCityById = async (req) => {
+    try {
+        const { id } = req.params;
+        const cityData = await cityModel.findOne({ _id: id, is_active: true });
+        if(!cityData) {
+            return {
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.City_not_found
+            };
+        }
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data: cityData
+        }
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}
