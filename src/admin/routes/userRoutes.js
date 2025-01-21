@@ -74,7 +74,7 @@ router.post('/unblockDriver', auth, responseHandler(driverController.unblockDriv
 router.get('/taxiTypeDropDown', auth, responseHandler(driverController.taxiTypeDropDown));
 
 // taxitype manger
-router.post('/addTaxiType', upload.single('image'), responseHandler(taxiTypeController.addTaxiTypeController));
+router.post('/addTaxiType', auth, upload.single('image'), responseHandler(taxiTypeController.addTaxiTypeController));
 router.get('/viewTaxiType', auth, responseHandler(taxiTypeController.viewTaxiType));
 router.post('/updateTaxiType/:id', auth, upload.single('image'), responseHandler(taxiTypeController.updateTaxiType));
 router.post('/updateTaxistatus', auth, responseHandler(taxiTypeController.updateTaxiStatus));

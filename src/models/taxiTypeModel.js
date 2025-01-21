@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const taxiTypeSchema = new mongoose.Schema({
-    city: {
+    city_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'City'
     },
