@@ -738,6 +738,7 @@ exports.unblockDriver = async (req) => {
 
 exports.onlineDriverList = async (req) => {
     try {
+        const adminData = await Admin.findById(req.auth._id);
         var page = req.query.page || 1;
         let pagesize = req.query.pagesize || 10;
 
@@ -783,7 +784,8 @@ exports.onlineDriverList = async (req) => {
             $match: {
                 status: "Unblock",
                 is_delete: false,
-                is_online: true
+                is_online: true,
+                city_id: adminData.city_id
             }
         },
             {
