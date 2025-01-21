@@ -94,7 +94,7 @@ router.get('/rentalList', auth, responseHandler(rentalController.rentalListData)
 router.get('/viewVehicle', auth, responseHandler(vehicleController.viewVehicle));
 router.post('/updateVehicleStatus', auth, responseHandler(vehicleController.updateVehicleStatusController));
 router.get('/vehicleTypeList', auth, responseHandler(vehicleController.vehicleTypeList));
-router.post('/createVehicle', auth, responseHandler(vehicleController.createVehicle));
+router.post('/createVehicle', responseHandler(vehicleController.createVehicle));
 router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
 router.get('/editVehicle/:id', auth, responseHandler(vehicleController.editVehicleController));
 router.post('/updateVehicle/:id', auth, responseHandler(vehicleController.updateVehicleController));
