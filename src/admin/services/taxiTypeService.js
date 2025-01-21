@@ -1,5 +1,6 @@
-const taxiTypeModel = require('../../models/taxiTypeModel');
 const mongoose = require('mongoose');
+const taxiTypeModel = require('../../models/taxiTypeModel');
+const Admin = require('../../models/adminModel');
 const { statusCode, resMessage } = require('../../config/default.json');
 
 exports.taxiTypeList = async (req) => {
