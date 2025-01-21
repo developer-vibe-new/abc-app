@@ -1,7 +1,8 @@
+const mongoose = require('mongoose');
+const Admin = require('../../models/adminModel');
 const driverModel = require('../../models/providerModel');
 const taxiTypeModel = require('../../models/taxiTypeModel');
 const { statusCode, resMessage } = require('../../config/default.json');
-const mongoose = require('mongoose');
 
 
 exports.driverDetailsService = async (req) => {
@@ -147,6 +148,8 @@ exports.driverCreate = async (req) => {
 
 exports.driverView = async (req) => {
     try {
+        const adminData = await Admin.findById(req.auth._id);
+        console.log("========", adminData)
         var page = req.query.page || 1;
         let pagesize = parseInt(req.query.pagesize) || 10;
 
@@ -203,7 +206,8 @@ exports.driverView = async (req) => {
         conditions.push({
             $match: {
                 status: "Unblock",
-                is_delete: false
+                is_delete: false,
+                city_id: adminData.city_id
             }
         }, {
             $lookup: {
