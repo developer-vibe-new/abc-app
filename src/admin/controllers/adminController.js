@@ -57,7 +57,7 @@ exports.operatorsUpdate = async (req) => {
     }
 };
 
-exports.dashboardDataController = async (req, res) => {
+exports.dashboardDataController = async (req) => {
     try {
         return await services.dashboardData(req);
     } catch (error) {

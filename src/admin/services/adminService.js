@@ -174,14 +174,16 @@ exports.updateOperator = async (req) => {
   }
 };
 
-exports.dashboardData = async (req, res) => {
+exports.dashboardData = async (req) => {
   try {
-    const totalProviders = await Provider.find().countDocuments();
+    const  adminData = await adminModel.findById(req.auth._id);
+    const totalProviders = await Provider.find({ city_id: adminData.city_id }).countDocuments();
     const totalUsers = await User.find().countDocuments();
-    const totalCars = await Car.find().countDocuments();
+    const totalCars = await Car.find({ city_id: adminData.city_id }).countDocuments();
     const totalTaxiType = await Taxitype.find().countDocuments();
     const onlineDriverList = await Provider.find({
       is_online: true,
+      city_id: adminData.city_id
     }).countDocuments();
     return {
       status: statusCode.OK,
