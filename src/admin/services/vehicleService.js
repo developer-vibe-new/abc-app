@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
 const vehicleModel = require('../../models/cars');
 const taxiTypeModel = require('../../models/taxiTypeModel');
+const Admin = require('../../models/adminModel');
 const { statusCode, resMessage } = require('../../config/default.json');
 
 exports.vehicleList = async (req) => {
     try {
+        const adminData = await Admin.findById(req.auth._id);
         let pipeline = [];
         let search = req.query.search;
         let type = req.query.type;
@@ -27,6 +29,11 @@ exports.vehicleList = async (req) => {
         const skip = (page - 1) * limit;
 
         pipeline.push(
+            {
+                $match: {
+                    city_id: adminData.city_id
+                }
+            },
             {
                 $addFields: {
                     added_on: {
@@ -58,7 +65,8 @@ exports.vehicleList = async (req) => {
                     make: 1,
                     model: 1,
                     type: 1,
-                    is_active: 1
+                    is_active: 1,
+                    city_id: 1
                 }
             }
         );
