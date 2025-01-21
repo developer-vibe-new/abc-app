@@ -506,6 +506,7 @@ exports.blockDriver = async (req) => {
 
 exports.blockedDriverList = async (req) => {
     try {
+        const adminData = await Admin.findById(req.auth._id);
         let pipeline = [];
         let search_value = req.query.search || "";
 
@@ -547,7 +548,8 @@ exports.blockedDriverList = async (req) => {
             {
                 $match: {
                     status: "blocked",
-                    is_delete: false
+                    is_delete: false,
+                    city_id: adminData.city_id
                 }
             },
             {

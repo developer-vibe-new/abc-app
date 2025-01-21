@@ -63,7 +63,7 @@ router.get('/viewDriver', auth, responseHandler(driverController.viewDriver));
 router.get('/editDriver/:id', auth, responseHandler(driverController.editDriver));
 router.post('/updateDriver/:id', auth, upload.single('image'), responseHandler(driverController.updateDriver));
 router.post('/blockDriver', auth, responseHandler(driverController.blockDriver));
-router.get('/blockedDriversList', responseHandler(driverController.blockedDriversList));
+router.get('/blockedDriversList', auth, responseHandler(driverController.blockedDriversList));
 router.get('/onlineDriverList', auth, responseHandler(driverController.onlineDriverList));
 router.post('/updateDocumentStatus/:id', auth, responseHandler(driverController.updateDocumentStatusController));
 
