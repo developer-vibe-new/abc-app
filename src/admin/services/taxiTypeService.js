@@ -4,6 +4,7 @@ const { statusCode, resMessage } = require('../../config/default.json');
 
 exports.taxiTypeList = async (req) => {
     try {
+        const adminData = await Admin.finById(req.auth._id);
         let page = parseInt(req.query.page) || 1;
         let pagesize = parseInt(req.query.pagesize) || 10;
         let search_value = req.query.search || "";
@@ -18,6 +19,12 @@ exports.taxiTypeList = async (req) => {
         }
 
         conditions.push({
+            $match: {
+                city: adminData.city_id
+            }
+        });
+
+        conditions.push({
             $project: {
                 icon: {
                     $concat: [
@@ -30,6 +37,7 @@ exports.taxiTypeList = async (req) => {
                 base_fare: 1,
                 time_fare: 1,
                 distance_fare: 1,
+                city: 1,
                 airportCharge: 1,
                 outstation_distance_fare: 1,
                 outstation_two_distance_fare: 1,
