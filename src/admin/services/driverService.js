@@ -114,7 +114,7 @@ exports.driverDetailsService = async (req) => {
 
 exports.driverCreate = async (req) => {
     try {
-        const { first_name, last_name, mobile, email } = req.body;
+        const { first_name, last_name, mobile, email, city_id } = req.body;
         let profile_image;
         if(req.file) {
             profile_image = `${req.body.typeName}/${req.file.filename}`;
@@ -127,7 +127,7 @@ exports.driverCreate = async (req) => {
             };
         }
         const createdData = await driverModel.create({
-            first_name: first_name, last_name: last_name, full_name: first_name + " " + last_name, mobile: mobile, email: email, profile_image: profile_image
+            first_name: first_name, last_name: last_name, full_name: first_name + " " + last_name, mobile: mobile, email: email, profile_image: profile_image, city_id: city_id
         });
         return {
             statusCode: statusCode.OK,

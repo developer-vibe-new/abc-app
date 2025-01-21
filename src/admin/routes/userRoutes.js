@@ -58,7 +58,7 @@ router.post('/editOperatorDetails/:id',auth,responseHandler(adminController.edit
 
 // driver 
 router.get('/getDriverDetails/:id',auth,responseHandler(driverController.getDriverDetails));
-router.post('/createDriver', auth, upload.single('image'), responseHandler(driverController.createDriver));
+router.post('/createDriver', upload.single('image'), responseHandler(driverController.createDriver));
 router.get('/viewDriver', auth, responseHandler(driverController.viewDriver));
 router.get('/editDriver/:id', auth, responseHandler(driverController.editDriver));
 router.post('/updateDriver/:id', auth, upload.single('image'), responseHandler(driverController.updateDriver));
