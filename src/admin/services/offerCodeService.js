@@ -1,5 +1,6 @@
 const { statusCode, resMessage } = require('../../config/default.json');
 const OfferCode = require('../../models/offerCodeModel');
+const Admin = require('../../models/adminModel');
 
 exports.addOfferCode = async (req) => {
     try {
@@ -29,6 +30,7 @@ exports.addOfferCode = async (req) => {
 
 exports.viewOfferCode = async (req) => {
     try {
+        const adminData = await Admin.findById(req.auth._id);
         let search = req.query.search;
         let page = parseInt(req.query.page) || 1;
         let limit = parseInt(req.query.limit) || 10;
@@ -43,6 +45,13 @@ exports.viewOfferCode = async (req) => {
                 }
             );
         }
+        pipeline.push(
+            {
+                $match: {
+                    city_id: adminData.city_id
+                }
+            }
+        );
         pipeline.push(
             {
                 $project: {
