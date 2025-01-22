@@ -117,7 +117,8 @@ exports.driverCreate = async (req) => {
         const { first_name, last_name, mobile, email, city_id } = req.body;
         let profile_image;
         if(req.file) {
-            profile_image = `${req.body.typeName}/${req.file.filename}`;
+            const baseUrl = "http://192.168.0.15:6161";
+            profile_image = `${baseUrl}/${req.body.typeName}/${req.file.filename}`;
         }
         if (!first_name || !last_name || !mobile || !email) {
             return {
@@ -227,12 +228,12 @@ exports.driverView = async (req) => {
         conditions.push({
             $addFields:
             {
-                profile_image: {
-                    $concat: [
-                        "http://192.168.0.18:6161/driver/",
-                        "$profile_image"
-                    ]
-                },
+                // profile_image: {
+                //     $concat: [
+                //         "http://192.168.0.18:6161/driver/",
+                //         "$profile_image"
+                //     ]
+                // },
                 taxitype: "$taxi_types.title",
                 status: "Block",
             }
