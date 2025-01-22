@@ -84,11 +84,10 @@ exports.updateTaxiTypeList = async (req) => {
     try {
         const body = req.body;
         if (req.file) {
-
-            body.icon = req.file.filename;
+            const baseUrl = process.env.BASE_URL;
+            body.icon = `${baseUrl}/taxitype/${req.file.filename}`;
         }
-        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true });
-
+        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true })
         if (editData) {
             return {
                 success: true,
