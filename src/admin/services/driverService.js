@@ -117,7 +117,7 @@ exports.driverCreate = async (req) => {
         const { first_name, last_name, mobile, email, city_id } = req.body;
         let profile_image;
         if(req.file) {
-            const baseUrl = "http://192.168.0.15:6161";
+            const baseUrl = proess.env.BASE_URL;
             profile_image = `${baseUrl}/${req.body.typeName}/${req.file.filename}`;
         }
         if (!first_name || !last_name || !mobile || !email) {
@@ -417,7 +417,8 @@ exports.driverEdit = async (req) => {
 exports.driverUpdate = async ({ body, file, params }) => {
     try {
         if (file) {
-            body.profile_image = file.filename;
+            const baseUrl = process.env.BASE_URL;
+            body.profile_image =  `${baseUrl}/driver/${file.filename}`;
         }
         if(body.first_name && body.last_name) {
             body.full_name = body.first_name + " " + body.last_name;
