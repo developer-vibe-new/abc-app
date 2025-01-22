@@ -39,6 +39,11 @@ var OfferCodeSchema = new Schema({
         default: 0
     },
 
+    city_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'City',
+            default: null
+        },
 }, {
     timestamps: {
         createdAt: 'created',

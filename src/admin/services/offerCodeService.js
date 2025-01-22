@@ -3,15 +3,15 @@ const OfferCode = require('../../models/offerCodeModel');
 
 exports.addOfferCode = async (req) => {
     try {
-        const { ride_type, offercode, description, start_date, end_date, percentage, price, usedtimes } = req.body;
-        if(!ride_type || !offercode || !description || !start_date || !end_date || !percentage || !price || !usedtimes) {
+        const { offercode, ride_type, description, start_date, end_date, percentage, price, usedtimes, city_id } = req.body;
+        if (!offercode || !ride_type || !description || !city_id || !start_date || !end_date || !percentage || !price || !usedtimes) {
             return {
                 status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Required_Data
             }
         }
-        const data = await OfferCode.create({ offercode, description, start_date, end_date, ride_type, percentage, price, usedtimes });
+        const data = await OfferCode.create({ offercode, ride_type, city_id, description, start_date, end_date, percentage, price, usedtimes });
         return {
             status: statusCode.OK,
             success: true,
