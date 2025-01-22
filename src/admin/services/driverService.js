@@ -564,12 +564,6 @@ exports.blockedDriverList = async (req) => {
             },
             {
                 $addFields: {
-                    profile_image: {
-                        $concat: [
-                            "http://192.168.0.18:6161/driver/",
-                            "$profile_image"
-                          ]
-                    },
                     taxitype: "$taxi_types.title"
                 }
             });
@@ -802,12 +796,6 @@ exports.onlineDriverList = async (req) => {
         conditions.push({
             $addFields:
             {
-                profile_image: {
-                    $concat: [
-                        "http://192.168.0.18:6161/driver/",
-                        "$profile_image"
-                    ]
-                },
                 taxitype: "$taxi_types.title"
 
             }
