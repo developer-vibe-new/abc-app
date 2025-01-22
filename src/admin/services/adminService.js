@@ -180,7 +180,7 @@ exports.dashboardData = async (req) => {
     const totalProviders = await Provider.find({ city_id: adminData.city_id }).countDocuments();
     const totalUsers = await User.find().countDocuments();
     const totalCars = await Car.find({ city_id: adminData.city_id }).countDocuments();
-    const totalTaxiType = await Taxitype.find().countDocuments();
+    const totalTaxiType = await Taxitype.find({ city_id: adminData.city_id }).countDocuments();
     const onlineDriverList = await Provider.find({
       is_online: true,
       city_id: adminData.city_id

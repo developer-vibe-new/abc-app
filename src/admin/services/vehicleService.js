@@ -148,7 +148,8 @@ exports.addVehicle = async (req) => {
             taxi_type: req.body.taxi_type,
             title: req.body.title,
             make: req.body.make,
-            model: req.body.model
+            model: req.body.model,
+            city_id: req.body.city_id
         });
         if (createData) {
             return {
