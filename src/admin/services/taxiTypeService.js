@@ -119,7 +119,8 @@ exports.addTaxiType = async (req, res) => {
     try {
         const body = req.body;
         if (req.file) {
-            body.icon = req.file.filename;
+            const baseUrl = process.env.BASE_URL;
+            body.icon = `${baseUrl}/${req.body.typeName}/${req.file.filename}`;
         }
         const editData = await taxiTypeModel.create(body);
         return {
