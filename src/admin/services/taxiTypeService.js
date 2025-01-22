@@ -5,7 +5,7 @@ const { statusCode, resMessage } = require('../../config/default.json');
 
 exports.taxiTypeList = async (req) => {
     try {
-        const adminData = await Admin.finById(req.auth._id);
+        const adminData = await Admin.findById(req.auth._id);
         let page = parseInt(req.query.page) || 1;
         let pagesize = parseInt(req.query.pagesize) || 10;
         let search_value = req.query.search || "";
@@ -21,7 +21,7 @@ exports.taxiTypeList = async (req) => {
 
         conditions.push({
             $match: {
-                city: adminData.city_id
+                city_id: adminData.city_id
             }
         });
 
