@@ -27,12 +27,7 @@ exports.taxiTypeList = async (req) => {
 
         conditions.push({
             $project: {
-                icon: {
-                    $concat: [
-                        "http://192.168.0.18:6161/taxiType/",
-                        "$icon"
-                    ]
-                },
+                icon: 1,
                 title: 1,
                 currency: 1,
                 base_fare: 1,
