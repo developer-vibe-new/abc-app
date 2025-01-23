@@ -49,16 +49,16 @@ router.post('/updateDocumentStatus/:id', auth, authorize(['updateDocumentStatus'
 // City routes
 router.get('/viewCity', auth, authorize(['viewCity']), responseHandler(stateController.viewCity));
 router.post('/updateCityStatus', auth, authorize(['updateCityStatus']), responseHandler(stateController.updateCityStatusController));
+router.get('/editCity/:id', auth, authorize(['editCity']), responseHandler(stateController.viewCityByIdController));
+router.post('/updateCity/:id', auth, authorize(['updateCity']), responseHandler(stateController.updateCity));
+router.post('/deleteCity/:id', auth, authorize(['deleteCity']), responseHandler(stateController.deleteCity));
+router.post('/createCity', auth, authorize(['createCity']), responseHandler(stateController.createCity));
 
 router.post('/adminRegister', adminController.registerAdmin);
 router.post('/stateCreate', auth, responseHandler(stateController.createState));
 router.post('/updateState', auth, responseHandler(stateController.updateState));
 router.post('/deleteState/:id', auth, responseHandler(stateController.deleteState));
 router.get('/viewState', auth, responseHandler(stateController.viewState));
-router.post('/createCity', auth, responseHandler(stateController.createCity));
-router.post('/updateCity/:id', responseHandler(stateController.updateCity));
-router.post('/deleteCity/:id', responseHandler(stateController.deleteCity));
-router.get('/viewCity/:id', responseHandler(stateController.viewCityByIdController));
 
 // Operator routes
 router.get('/operatorList', auth,responseHandler(adminController.operatorListController));
