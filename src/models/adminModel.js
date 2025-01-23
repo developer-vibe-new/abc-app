@@ -34,9 +34,7 @@ const adminRegisterSchema = new mongoose.Schema({
 		super_admin, admin, 
 	*/
 	role_type: {
-		type: String,
-		default: "manager",
-		select: false
+		type: String
 	},
 
 	city_id: {
@@ -94,9 +92,7 @@ const adminRegisterSchema = new mongoose.Schema({
 		type: String
 	},
 
-	permission: {
-		type: Array,
-	},
+	permissions: [{ type: String }]
 
 }, {
 	timestamps: {

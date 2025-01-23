@@ -29,6 +29,7 @@ exports.adminRegister = async (req) => {
       last_name: req.body.last_name,
       email: req.body.email,
       password: req.body.password,
+      role_type: "admin"
     });
     if (insertAdminuser) {
       return {

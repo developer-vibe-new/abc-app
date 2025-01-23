@@ -8,7 +8,7 @@ const validate = require('../../helpers/validate');
 const userVal = require('../../validators/admin/userVal');
 const { upload } = require('../../helpers/multer');
 const stateController = require('../../admin/controllers/stateController');
-const { auth } = require('../../middleware/authAdmin');
+const { auth, authorize } = require('../../middleware/authAdmin');
 const driverController = require('../../admin/controllers/driverController');
 const taxiTypeController = require('../controllers/taxiTypeController');
 const userManController = require('../controllers/userManController');
@@ -43,10 +43,10 @@ router.post('/stateCreate', auth, responseHandler(stateController.createState));
 router.post('/updateState', auth, responseHandler(stateController.updateState));
 router.post('/deleteState/:id', auth, responseHandler(stateController.deleteState));
 router.get('/viewState', auth, responseHandler(stateController.viewState));
-router.post('/createCity', responseHandler(stateController.createCity));
+router.post('/createCity', auth, responseHandler(stateController.createCity));
 router.post('/updateCity/:id', responseHandler(stateController.updateCity));
 router.post('/deleteCity/:id', responseHandler(stateController.deleteCity));
-router.get('/viewCity', responseHandler(stateController.viewCity));
+router.get('/viewCity', auth, responseHandler(stateController.viewCity));
 router.get('/viewCity/:id', responseHandler(stateController.viewCityByIdController));
 
 // Operator routes

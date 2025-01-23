@@ -5,11 +5,17 @@ const Admin = require('../../models/adminModel');
 
 exports.addSubAdmin = async (req) => {
     try {
-        const { first_name, last_name, email, mobile, password, permission } = req.body;
+        const { first_name, last_name, email, mobile, password, permissions } = req.body;
+        if(req.auth.role_type !== 'admin') {
+            return {
+                statusCode: statusCode.ACCESS_DENIED,
+                success: false,
+                message: resMessage.Permission_Denied,
+            }
+        }
         const findEmail = await Admin.findOne({ email });
         if(!findEmail) {
-            const passwordHash = await bcrypt.hash(password, 10);
-            const subAdmin = await Admin.create({ first_name, last_name, email, mobile, password: passwordHash, permission });
+            const subAdmin = await Admin.create({ role_type: 'sub-admin', first_name, last_name, email, mobile, password, permissions });
             return {
                 statusCode: statusCode.OK,
                 success: true,

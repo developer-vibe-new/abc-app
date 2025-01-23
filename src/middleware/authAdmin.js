@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const Admin = require('../models/adminModel')
 const SECRET_Key = process.env.SECRET_Key;
 const { statusCode, resMessage } = require('../config/default.json');
 
@@ -15,7 +16,7 @@ exports.auth = async (req, res, next) => {
 
         const token = authHeader.split(" ")[1];
         const decoded = jwt.verify(token, SECRET_Key);
-
+        const adminData = await Admin.findById(decoded._id);
         if (!decoded) {
             return res.json({
                 statusCode: statusCode.UNAUTHORIZED,
@@ -24,7 +25,7 @@ exports.auth = async (req, res, next) => {
 
             });
         }
-        req.auth = decoded;
+        req.auth = adminData;
         next();
 
     } catch (error) {
@@ -48,3 +49,15 @@ exports.auth = async (req, res, next) => {
     }
 };
 
+exports.authorize = (permissions) => (req, res, next) => {
+    if(req.auth.role_type === 'admin') return next();
+    const allowed = permissions.some((permission) => req.auth.permissions.includes(permission))
+    if(!allowed) {
+        return res.json({
+            statusCode: statusCode.ACCESS_DENIED,
+            success: false,
+            message: resMessage.Access_Denied
+        })
+    }
+    next();
+}
