@@ -104,8 +104,6 @@ router.post('/rentalEditData/:id', auth, responseHandler(rentalController.rental
 router.get('/rentalList', auth, responseHandler(rentalController.rentalListData));
 
 router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
-router.get('/editVehicle/:id', auth, responseHandler(vehicleController.editVehicleController));
-router.post('/updateVehicle/:id', auth, responseHandler(vehicleController.updateVehicleController));
 
 // Offer Code
 router.post("/addOfferCode", auth, responseHandler(offerCodeController.addOfferCodeController));
