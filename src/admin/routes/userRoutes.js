@@ -62,18 +62,18 @@ router.post('/updateTaxistatus', auth, authorize(['updateTaxistatus']), response
 router.get('/editTaxiType/:id', auth, authorize(['editTaxiType']), responseHandler(taxiTypeController.editTaxiTypeController));
 router.post('/updateTaxiType/:id', auth, authorize(['updateTaxiType']), upload.single('image'), responseHandler(taxiTypeController.updateTaxiType));
 
+// Operator routes
+router.get('/operatorList', auth, authorize(['operatorList']), responseHandler(adminController.operatorListController));
+router.post('/operatorsCurrentStatus', auth, authorize(['operatorsCurrentStatus']), responseHandler(adminController.operatorsUpdate));
+router.post('/operatorStatus', auth, authorize(['operatorStatus']),  responseHandler(adminController.operatorsUpdateStatusController));
+router.get('/getOperatorDetails/:id', auth, authorize(['getOperatorDetails']), responseHandler(adminController.getOperatorDetailsContoller));
+router.post('/editOperatorDetails/:id', auth, authorize(['editOperatorDetails']), responseHandler(adminController.editOperatorDetailsController));
+
 router.post('/adminRegister', adminController.registerAdmin);
 router.post('/stateCreate', auth, responseHandler(stateController.createState));
 router.post('/updateState', auth, responseHandler(stateController.updateState));
 router.post('/deleteState/:id', auth, responseHandler(stateController.deleteState));
 router.get('/viewState', auth, responseHandler(stateController.viewState));
-
-// Operator routes
-router.get('/operatorList', auth,responseHandler(adminController.operatorListController));
-router.post('/operatorsCurrentStatus',auth, responseHandler(adminController.operatorsUpdate));
-router.post('/operatorStatus',auth, responseHandler(adminController.operatorsUpdateStatusController));
-router.get('/getOperatorDetails/:id',auth,responseHandler(adminController.getOperatorDetailsContoller));
-router.post('/editOperatorDetails/:id',auth,responseHandler(adminController.editOperatorDetailsController));
  
 router.post('/createDriver', upload.single('image'), responseHandler(driverController.createDriver));
 router.get('/blockedDriversList', auth, responseHandler(driverController.blockedDriversList));
