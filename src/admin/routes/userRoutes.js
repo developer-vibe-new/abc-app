@@ -69,6 +69,11 @@ router.post('/operatorStatus', auth, authorize(['operatorStatus']),  responseHan
 router.get('/getOperatorDetails/:id', auth, authorize(['getOperatorDetails']), responseHandler(adminController.getOperatorDetailsContoller));
 router.post('/editOperatorDetails/:id', auth, authorize(['editOperatorDetails']), responseHandler(adminController.editOperatorDetailsController));
 
+// user
+router.get('/userList', auth, authorize(['userList']), responseHandler(userManController.userListing));
+router.post('/updateStatusUser', auth, authorize(['updateStatusUser']), responseHandler(userManController.updateStatusUser));
+router.get('/userRideingDetails/:id', auth, authorize(['userRideingDetails']), responseHandler(userManController.userRideingDetails));
+
 router.post('/adminRegister', adminController.registerAdmin);
 router.post('/stateCreate', auth, responseHandler(stateController.createState));
 router.post('/updateState', auth, responseHandler(stateController.updateState));
@@ -84,11 +89,6 @@ router.get('/editBlockDriver/:id', auth, responseHandler(driverController.editBl
 router.post('/blockedDriverUpdate/:id', auth, upload.single('image'), responseHandler(driverController.blockedDriverUpdate));
 router.post('/unblockDriver', auth, responseHandler(driverController.unblockDriver));
 router.get('/taxiTypeDropDown', auth, responseHandler(driverController.taxiTypeDropDown));
-
-// user
-router.get('/userList', responseHandler(userManController.userListing));
-router.post('/updateStatusUser', auth, responseHandler(userManController.updateStatusUser));
-router.get('/userRideingDetails/:id', auth, responseHandler(userManController.userRideingDetails));
 
 router.post('/createRental', auth, responseHandler(rentalController.createRental));
 router.get('/veiwRentalData/:id', auth, responseHandler(rentalController.viewRentalDataController));
