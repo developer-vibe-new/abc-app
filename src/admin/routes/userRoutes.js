@@ -48,7 +48,7 @@ router.post('/updateDocumentStatus/:id', auth, authorize(['updateDocumentStatus'
 
 // City routes
 router.get('/viewCity', auth, authorize(['viewCity']), responseHandler(stateController.viewCity));
-router.post('/updateCityStatus', responseHandler(stateController.updateCityStatusController));
+router.post('/updateCityStatus', auth, authorize(['updateCityStatus']), responseHandler(stateController.updateCityStatusController));
 
 router.post('/adminRegister', adminController.registerAdmin);
 router.post('/stateCreate', auth, responseHandler(stateController.createState));
