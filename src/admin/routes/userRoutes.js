@@ -54,6 +54,14 @@ router.post('/updateCity/:id', auth, authorize(['updateCity']), responseHandler(
 router.post('/deleteCity/:id', auth, authorize(['deleteCity']), responseHandler(stateController.deleteCity));
 router.post('/createCity', auth, authorize(['createCity']), responseHandler(stateController.createCity));
 
+// Taxi Type routes
+router.post('/addTaxiType', auth, authorize(['addTaxiType']), upload.single('image'), responseHandler(taxiTypeController.addTaxiTypeController));
+router.get('/viewTaxiType', auth, authorize(['viewTaxiType']), responseHandler(taxiTypeController.viewTaxiType));
+router.post('/updateTaxiOutstationStatus', auth, authorize(['updateTaxiOutstationStatus']), responseHandler(taxiTypeController.updateTaxiTypeOutstationStatusController));
+router.post('/updateTaxistatus', auth, authorize(['updateTaxistatus']), responseHandler(taxiTypeController.updateTaxiStatus));
+router.get('/editTaxiType/:id', auth, authorize(['editTaxiType']), responseHandler(taxiTypeController.editTaxiTypeController));
+router.post('/updateTaxiType/:id', auth, authorize(['updateTaxiType']), upload.single('image'), responseHandler(taxiTypeController.updateTaxiType));
+
 router.post('/adminRegister', adminController.registerAdmin);
 router.post('/stateCreate', auth, responseHandler(stateController.createState));
 router.post('/updateState', auth, responseHandler(stateController.updateState));
@@ -77,19 +85,10 @@ router.post('/blockedDriverUpdate/:id', auth, upload.single('image'), responseHa
 router.post('/unblockDriver', auth, responseHandler(driverController.unblockDriver));
 router.get('/taxiTypeDropDown', auth, responseHandler(driverController.taxiTypeDropDown));
 
-// taxitype manger
-router.post('/addTaxiType', auth, upload.single('image'), responseHandler(taxiTypeController.addTaxiTypeController));
-router.get('/viewTaxiType', auth, responseHandler(taxiTypeController.viewTaxiType));
-router.post('/updateTaxiType/:id', auth, upload.single('image'), responseHandler(taxiTypeController.updateTaxiType));
-router.post('/updateTaxistatus', auth, responseHandler(taxiTypeController.updateTaxiStatus));
-
 // user
 router.get('/userList', responseHandler(userManController.userListing));
 router.post('/updateStatusUser', auth, responseHandler(userManController.updateStatusUser));
 router.get('/userRideingDetails/:id', auth, responseHandler(userManController.userRideingDetails));
-
-router.post('/updateTaxiOutstationStatus', auth, responseHandler(taxiTypeController.updateTaxiTypeOutstationStatusController));
-router.get('/editTaxiType/:id', auth, responseHandler(taxiTypeController.editTaxiTypeController));
 
 router.post('/createRental', auth, responseHandler(rentalController.createRental));
 router.get('/veiwRentalData/:id', auth, responseHandler(rentalController.viewRentalDataController));
