@@ -82,6 +82,12 @@ router.post('/createVehicle', auth, authorize(['createVehicle']), responseHandle
 router.get('/editVehicle/:id', auth, authorize(['editVehicle']), responseHandler(vehicleController.editVehicleController));
 router.post('/updateVehicle/:id', auth, authorize(['updateVehicle']), responseHandler(vehicleController.updateVehicleController));
 
+// Offer Code
+router.post("/addOfferCode", auth, authorize(['addOfferCode']), responseHandler(offerCodeController.addOfferCodeController));
+router.get('/viewOfferCode', auth, authorize(['viewOfferCode']), responseHandler(offerCodeController.viewOfferCodeController));
+router.get('/editOfferCode/:id', auth, authorize(['editOfferCode']), responseHandler(offerCodeController.getEditOfferCodeController));
+router.post('/updateOfferCode/:id', auth, authorize(['updateOfferCode']), responseHandler(offerCodeController.updateOfferCodeController));
+
 router.post('/adminRegister', adminController.registerAdmin);
 router.post('/stateCreate', auth, responseHandler(stateController.createState));
 router.post('/updateState', auth, responseHandler(stateController.updateState));
@@ -104,12 +110,6 @@ router.post('/rentalEditData/:id', auth, responseHandler(rentalController.rental
 router.get('/rentalList', auth, responseHandler(rentalController.rentalListData));
 
 router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
-
-// Offer Code
-router.post("/addOfferCode", auth, responseHandler(offerCodeController.addOfferCodeController));
-router.get('/viewOfferCode', auth, responseHandler(offerCodeController.viewOfferCodeController));
-router.get('/editOfferCode/:id', auth, responseHandler(offerCodeController.getEditOfferCodeController));
-router.post('/updateOfferCode/:id', auth, responseHandler(offerCodeController.updateOfferCodeController));
 
 // Sub admin
 router.post('/addSubAdmin', auth, responseHandler(subAdminController.addSubAdminController));
