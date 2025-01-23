@@ -1,8 +1,5 @@
-
 const services = require('../services/stateService');
-
-
-
+const { statusCode } = require('../../config/default.json');
 
 exports.createState = async (req, res) => {
     try {
@@ -124,3 +121,16 @@ exports.viewCityByIdController = async (req, res) => {
         });
     }
 };
+
+exports.updateCityStatusController = async (req) => {
+    try {
+        return await services.updateCityStatus(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        }
+    }
+}

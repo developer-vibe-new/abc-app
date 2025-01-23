@@ -36,7 +36,19 @@ router.post('/updateAdminCity', auth, responseHandler(adminController.updateAdmi
  */
 
 // Dashboard
-router.get('/dashboard', auth, responseHandler(adminController.dashboardDataController));
+router.get('/dashboard', auth, authorize(['dashboard']), responseHandler(adminController.dashboardDataController));
+
+// Driver routes
+router.get('/viewDriver', auth, authorize(['viewDriver']), responseHandler(driverController.viewDriver));
+router.post('/blockDriver', auth, authorize(['blockDriver']), responseHandler(driverController.blockDriver));
+router.get('/editDriver/:id', auth, authorize(['editDriver']), responseHandler(driverController.editDriver));
+router.post('/updateDriver/:id', auth, authorize(['updateDriver']), upload.single('image'), responseHandler(driverController.updateDriver));
+router.get('/getDriverDetails/:id', auth, authorize(['getDriverDetails']), responseHandler(driverController.getDriverDetails));
+router.post('/updateDocumentStatus/:id', auth, authorize(['updateDocumentStatus']), responseHandler(driverController.updateDocumentStatusController));
+
+// City routes
+router.get('/viewCity', auth, authorize(['viewCity']), responseHandler(stateController.viewCity));
+router.post('/updateCityStatus', responseHandler(stateController.updateCityStatusController));
 
 router.post('/adminRegister', adminController.registerAdmin);
 router.post('/stateCreate', auth, responseHandler(stateController.createState));
@@ -46,7 +58,6 @@ router.get('/viewState', auth, responseHandler(stateController.viewState));
 router.post('/createCity', auth, responseHandler(stateController.createCity));
 router.post('/updateCity/:id', responseHandler(stateController.updateCity));
 router.post('/deleteCity/:id', responseHandler(stateController.deleteCity));
-router.get('/viewCity', auth, responseHandler(stateController.viewCity));
 router.get('/viewCity/:id', responseHandler(stateController.viewCityByIdController));
 
 // Operator routes
@@ -55,17 +66,10 @@ router.post('/operatorsCurrentStatus',auth, responseHandler(adminController.oper
 router.post('/operatorStatus',auth, responseHandler(adminController.operatorsUpdateStatusController));
 router.get('/getOperatorDetails/:id',auth,responseHandler(adminController.getOperatorDetailsContoller));
 router.post('/editOperatorDetails/:id',auth,responseHandler(adminController.editOperatorDetailsController));
-
-// driver 
-router.get('/getDriverDetails/:id',auth,responseHandler(driverController.getDriverDetails));
+ 
 router.post('/createDriver', upload.single('image'), responseHandler(driverController.createDriver));
-router.get('/viewDriver', auth, responseHandler(driverController.viewDriver));
-router.get('/editDriver/:id', auth, responseHandler(driverController.editDriver));
-router.post('/updateDriver/:id', auth, upload.single('image'), responseHandler(driverController.updateDriver));
-router.post('/blockDriver', auth, responseHandler(driverController.blockDriver));
 router.get('/blockedDriversList', auth, responseHandler(driverController.blockedDriversList));
 router.get('/onlineDriverList', auth, responseHandler(driverController.onlineDriverList));
-router.post('/updateDocumentStatus/:id', auth, responseHandler(driverController.updateDocumentStatusController));
 
 // router.post('/deleteDriver/:id', auth, responseHandler(driverController.deleteDriver));
 router.get('/editBlockDriver/:id', auth, responseHandler(driverController.editBlockDriver));

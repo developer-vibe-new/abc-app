@@ -273,3 +273,32 @@ exports.viewCityById = async (req) => {
         };
     }
 }
+
+exports.updateCityStatus = async (req) => {
+    try {
+        const { id } = req.body;
+        const cityData = await cityModel.findById(id);
+        if(!cityData) {
+            return {
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.City_not_found
+            };
+        }
+        cityData.is_active =!cityData.is_active;
+        await cityData.save();
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.City_Status_Updated_Successfully,
+            data: cityData
+        }
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}

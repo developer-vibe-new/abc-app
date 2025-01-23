@@ -14,6 +14,7 @@
     "saltRounds": 10
   },
   "resMessage": {
+    "City_Status_Updated_Successfully": "City Status Updated Successfully",
     "Permission_Denied": "Only admins can create sub-admin",
     "Access_Denied": "Access Denied",
     "City_not_found": "City not found",
