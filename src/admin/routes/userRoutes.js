@@ -69,10 +69,18 @@ router.post('/operatorStatus', auth, authorize(['operatorStatus']),  responseHan
 router.get('/getOperatorDetails/:id', auth, authorize(['getOperatorDetails']), responseHandler(adminController.getOperatorDetailsContoller));
 router.post('/editOperatorDetails/:id', auth, authorize(['editOperatorDetails']), responseHandler(adminController.editOperatorDetailsController));
 
-// user
+// User routes
 router.get('/userList', auth, authorize(['userList']), responseHandler(userManController.userListing));
 router.post('/updateStatusUser', auth, authorize(['updateStatusUser']), responseHandler(userManController.updateStatusUser));
 router.get('/userRideingDetails/:id', auth, authorize(['userRideingDetails']), responseHandler(userManController.userRideingDetails));
+
+// Vehicle routes
+router.get('/viewVehicle', auth, authorize(['viewVehicle']), responseHandler(vehicleController.viewVehicle));
+router.post('/updateVehicleStatus', auth, authorize(['updateVehicleStatus']), responseHandler(vehicleController.updateVehicleStatusController));
+router.get('/vehicleTypeList', auth, authorize(['vehicleTypeList']), responseHandler(vehicleController.vehicleTypeList));
+router.post('/createVehicle', auth, authorize(['createVehicle']), responseHandler(vehicleController.createVehicle));
+router.get('/editVehicle/:id', auth, authorize(['editVehicle']), responseHandler(vehicleController.editVehicleController));
+router.post('/updateVehicle/:id', auth, authorize(['updateVehicle']), responseHandler(vehicleController.updateVehicleController));
 
 router.post('/adminRegister', adminController.registerAdmin);
 router.post('/stateCreate', auth, responseHandler(stateController.createState));
@@ -94,10 +102,7 @@ router.post('/createRental', auth, responseHandler(rentalController.createRental
 router.get('/veiwRentalData/:id', auth, responseHandler(rentalController.viewRentalDataController));
 router.post('/rentalEditData/:id', auth, responseHandler(rentalController.rentalEditData));
 router.get('/rentalList', auth, responseHandler(rentalController.rentalListData));
-router.get('/viewVehicle', auth, responseHandler(vehicleController.viewVehicle));
-router.post('/updateVehicleStatus', auth, responseHandler(vehicleController.updateVehicleStatusController));
-router.get('/vehicleTypeList', auth, responseHandler(vehicleController.vehicleTypeList));
-router.post('/createVehicle', responseHandler(vehicleController.createVehicle));
+
 router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
 router.get('/editVehicle/:id', auth, responseHandler(vehicleController.editVehicleController));
 router.post('/updateVehicle/:id', auth, responseHandler(vehicleController.updateVehicleController));
