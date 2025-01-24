@@ -39,6 +39,11 @@ var OfferCodeSchema = new Schema({
         default: 0
     },
 
+    is_active: {
+        type: Boolean,
+        default: true
+    },
+
     city_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'City',

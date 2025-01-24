@@ -5,7 +5,7 @@ const Admin = require('../../models/adminModel');
 
 exports.addSubAdmin = async (req) => {
     try {
-        const { first_name, last_name, email, mobile, password, permissions } = req.body;
+        const { first_name, last_name, email, mobile, password, permissions, city_id } = req.body;
         if(req.auth.role_type !== 'admin') {
             return {
                 statusCode: statusCode.ACCESS_DENIED,
@@ -15,7 +15,7 @@ exports.addSubAdmin = async (req) => {
         }
         const findEmail = await Admin.findOne({ email });
         if(!findEmail) {
-            const subAdmin = await Admin.create({ role_type: 'sub-admin', first_name, last_name, email, mobile, password, permissions });
+            const subAdmin = await Admin.create({ role_type: 'sub-admin', first_name, last_name, email, mobile, password, permissions, city_id });
             return {
                 statusCode: statusCode.OK,
                 success: true,
@@ -46,8 +46,7 @@ exports.viewSubAdmin = async (req) => {
         let pipeline = [];
         pipeline.push({
             $match: {
-              role_type: "manager",
-              is_active: true
+              role_type: "sub-admin"
             }
           },
           {
@@ -55,7 +54,8 @@ exports.viewSubAdmin = async (req) => {
               first_name: 1,
               last_name: 1,
               email: 1,
-              mobile: 1
+              mobile: 1,
+              is_active: 1
             }
         },
         {
@@ -102,17 +102,13 @@ exports.editSubAdmin = async (req) => {
             {
               $match: {
                   _id: new mongoose.Types.ObjectId(id),
-                  role_type: "manager",
+                  role_type: "sub-admin",
                   is_active: true
               }
             },
             {
               $project: {
-                first_name: 1,
-                last_name: 1,
-                email: 1,
-                mobile: 1,
-                permission: 1
+                password: 0
               }
             }
         ]);
@@ -141,7 +137,7 @@ exports.editSubAdmin = async (req) => {
 exports.updateSubAdmin = async (req) => {
     try {
         const { id } = req.params;
-        const data = await Admin.findOne({ _id: id, role_type: 'manager', is_active: true });
+        const data = await Admin.findOne({ _id: id, role_type: 'sub-admin', is_active: true });
         if(!data) {
             return {
                 status: statusCode.DATA_NOT_FOUND,
@@ -149,7 +145,7 @@ exports.updateSubAdmin = async (req) => {
                 message: resMessage.Data_Not_Found
             }
         }
-        const { first_name, last_name, email, mobile, password, permission } = req.body;
+        const { first_name, city_id, last_name, email, mobile, password, permissions } = req.body;
         let passwordHash;
         if(password !== "" && password) {
             passwordHash = await bcrypt.hash(password, 10);
@@ -159,9 +155,10 @@ exports.updateSubAdmin = async (req) => {
                 first_name,
                 last_name,
                 email,
+                city_id,
                 mobile,
                 password: passwordHash,
-                permission
+                permissions
             },
             { new: true }
         );
@@ -210,6 +207,34 @@ exports.deleteSubAdmin = async (req) => {
             success: false,
             message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",
+        };
+    }
+}
+
+exports.updateSubAdminStatus = async (req) => {
+    try {
+        const { id } = req.body;
+        const data = await Admin.findById(id);
+        if(!data) {
+            return {
+                status: statusCode.DATA_NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
+            }
+        }
+        data.is_active = !data.is_active;
+        await data.save();
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Status_Updated_Successfully,
+        }
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: resMessage.Internal_Server_Error,
         };
     }
 }

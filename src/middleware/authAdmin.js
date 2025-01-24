@@ -49,15 +49,15 @@ exports.auth = async (req, res, next) => {
     }
 };
 
-exports.authorize = (permissions) => (req, res, next) => {
+exports.authorize = (category, action) => (req, res, next) => {
     if(req.auth.role_type === 'admin') return next();
-    const allowed = permissions.some((permission) => req.auth.permissions.includes(permission))
-    if(!allowed) {
+    const hasPermission = req.auth.permissions?.[category]?.includes(action);
+    if (!hasPermission) {
         return res.json({
             statusCode: statusCode.ACCESS_DENIED,
             success: false,
             message: resMessage.Access_Denied
-        })
+        });
     }
     next();
 }

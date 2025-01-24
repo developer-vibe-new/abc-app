@@ -92,7 +92,10 @@ const adminRegisterSchema = new mongoose.Schema({
 		type: String
 	},
 
-	permissions: [{ type: String }]
+	permissions: {
+		type: Object,
+		default: {},
+	  }
 
 }, {
 	timestamps: {

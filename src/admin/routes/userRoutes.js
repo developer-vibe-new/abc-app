@@ -36,87 +36,92 @@ router.post('/updateAdminCity', auth, responseHandler(adminController.updateAdmi
  */
 
 // Dashboard
-router.get('/dashboard', auth, authorize(['dashboard']), responseHandler(adminController.dashboardDataController));
+router.get('/dashboard', auth, responseHandler(adminController.dashboardDataController));
 
 // Driver routes
-router.get('/viewDriver', auth, authorize(['viewDriver']), responseHandler(driverController.viewDriver));
-router.post('/blockDriver', auth, authorize(['blockDriver']), responseHandler(driverController.blockDriver));
-router.get('/editDriver/:id', auth, authorize(['editDriver']), responseHandler(driverController.editDriver));
-router.post('/updateDriver/:id', auth, authorize(['updateDriver']), upload.single('image'), responseHandler(driverController.updateDriver));
-router.get('/getDriverDetails/:id', auth, authorize(['getDriverDetails']), responseHandler(driverController.getDriverDetails));
-router.post('/updateDocumentStatus/:id', auth, authorize(['updateDocumentStatus']), responseHandler(driverController.updateDocumentStatusController));
+router.get('/viewDriver', auth, authorize('driverManager', 'viewDriver'), responseHandler(driverController.viewDriver));
+router.post('/blockDriver', auth, authorize('driverManager', 'blockDriver'), responseHandler(driverController.blockDriver));
+router.get('/editDriver/:id', auth, authorize('driverManager', 'editDriver'), responseHandler(driverController.editDriver));
+router.post('/updateDriver/:id', auth, authorize('driverManager', 'updateDriver'), upload.single('image'), responseHandler(driverController.updateDriver));
+router.get('/getDriverDetails/:id', auth, authorize('driverManager', 'getDriverDetails'), responseHandler(driverController.getDriverDetails));
+router.post('/updateDocumentStatus/:id', auth, authorize('driverManager', 'updateDocumentStatus'), responseHandler(driverController.updateDocumentStatusController));
+router.get('/blockedDriversList', auth, authorize('driverManager', 'blockedDriversList'), responseHandler(driverController.blockedDriversList));
+router.post('/unblockDriver', auth, authorize('driverManager', 'unblockDriver'), responseHandler(driverController.unblockDriver));
+router.get('/onlineDriverList', auth, authorize('driverManager', 'onlineDriverList'), responseHandler(driverController.onlineDriverList));
 
 // City routes
-router.get('/viewCity', auth, authorize(['viewCity']), responseHandler(stateController.viewCity));
-router.post('/updateCityStatus', auth, authorize(['updateCityStatus']), responseHandler(stateController.updateCityStatusController));
-router.get('/editCity/:id', auth, authorize(['editCity']), responseHandler(stateController.viewCityByIdController));
-router.post('/updateCity/:id', auth, authorize(['updateCity']), responseHandler(stateController.updateCity));
-router.post('/deleteCity/:id', auth, authorize(['deleteCity']), responseHandler(stateController.deleteCity));
-router.post('/createCity', auth, authorize(['createCity']), responseHandler(stateController.createCity));
+router.get('/viewCity', auth, responseHandler(stateController.viewCity));
+router.post('/updateCityStatus', auth, authorize('cityManager', 'updateCityStatus'), responseHandler(stateController.updateCityStatusController));
+router.get('/editCity/:id', auth, authorize('cityManager', 'editCity'), responseHandler(stateController.viewCityByIdController));
+router.post('/updateCity/:id', auth, authorize('cityManager', 'updateCity'), responseHandler(stateController.updateCity));
+router.post('/deleteCity/:id', auth, authorize('cityManager', 'deleteCity'), responseHandler(stateController.deleteCity));
+router.post('/createCity', auth, authorize('cityManager', 'createCity'), responseHandler(stateController.createCity));
 
 // Taxi Type routes
-router.post('/addTaxiType', auth, authorize(['addTaxiType']), upload.single('image'), responseHandler(taxiTypeController.addTaxiTypeController));
-router.get('/viewTaxiType', auth, authorize(['viewTaxiType']), responseHandler(taxiTypeController.viewTaxiType));
-router.post('/updateTaxiOutstationStatus', auth, authorize(['updateTaxiOutstationStatus']), responseHandler(taxiTypeController.updateTaxiTypeOutstationStatusController));
-router.post('/updateTaxistatus', auth, authorize(['updateTaxistatus']), responseHandler(taxiTypeController.updateTaxiStatus));
-router.get('/editTaxiType/:id', auth, authorize(['editTaxiType']), responseHandler(taxiTypeController.editTaxiTypeController));
-router.post('/updateTaxiType/:id', auth, authorize(['updateTaxiType']), upload.single('image'), responseHandler(taxiTypeController.updateTaxiType));
-
-// Operator routes
-router.get('/operatorList', auth, authorize(['operatorList']), responseHandler(adminController.operatorListController));
-router.post('/operatorsCurrentStatus', auth, authorize(['operatorsCurrentStatus']), responseHandler(adminController.operatorsUpdate));
-router.post('/operatorStatus', auth, authorize(['operatorStatus']),  responseHandler(adminController.operatorsUpdateStatusController));
-router.get('/getOperatorDetails/:id', auth, authorize(['getOperatorDetails']), responseHandler(adminController.getOperatorDetailsContoller));
-router.post('/editOperatorDetails/:id', auth, authorize(['editOperatorDetails']), responseHandler(adminController.editOperatorDetailsController));
+router.post('/addTaxiType', auth, authorize('taxiTypeManager', 'addTaxiType'), upload.single('image'), responseHandler(taxiTypeController.addTaxiTypeController));
+router.get('/viewTaxiType', auth, authorize('taxiTypeManager', 'viewTaxiType'), responseHandler(taxiTypeController.viewTaxiType));
+router.post('/updateTaxiOutstationStatus', auth, authorize('taxiTypeManager', 'updateTaxiOutstationStatus'), responseHandler(taxiTypeController.updateTaxiTypeOutstationStatusController));
+router.post('/updateTaxistatus', auth, authorize('taxiTypeManager', 'updateTaxistatus'), responseHandler(taxiTypeController.updateTaxiStatus));
+router.get('/editTaxiType/:id', auth, authorize('taxiTypeManager', 'editTaxiType'), responseHandler(taxiTypeController.editTaxiTypeController));
+router.post('/updateTaxiType/:id', auth, authorize('taxiTypeManager', 'updateTaxiType'), upload.single('image'), responseHandler(taxiTypeController.updateTaxiType));
 
 // User routes
-router.get('/userList', auth, authorize(['userList']), responseHandler(userManController.userListing));
-router.post('/updateStatusUser', auth, authorize(['updateStatusUser']), responseHandler(userManController.updateStatusUser));
-router.get('/userRideingDetails/:id', auth, authorize(['userRideingDetails']), responseHandler(userManController.userRideingDetails));
+router.get('/userList', auth, authorize('userManager', 'userList'), responseHandler(userManController.userListing));
+router.post('/updateStatusUser', auth, authorize('userManager', 'updateStatusUser'), responseHandler(userManController.updateStatusUser));
+router.get('/userRideingDetails/:id', auth, authorize('userManager', 'userRideingDetails'), responseHandler(userManController.userRideingDetails));
+
+// Rental routes
+router.post('/createRental', auth, authorize('rentalManager', 'createRental'), responseHandler(rentalController.createRental));
+router.get('/rentalList', auth, authorize('rentalManager', 'rentalList'), responseHandler(rentalController.rentalListData));
+router.get('/veiwRentalData/:id', auth, authorize('rentalManager', 'veiwRentalData'), responseHandler(rentalController.viewRentalDataController));
+router.post('/rentalEditData/:id', auth, authorize('rentalManager', 'rentalEditData'), responseHandler(rentalController.rentalEditData));
 
 // Vehicle routes
-router.get('/viewVehicle', auth, authorize(['viewVehicle']), responseHandler(vehicleController.viewVehicle));
-router.post('/updateVehicleStatus', auth, authorize(['updateVehicleStatus']), responseHandler(vehicleController.updateVehicleStatusController));
-router.get('/vehicleTypeList', auth, authorize(['vehicleTypeList']), responseHandler(vehicleController.vehicleTypeList));
-router.post('/createVehicle', auth, authorize(['createVehicle']), responseHandler(vehicleController.createVehicle));
-router.get('/editVehicle/:id', auth, authorize(['editVehicle']), responseHandler(vehicleController.editVehicleController));
-router.post('/updateVehicle/:id', auth, authorize(['updateVehicle']), responseHandler(vehicleController.updateVehicleController));
+router.get('/vehicleTypeList', auth, responseHandler(vehicleController.vehicleTypeList));
+router.get('/viewVehicle', auth, authorize('vehicleManager', 'viewVehicle'), responseHandler(vehicleController.viewVehicle));
+router.post('/updateVehicleStatus', auth, authorize('vehicleManager', 'updateVehicleStatus'), responseHandler(vehicleController.updateVehicleStatusController));
+router.post('/createVehicle', auth, authorize('vehicleManager', 'createVehicle'), responseHandler(vehicleController.createVehicle));
+router.get('/editVehicle/:id', auth, authorize('vehicleManager', 'editVehicle'), responseHandler(vehicleController.editVehicleController));
+router.post('/updateVehicle/:id', auth, authorize('vehicleManager', 'updateVehicle'), responseHandler(vehicleController.updateVehicleController));
 
 // Offer Code
-router.post("/addOfferCode", auth, authorize(['addOfferCode']), responseHandler(offerCodeController.addOfferCodeController));
-router.get('/viewOfferCode', auth, authorize(['viewOfferCode']), responseHandler(offerCodeController.viewOfferCodeController));
-router.get('/editOfferCode/:id', auth, authorize(['editOfferCode']), responseHandler(offerCodeController.getEditOfferCodeController));
-router.post('/updateOfferCode/:id', auth, authorize(['updateOfferCode']), responseHandler(offerCodeController.updateOfferCodeController));
+router.post("/addOfferCode", auth, authorize('offerCodeManager', 'addOfferCode'), responseHandler(offerCodeController.addOfferCodeController));
+router.get('/viewOfferCode', auth, authorize('offerCodeManager', 'viewOfferCode'), responseHandler(offerCodeController.viewOfferCodeController));
+router.get('/editOfferCode/:id', auth, authorize('offerCodeManager', 'editOfferCode'), authorize(['editOfferCode']), responseHandler(offerCodeController.getEditOfferCodeController));
+router.post('/updateOfferCode/:id', auth, authorize('offerCodeManager', 'updateOfferCode'), responseHandler(offerCodeController.updateOfferCodeController));
+
+// Sub admin
+router.post('/addSubAdmin', auth, authorize('subAdminManager', 'addSubAdmin'), responseHandler(subAdminController.addSubAdminController));
+router.get('/viewSubAdmin', auth, authorize('subAdminManager', 'viewSubAdmin'), responseHandler(subAdminController.viewSubAdminController));
+router.get('/editSubAdmin/:id', auth, authorize('subAdminManager', 'editSubAdmin'), responseHandler(subAdminController.editSubAdminController));
+router.post('/updateSubAdmin/:id', auth, authorize('subAdminManager', 'updateSubAdmin'), responseHandler(subAdminController.updateSubAdminController));
+router.post('/deleteSubAdmin', auth, authorize('subAdminManager', 'deleteSubAdmin'), responseHandler(subAdminController.deleteSubAdminController));
+router.post('/updateSubAdminStatus', auth, authorize('subAdminManager', 'updateSubAdminStatus'), responseHandler(subAdminController.updateSubAdminStatusController));
+
+// Operator routes
+router.get('/operatorList', auth, authorize('operatorManager', 'operatorList'), responseHandler(adminController.operatorListController));
+router.post('/operatorsCurrentStatus', auth, authorize('operatorManager', 'operatorsCurrentStatus'), responseHandler(adminController.operatorsUpdate));
+router.post('/operatorStatus', auth, authorize('operatorManager', 'operatorStatus'),  responseHandler(adminController.operatorsUpdateStatusController));
+router.get('/getOperatorDetails/:id', auth, authorize('operatorManager', 'getOperatorDetails'), responseHandler(adminController.getOperatorDetailsContoller));
+router.post('/editOperatorDetails/:id', auth, authorize('operatorManager', 'editOperatorDetails'), responseHandler(adminController.editOperatorDetailsController));
 
 router.post('/adminRegister', adminController.registerAdmin);
 router.post('/stateCreate', auth, responseHandler(stateController.createState));
 router.post('/updateState', auth, responseHandler(stateController.updateState));
 router.post('/deleteState/:id', auth, responseHandler(stateController.deleteState));
 router.get('/viewState', auth, responseHandler(stateController.viewState));
- 
-router.post('/createDriver', upload.single('image'), responseHandler(driverController.createDriver));
-router.get('/blockedDriversList', auth, responseHandler(driverController.blockedDriversList));
-router.get('/onlineDriverList', auth, responseHandler(driverController.onlineDriverList));
 
 // router.post('/deleteDriver/:id', auth, responseHandler(driverController.deleteDriver));
 router.get('/editBlockDriver/:id', auth, responseHandler(driverController.editBlockDriver));
 router.post('/blockedDriverUpdate/:id', auth, upload.single('image'), responseHandler(driverController.blockedDriverUpdate));
-router.post('/unblockDriver', auth, responseHandler(driverController.unblockDriver));
 router.get('/taxiTypeDropDown', auth, responseHandler(driverController.taxiTypeDropDown));
 
-router.post('/createRental', auth, responseHandler(rentalController.createRental));
-router.get('/veiwRentalData/:id', auth, responseHandler(rentalController.viewRentalDataController));
-router.post('/rentalEditData/:id', auth, responseHandler(rentalController.rentalEditData));
-router.get('/rentalList', auth, responseHandler(rentalController.rentalListData));
+
+
+
+
 
 router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
-
-// Sub admin
-router.post('/addSubAdmin', auth, responseHandler(subAdminController.addSubAdminController));
-router.get('/viewSubAdmin', auth, responseHandler(subAdminController.viewSubAdminController));
-router.get('/editSubAdmin/:id', auth, responseHandler(subAdminController.editSubAdminController));
-router.post('/updateSubAdmin/:id', auth, responseHandler(subAdminController.updateSubAdminController));
-router.post('/deleteSubAdmin', auth, responseHandler(subAdminController.deleteSubAdminController));
 
 // Notification manager
 router.post('/addNotification', auth, responseHandler(notificationController.addNotificationController));

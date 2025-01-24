@@ -5,13 +5,13 @@ const Admin = require('../../models/adminModel');
 exports.addOfferCode = async (req) => {
     try {
         const { offercode, ride_type, description, start_date, end_date, percentage, price, usedtimes, city_id } = req.body;
-        if (!offercode || !ride_type || !description || !city_id || !start_date || !end_date || !percentage || !price || !usedtimes) {
-            return {
-                status: statusCode.BAD_REQUEST,
-                success: false,
-                message: resMessage.Required_Data
-            }
-        }
+        // if (!offercode || !ride_type || !description || !city_id || !start_date || !end_date || !percentage || !price || !usedtimes) {
+        //     return {
+        //         status: statusCode.BAD_REQUEST,
+        //         success: false,
+        //         message: resMessage.Required_Data
+        //     }
+        // }
         const data = await OfferCode.create({ offercode, ride_type, city_id, description, start_date, end_date, percentage, price, usedtimes });
         return {
             status: statusCode.OK,

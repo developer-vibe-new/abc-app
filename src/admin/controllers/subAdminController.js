@@ -60,3 +60,15 @@ exports.deleteSubAdminController = async (req) => {
         };
     }
 }
+
+exports.updateSubAdminStatusController = async (req) => {
+    try {
+        return await service.updateSubAdminStatus(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+}

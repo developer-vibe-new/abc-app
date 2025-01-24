@@ -382,7 +382,7 @@ exports.checkAuthService = async (req) => {
       status: statusCode.OK,
       success: true,
       message: resMessage.Data_Fetch_Successfully,
-      decoded: decoded
+      data: adminData
     };
   
   } catch (error) {
