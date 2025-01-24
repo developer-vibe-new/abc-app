@@ -221,9 +221,6 @@ exports.cityView = async (req) => {
             });
         }
         conditions.push(
-            { $match: { is_active: true } }
-        );
-        conditions.push(
             { $sort: { name: 1 } },
             { $skip: (page - 1) * pagesize },
             { $limit: pagesize }
