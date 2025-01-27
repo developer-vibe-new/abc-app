@@ -14,21 +14,23 @@ exports.addProviderTaxi = async (req) => {
         if (!providerTaxi.car_id || !providerTaxi.type_ids || !providerTaxi.plateno) {
             return {
                 statusCode: statusCode.BAD_REQUEST,
+                status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Required_Data,
             };
         }
         const providerData = await ProviderTaxi.create(providerTaxi);
         await Location.create({
-            provider_id: providerTaxi.providerId,
+            provider_id: providerTaxi.provider_id,
             type_ids: providerTaxi.type_ids
         });
-        await Provider.findByIdAndUpdate(providerTaxi.providerId,
+        await Provider.findByIdAndUpdate(providerTaxi.provider_id,
             { online_taxi: providerData._id },
             { new: true }
         );
         return {
             statusCode: statusCode.OK,
+            status: statusCode.OK,
             success: true,
             message: resMessage.Data_Created_Successfully,
         };
