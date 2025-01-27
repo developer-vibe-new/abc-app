@@ -10,7 +10,8 @@ exports.sendOtp = async (req) => {
         if (!register) {
             await User.create({ mobile, otp: 1234 });
             return {
-                status: statusCode.Ok,
+                statusCode: statusCode.OK,
+                status: statusCode.OK,
                 success: true,
                 message: resMessage.Otp_Send_Success
             };
@@ -18,7 +19,8 @@ exports.sendOtp = async (req) => {
         register.otp = 1234;
         await register.save();
         return {
-            status: statusCode.Ok,
+            statusCode: statusCode.OK,
+            status: statusCode.OK,
             success: true,
             message: resMessage.Otp_Send_Success
         };

@@ -44,29 +44,36 @@ async function runServer() {
           return data.socket_id;
         }
         if (event === "authenticate") {
-          try {
-            const userData = await User.findOne({ login_token: data.loginToken, is_active: true });
-            if (userData) {
+          const handleAuthentication = async () => {
+            try {
+              const userData = await User.findOne({ login_token: data.loginToken, is_active: true });
+        
+              if (!userData) {
+                return socket.emit('error', {
+                  status: 400,
+                  message: 'Authentication failed: Invalid login token',
+                });
+              }
+        
               socket.user_data = userData;
               // await setRedis(redisKeyPrefix + userData._id.toString(), socket.id);
+              
               socket.emit('authenticationSuccess', {
                 status: 200,
                 message: 'Authentication successful',
                 data: userData
               });
-            } else {
+        
+            } catch (err) {
               socket.emit('error', {
                 status: 400,
-                message: 'Authentication failed: Invalid login token',
+                message: 'An error occurred during authentication',
+                error: err.message,
               });
             }
-          } catch (err) {
-            socket.emit('error', {
-              status: 400,
-              message: 'An error occurred during authentication',
-              error: err.message,
-            });
-          }
+          };
+        
+          handleAuthentication();
           return;
         }
         if (!socket.user_data) {
