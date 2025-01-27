@@ -88,6 +88,7 @@ exports.login = async (req) => {
       success: true,
       message: resMessage.User_login_Successfully,
       token: auth_key,
+      data: findData
     };
   } catch (error) {
     console.log(error);
