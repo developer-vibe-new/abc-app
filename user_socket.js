@@ -3,7 +3,9 @@ const { createClient } = require('@redis/client');
 const client = createClient({
   url: process.env.REDIS_URL,
 });
+const appSettings = require('./src/models/settingModel');
 const RequestRide = require('./src/models/RequestRide');
+const FUNC = require('./src/functions/function');
 const { SOCKET_USER_PORT } = require('./src/config/dev.config');
 const moment = require('moment');
 const http = require('http');

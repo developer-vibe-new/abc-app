@@ -57,7 +57,7 @@ const RideSchema = new mongoose.Schema({
 		ride_status: {
 			type: String,
 			default: "requested",
-			required: true
+			// required: true
 		},
 
 		ride_edit_status: {
@@ -77,7 +77,7 @@ const RideSchema = new mongoose.Schema({
 		payment_type: {
 			type: String,
 			default: "cash",
-			required: true
+			// required: true
 		},
 
 		razorpay_orderId: {
@@ -211,15 +211,15 @@ const RideSchema = new mongoose.Schema({
 		source: {
 			longitude: {
 				type: Number,
-				required: true
+				// required: true
 			},
 			latitude: {
 				type: Number,
-				required: true
+				// required: true
 			},
 			address: {
 				type: String,
-				required: true
+				// required: true
 			}
 		},
 
