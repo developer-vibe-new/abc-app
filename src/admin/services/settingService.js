@@ -3,13 +3,13 @@ const Setting = require('../../models/settingModel');
 
 exports.addSetting = async (req) => {
     try {
-        const { online_payment, support_no, daily_instruction, outstation_instruction, rental_instruction } = req.body;
-        const data = await Setting.create({ online_payment, support_no, daily_instruction, outstation_instruction, rental_instruction });
+        const settingData = req.body;
+        const newSetting = new Setting(settingData);
+        await newSetting.save();
         return {
             status: statusCode.OK,
             success: true,
-            message: resMessage.Data_Created_Successfully,
-            data,
+            message: resMessage.Data_Created_Successfully
         }
     } catch (error) {
         return {
