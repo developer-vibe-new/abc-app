@@ -1,8 +1,8 @@
 const express = require('express');
-var redis = require("redis"),
-	client = redis.createClient({
-		port: process.env.REDIS_PORT
-	});
+const { createClient } = require('@redis/client');
+const client = createClient({
+  url: process.env.REDIS_URL,
+});
 const RequestRide = require('./src/models/RequestRide');
 const { SOCKET_USER_PORT } = require('./src/config/dev.config');
 const moment = require('moment');
@@ -43,30 +43,46 @@ async function runServer() {
           io.to(data.socket_id).emit(data.event, data.message);
           return data.socket_id;
         }
+
         if (event === "authenticate") {
           const handleAuthentication = async () => {
             try {
               const userData = await User.findOne({ login_token: data.loginToken, is_active: true });
-        
+              
               if (!userData) {
                 return socket.emit('error', {
                   status: 400,
                   message: 'Authentication failed: Invalid login token',
                 });
               }
-        
-              socket.user_data = userData;
-              // await setRedis(redisKeyPrefix + userData._id.toString(), socket.id);
               
+              socket.user_data = userData;
+        
+              if (!client.isOpen) {
+                try {
+                  await client.connect();
+                  console.log('Redis client connected');
+                } catch (err) {
+                  return socket.emit('error', {
+                    status: 500,
+                    message: 'Error connecting to Redis',
+                    error: err.message,
+                  });
+                }
+              }
+        
+              await client.set(`socket_user:${userData._id.toString()}`, socket.id);
+        
               socket.emit('authenticationSuccess', {
                 status: 200,
                 message: 'Authentication successful',
-                data: userData
+                data: userData,
               });
         
             } catch (err) {
+              console.error('Error during authentication:', err);
               socket.emit('error', {
-                status: 400,
+                status: 500,
                 message: 'An error occurred during authentication',
                 error: err.message,
               });
@@ -75,7 +91,8 @@ async function runServer() {
         
           handleAuthentication();
           return;
-        }
+        }        
+
         if (!socket.user_data) {
           socket.emit('error', {
             status: 401,
