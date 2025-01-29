@@ -23,7 +23,7 @@ exports.addSetting = async (req) => {
 
 exports.viewSetting = async (req) => {
     try {
-        const data = await Setting.findOne({ _id: "674eca607641e2014a80a966" });
+        const data = await Setting.findOne({ _id: "6799c0ee81224f899e726828" });
         if(!data) {
             return {
                 status: statusCode.DATA_NOT_FOUND,
@@ -49,8 +49,8 @@ exports.viewSetting = async (req) => {
 
 exports.updateSetting = async (req) => {
     try {
-        const { online_payment, support_no, daily_instruction, outstation_instruction, rental_instruction } = req.body;
-        const data = await Setting.findOne({ _id: "674eca607641e2014a80a966" });
+        const settingData = req.body;
+        const data = await Setting.findOne({ _id: "6799c0ee81224f899e726828" });
         if(!data) {
             return {
                 status: statusCode.DATA_NOT_FOUND,
@@ -58,12 +58,8 @@ exports.updateSetting = async (req) => {
                 message: resMessage.Data_Not_Found,
             }
         }
-        await Setting.findByIdAndUpdate("674eca607641e2014a80a966", {
-            online_payment,
-            support_no,
-            daily_instruction,
-            outstation_instruction,
-            rental_instruction,
+        await Setting.findByIdAndUpdate("6799c0ee81224f899e726828", {
+            settingData
         });
         return {
             status: statusCode.OK,
