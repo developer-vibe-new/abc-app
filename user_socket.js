@@ -50,16 +50,16 @@ async function runServer() {
           const handleAuthentication = async () => {
             try {
               const userData = await User.findOne({ login_token: data.loginToken, is_active: true });
-              
+
               if (!userData) {
                 return socket.emit('error', {
                   status: 400,
                   message: 'Authentication failed: Invalid login token',
                 });
               }
-              
+
               socket.user_data = userData;
-        
+
               if (!client.isOpen) {
                 try {
                   await client.connect();
@@ -72,15 +72,15 @@ async function runServer() {
                   });
                 }
               }
-        
+
               await client.set(`socket_user:${userData._id.toString()}`, socket.id);
-        
+
               socket.emit('authenticationSuccess', {
                 status: 200,
                 message: 'Authentication successful',
                 data: userData,
               });
-        
+
             } catch (err) {
               console.error('Error during authentication:', err);
               socket.emit('error', {
@@ -90,10 +90,10 @@ async function runServer() {
               });
             }
           };
-        
+
           handleAuthentication();
           return;
-        }        
+        }
 
         if (!socket.user_data) {
           socket.emit('error', {
@@ -308,41 +308,41 @@ async function runServer() {
                         resolve(result);
                       });
                     });
-              
+
                     await RequestRide.create({ ride_id: ride_id, provider_id: provider.provider_id._id });
                   }
-              
+
                   await new Promise((resolve, reject) => {
                     client.set("request_data:" + ride_id, JSON.stringify(request_data), (err, result) => {
                       if (err) reject(err);
                       resolve(result);
                     });
                   });
-              
+
                   await new Promise((resolve, reject) => {
                     client.set("ride_attempt:" + ride_id, appSettings.ride_settings.ride_attempt, (err, result) => {
                       if (err) reject(err);
                       resolve(result);
                     });
                   });
-              
+
                   await FUNC.send_request(ride_id, io, appSettings);
-              
+
                 } catch (err) {
                   const rideDetails = await Ride.findOneAndUpdate(
                     { _id: ObjectId(ride_id), "basic.ride_status": "requested" },
                     { $set: { "basic.ride_status": "declined" } },
                     { new: true }
                   );
-              
+
                   if (rideDetails) {
                     socket.emit('ride_declined', { ride_id: ride_id });
                   }
                 }
               };
-              
+
               processProviders();
-              
+
             }
             break;
 
