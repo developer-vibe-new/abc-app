@@ -139,10 +139,7 @@ async function runServer() {
             break;
 
           case 'book_ride':
-            var source = {
-              "longitude": data.longitude,
-              "latitude": data.latitude
-            };
+            var source = data.source;
             let locationQuery = [
               {
                 $geoNear: {
@@ -184,7 +181,6 @@ async function runServer() {
             var planId = data.planId;
             var way = data.way;
             var city_id = data.city_id;
-            var source = data.source;
             var stops = data.stops;
             var destination = data.destination;
             var payment_type = data.payment_type;
@@ -277,6 +273,7 @@ async function runServer() {
                 request_data.ride_status = NewRide.basic.ride_status;
                 request_data.ride_edit_status = NewRide.basic.ride_edit_status;
                 request_data.ride_type = NewRide.basic.ride_type;
+                request_data.load_sec = 60;
                 request_data.ridestationtype = NewRide.basic.ridestationtype;
                 request_data.planId = NewRide.basic.planId;
                 request_data.way = NewRide.basic.way;
@@ -302,35 +299,22 @@ async function runServer() {
               const processProviders = async () => {
                 try {
                   for (let provider of allProviders) {
-                    await new Promise((resolve, reject) => {
-                      client.rPush("request_queue:" + ride_id, provider.provider_id._id.toString(), (err, result) => {
-                        if (err) reject(err);
-                        resolve(result);
-                      });
-                    });
+                    
+                    await client.rPush(`request_queue:${ride_id}`, provider.provider_id._id.toString());
 
                     await RequestRide.create({ ride_id: ride_id, provider_id: provider.provider_id._id });
                   }
 
-                  await new Promise((resolve, reject) => {
-                    client.set("request_data:" + ride_id, JSON.stringify(request_data), (err, result) => {
-                      if (err) reject(err);
-                      resolve(result);
-                    });
-                  });
+                  await client.set(`request_data:${ride_id}`, JSON.stringify(request_data));
 
-                  await new Promise((resolve, reject) => {
-                    client.set("ride_attempt:" + ride_id, appSettings.ride_settings.ride_attempt, (err, result) => {
-                      if (err) reject(err);
-                      resolve(result);
-                    });
-                  });
+                  const settingData = await appSettings.findOne();
+                  await client.set(`ride_attempt:${ride_id}`, settingData.ride_settings.ride_attempt);
 
                   await FUNC.send_request(ride_id, io, appSettings);
 
                 } catch (err) {
                   const rideDetails = await Ride.findOneAndUpdate(
-                    { _id: ObjectId(ride_id), "basic.ride_status": "requested" },
+                    { _id: ride_id, "basic.ride_status": "requested" },
                     { $set: { "basic.ride_status": "declined" } },
                     { new: true }
                   );
@@ -338,6 +322,7 @@ async function runServer() {
                   if (rideDetails) {
                     socket.emit('ride_declined', { ride_id: ride_id });
                   }
+                  console.error('Error in processProviders:', err);
                 }
               };
 

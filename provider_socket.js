@@ -60,7 +60,7 @@ async function runServer() {
                   first_name: providerDetail.first_name,
                   last_name: providerDetail.last_name
                 }
-                await setRedis(providerSocket + providerDetail._id.toString(), socket.id);
+                await setRedis("socket_provider:" + providerDetail._id.toString(), socket.id);
                 socket.emit('authenticationSuccess', {
                   status: 200,
                   message: 'Authentication successful',

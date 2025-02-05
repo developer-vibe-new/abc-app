@@ -1,63 +1,65 @@
 const { createClient } = require('@redis/client');
 const google_distance = require('google-distance');
 const Location = require('../models/locationModel');
+const Ride = require('../models/ride');
 const FUNC = require('./function');
 
+google_distance.apiKey = 'AIzaSyAnrLQq4LPedUb4uI8MQQjyRU_23UvTfmQ';
+
 const client = createClient({
-  url: process.env.REDIS_URL,
+    url: process.env.REDIS_URL,
 });
 
-exports.send_request = async function(ride_id, io, appSettings, callback) {
+exports.send_request = async function (ride_id, io, appSettings) {
     try {
-        // Get request data
-        const request_data_str = await client.getAsync("request_data:" + ride_id);
+        if (!client.isOpen) {
+            await client.connect();
+        }
+
+        const request_data_str = await client.get("request_data:" + ride_id);
         const request_data = JSON.parse(request_data_str);
 
-        // Decrease ride attempts
-        const remaining_attempt = await client.decrbyAsync("ride_attempt:" + ride_id, 1);
+        const remaining_attempt = await client.decrBy("ride_attempt:" + ride_id, 1);
         if (remaining_attempt < 0) {
-            callback("ERROR");
-            return;
+            console.error("Max attempts reachd for ride ID: ", ride_id);
+            return "ERROR";
         }
 
-        // Get the provider id from the request queue
-        const provider_id = await client.lindexAsync("request_queue:" + ride_id, 0);
+        const provider_id = await client.lIndex("request_queue:" + ride_id, 0);
         if (!provider_id) {
-            callback("ERROR");
-            return;
+            console.error("No provider found for ride ID:", ride_id);
+            return 'ERROR';
         }
 
-        // Remove provider from request queue
-        await client.lremAsync("request_queue:" + ride_id, 1, provider_id);
+        // await client.lRem("request_queue:" + ride_id, 1, provider_id);
 
-        // Find the provider's location
         const location_data = await Location.findOne({
-            provider_id: ObjectId(provider_id),
+            provider_id: provider_id,
             available: true,
             blocked: false
         });
 
         if (location_data) {
             try {
-                await FUNC.lockDriver(provider_id, ride_id, request_data.load_sec);
+                // await FUNC.lockDriver(provider_id, ride_id, request_data.load_sec);
 
                 const provider_loc = {
-                    longitude: location_data.location[0],
-                    latitude: location_data.location[1]
+                    longitude: location_data.locations[0].coordinates[0],
+                    latitude: location_data.locations[0].coordinates[1]
                 };
-
-                // Estimate the time
                 const distanceObj = await FUNC.time_estimate(provider_loc, request_data.source);
                 const estimated_time = distanceObj ? distanceObj.estimated_time : 5;
                 request_data.time_estimate = parseInt(estimated_time);
                 request_data.pickup_distance = distanceObj.pickup_distance;
 
-                const provider_socket = await client.getAsync("socket_provider:" + provider_id);
-                const clients = await io.of('/').adapter.clientsAsync();
+                const provider_socket = await client.get("socket_provider:" + provider_id);
 
-                if (clients.indexOf(provider_socket) === -1) {
-                    await client.setAsync("ride_request:" + provider_id, JSON.stringify(request_data));
-                    await client.expireAsync("ride_request:" + provider_id, request_data.load_sec);
+                const clients = await io.of('/').adapter.rooms;
+
+                if (clients.has(provider_socket) === -1) {
+                    console.error("Provider socket not found for provider ID");
+                    await client.set("ride_request:" + provider_id, JSON.stringify(request_data));
+                    await client.expire("ride_request:" + provider_id, request_data.load_sec);
 
                     const provider_details = await Provider.findOne({
                         _id: ObjectId(provider_id)
@@ -68,72 +70,63 @@ exports.send_request = async function(ride_id, io, appSettings, callback) {
                         language: 1
                     });
 
-                    // You can add the notification logic here if necessary.
                 } else {
+                    console.log("New Request Socket Emit");
                     io.to(provider_socket).emit('new_request', request_data);
                 }
 
-                // Wait for the timeout before updating the ride
                 setTimeout(async () => {
-                    const results = await Ride.update({
-                        _id: ObjectId(ride_id),
+                    console.log("Coming in Set Timeout");
+                    const results = await Ride.updateOne({
+                        _id: ride_id,
                         "basic.ride_status": "requested",
-                        "meta.search_providers": ObjectId(provider_id)
+                        "meta.search_providers": provider_id
                     }, {
                         $pull: {
-                            "meta.search_providers": ObjectId(provider_id)
+                            "meta.search_providers": provider_id
                         },
                         $addToSet: {
-                            "meta.skip_providers": ObjectId(provider_id)
+                            "meta.skip_providers": provider_id
                         }
                     });
 
                     if (results.nModified === 1) {
+                        console.log("Modified Data");
                         request_data.start_on = moment().unix();
-                        await client.setAsync("request_data:" + ride_id, JSON.stringify(request_data));
-                        await FUNC.send_request(ride_id, io, appSettings, callback);
+                        await client.set("request_data:" + ride_id, JSON.stringify(request_data));
+                        await FUNC.send_request(ride_id, io, appSettings);
                     }
-                }, request_data.load_sec * 1000);
+                    console.log("No Modified Data");
+                },request_data.load_sec * 1000);
+                console.log("Data has been loaded");
 
             } catch (err) {
-                await FUNC.send_request(ride_id, io, appSettings, callback);
+                console.log("Error1", err);
+                await FUNC.send_request(ride_id, io, appSettings);
             }
         } else {
-            await FUNC.send_request(ride_id, io, appSettings, callback);
+            console.log("Error2", err);
+            await FUNC.send_request(ride_id, io, appSettings);
         }
 
     } catch (err) {
-        callback("ERROR");
+        console.error("Error coming in catech: ", err);
     }
 };
 
 exports.lockDriver = async (provider_id, ride_id, ringTime) => {
     try {
-        const result = await new Promise((resolve, reject) => {
-            client.setNX("provider_available:" + provider_id, ride_id, (err, result) => {
-                if (err) return reject(err);
-                resolve(result);
-            });
-        });
-
-        if (result === 0) {
-            await new Promise((resolve, reject) => {
-                client.expire("provider_available:" + provider_id, ringTime, (err, result) => {
-                    if (err) return reject(err);
-                    resolve(result);
-                });
-            });
+        const result = await client.setNX("provider_available:" + provider_id.toString(), ride_id);
+        console.log("==========result---------", result);
+        if (result === false) {
+            await client.expire("provider_available:" + provider_id.toString(), ringTime);
             throw new Error("Driver is not available");
         } else {
-            await new Promise((resolve, reject) => {
-                client.expire("provider_available:" + provider_id, ringTime, (err, result) => {
-                    if (err) return reject(err);
-                    resolve(result);
-                });
-            });
+            await client.expire("provider_available:" + provider_id.toString(), ringTime);
         }
     } catch (err) {
-        throw err; // or handle the error as needed
+        console.error("Error locking driver:", err);
+        throw err;
     }
 };
 
