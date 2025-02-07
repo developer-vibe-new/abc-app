@@ -138,7 +138,10 @@ exports.time_estimate = async (origin, destination) => {
                 origin: origin.latitude + ',' + origin.longitude,
                 destination: destination.latitude + ',' + destination.longitude
             }, (err, data) => {
-                if (err) return reject(err);
+                if (err) {
+                    console.log("Error in time estimate: ", err);
+                    return reject(err);
+                }
                 resolve(data);
             });
         });

@@ -139,6 +139,7 @@ async function runServer() {
             break;
 
           case 'book_ride':
+            console.log("==========book_ride============");
             var source = data.source;
             let locationQuery = [
               {
@@ -200,6 +201,7 @@ async function runServer() {
             var per_km = data.per_km;
             var fare_estimate = data.fare_estimate;
 
+            
             const location_data = await Location.aggregate(locationQuery);
             var allProviders = location_data;
             if (allProviders.length > 0) {
@@ -208,6 +210,7 @@ async function runServer() {
               for (let provider of allProviders) {
                 provider = provider.toObject ? provider.toObject() : provider;
                 provider_ids.push(provider.provider_id._id);
+                console.log("========provider_ids--------", provider_ids);
                 provider_addrs.push({
                   longitude: provider.locations[0],
                   latitude: provider.locations[1],
