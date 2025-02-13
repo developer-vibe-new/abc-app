@@ -4,9 +4,9 @@ const path = require('path');
 
 const app = express();
 require('dotenv').config();
-const devConfig = require('./src/config/dev.config');
 const connectDB = require('./src/config/db.config');
 connectDB();
+// const devConfig = require('./src/config/dev.config');
 global.c = console.log.bind(console);
 
 app.use(cors({ origin: true }));
@@ -24,8 +24,11 @@ require('./src/app/routes')(app);
 // require('./src/admin/routes')(app);
 
 // set port, listen for request s
-const PORT = devConfig.PORT || 6262;
+const PORT = 5050;
+console.log('port: ' + PORT);
 
+
+console.log('sdf');
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
 });
