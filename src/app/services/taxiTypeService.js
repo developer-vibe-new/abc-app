@@ -75,7 +75,7 @@ exports.updateTaxiType = async (req) => {
         const { id } = req.params;
         const { base_fare, airportCharge, fixed_fare, distance_fare, time_fare, currency } = req.body;
         let icon;
-        if(req.file) {
+        if (req.file) {
             icon = req.file.filename;
         }
         const data = await Taxitype.findOne({ _id: id });
@@ -126,7 +126,7 @@ exports.updateTaxiType = async (req) => {
     }
 };
 
-exports.taxiTypeList = async (req) => {
+exports.taxiTypeList = async () => {
     try {
         // { operator_id: req.auth.id }
         const data = await Taxitype.find();

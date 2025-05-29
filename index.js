@@ -24,7 +24,7 @@ require('./src/app/routes')(app);
 // require('./src/admin/routes')(app);
 
 // set port, listen for request s
-const PORT = 5050;
+const PORT = 6262;
 console.log('port: ' + PORT);
 
 
@@ -32,3 +32,8 @@ console.log('sdf');
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
 });
+
+// api=6262
+// operator socket= 5050
+// driver socket= 4040
+// user socket=4040
