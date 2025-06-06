@@ -1,8 +1,9 @@
 const express = require('express');
 const { createClient } = require('@redis/client');
-const client = createClient({
-  url: process.env.REDIS_URL,
-});
+// const client = createClient({
+//   url: process.env.REDIS_URL,
+// });
+const client = createClient({ url: `redis://${process.env.REDIS_HOST || '127.0.0.1'}:${process.env.REDIS_PORT || 6379}` });
 const appSettings = require('./src/models/settingModel');
 const RequestRide = require('./src/models/RequestRide');
 const FUNC = require('./src/functions/function');
@@ -40,6 +41,7 @@ async function runServer() {
     socket.on("*", async function (event, data, ack) {
 
       try {
+        await client.connect();
         if (event === "test_socket") {
 
           io.to(data.socket_id).emit(data.event, data.message);
