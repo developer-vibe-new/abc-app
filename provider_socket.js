@@ -13,11 +13,11 @@ const { setRedis, getRedis, removeOrderFromAllPartners, sendNotification, payDel
 // const Delieverypartner = require('./src/models/delieverypartner');
 const Provider = require('./src/models/providerModel');
 const connectDB = require('./src/config/db.config');
-const User = require('./src/models/users');
-const Location = require('./src/models/locationModel')
+// const User = require('./src/models/users');
+const Location = require('./src/models/locationModel');
 const ProviderTaxi = require('./src/models/providerTaxi');
 const Ride = require('./src/models/ride');
-const providerSocket = 'ProviderSocket:';
+// const providerSocket = 'ProviderSocket:';
 const FUNC = require('./src/functions/function');
 connectDB();
 
@@ -77,7 +77,7 @@ async function runServer() {
                 first_name: providerDetail.first_name,
                 online_taxi: providerDetail.online_taxi,
                 last_name: providerDetail.last_name
-              }
+              };
               await setRedis("socket_provider:" + providerDetail._id.toString(), socket.id);
               socket.emit('authenticationSuccess', {
                 status: 200,

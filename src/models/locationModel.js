@@ -1,53 +1,52 @@
-const mongoose = require("mongoose"),
-	ObjectId = mongoose.Types.ObjectId;
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 var LocationSchema = new Schema({
 
-    provider_id: {
-        type: mongoose.Schema.Types.ObjectId,
+	provider_id: {
+		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Provider',
 		unique: true
-    },
-    
-	type_ids: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'TaxiType'
-    }],
+	},
 
-    zone_id: {
-        type: mongoose.Schema.Types.ObjectId,
+	type_ids: [{
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'TaxiType'
+	}],
+
+	zone_id: {
+		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Zone'
-    },
+	},
 	// array for ['longitude', 'latitude']
 	// searching uses mangodb 2dsphere indexing so longitude must be saved as first element of array
 	locations: [
 		{
-		  type: {
-			type: String,
-			enum: ['Point'],
-			default: 'Point'
-		  },
-		  coordinates: {
-			type: [Number],
-			required: true,
-			index: '2dsphere'
-		  }
+			type: {
+				type: String,
+				enum: ['Point'],
+				default: 'Point'
+			},
+			coordinates: {
+				type: [Number],
+				required: true,
+				index: '2dsphere'
+			}
 		}
 	],
-	
+
 	gotohomelocation: [
 		{
-		  type: {
-			type: String,
-			enum: ['Point'],
-			default: 'Point'
-		  },
-		  coordinates: {
-			type: [Number],
-			required: true,
-			index: '2dsphere'
-		  }
+			type: {
+				type: String,
+				enum: ['Point'],
+				default: 'Point'
+			},
+			coordinates: {
+				type: [Number],
+				required: true,
+				index: '2dsphere'
+			}
 		}
 	],
 
@@ -77,9 +76,9 @@ var LocationSchema = new Schema({
 		type: String,
 		default: 'mobile'
 	},
-	time_estimate :{
-		type:Number,
-		default:5
+	time_estimate: {
+		type: Number,
+		default: 5
 	},
 	lastlocationTime: {
 		type: Date

@@ -1,5 +1,4 @@
 const { getClient } = require('../config/redis');
-
 module.exports = {
     async setRedis(redisKey, data) {
         try {
@@ -37,5 +36,5 @@ module.exports = {
             console.error('Error getting or parsing Redis key:', error);
             throw error;
         }
-    },
-}
+    }
+};

@@ -10,7 +10,7 @@ const { SOCKET_USER_PORT } = require('./src/config/dev.config');
 const moment = require('moment');
 const http = require('http');
 const { initializeSocket, getIO } = require('./socket');
-const { setRedis, getRedis } = require('./src/utils/functions');
+// const { setRedis, getRedis } = require('./src/utils/functions');
 const User = require('./src/models/users');
 const Ride = require('./src/models/ride');
 // const redisKeyPrefix = 'UserSocket:';
@@ -37,7 +37,7 @@ async function runServer() {
       onevent.call(this, packet);
     };
 
-    socket.on("*", async function (event, data) {
+    socket.on("*", async function (event, data, ack) {
 
       try {
         if (event === "test_socket") {
@@ -45,102 +45,297 @@ async function runServer() {
           io.to(data.socket_id).emit(data.event, data.message);
           return data.socket_id;
         }
-
         if (event === "authenticate") {
-          const handleAuthentication = async () => {
-            try {
-              const userData = await User.findOne({ login_token: data.loginToken, is_active: true });
+          try {
+            const user = await User.findOne({
+              login_token: data.login_token,
+              is_active: 1
+            }, {
+              _id: 1,
+              first_name: 1,
+              last_name: 1,
+              full_name: 1,
+              mobile: 1,
+              in_ride: 1,
+              stripe_card_data: 1,
+              fcm_token: 1
+            }).lean();
 
-              if (!userData) {
-                return socket.emit('error', {
-                  status: 400,
-                  message: 'Authentication failed: Invalid login token',
-                });
-              }
+            if (!user) {
+              ack({
+                status: 401,
+                message: 'Authentication failed: Invalid login token'
+              });
+              return;
+            }
 
-              socket.user_data = userData;
-
-              if (!client.isOpen) {
-                try {
-                  await client.connect();
-                  console.log('Redis client connected');
-                } catch (err) {
-                  return socket.emit('error', {
+            // Save socket ID in Redis
+            await new Promise((resolve, reject) => {
+              client.set("socket_user:" + user._id.toString(), socket.id, (err, result) => {
+                if (err) {
+                  console.log("Redis error:", err);
+                  ack({
                     status: 500,
-                    message: 'Error connecting to Redis',
-                    error: err.message,
+                    message: 'Internal server error (Redis)'
                   });
+                  return reject(err);
                 }
+                resolve(result);
+              });
+            });
+
+            socket.user_data = user;
+
+            if (user.in_ride) {
+              const rides = await Ride.aggregate([
+                { $match: { "basic.user_id": user._id, "basic.ride_status": { $in: ["accepted", "arrived", "running"] } } },
+                {
+                  $lookup: {
+                    from: 'users',
+                    localField: 'basic.provider_id',
+                    foreignField: '_id',
+                    as: 'provider'
+                  }
+                },
+                { $unwind: "$provider" },
+                {
+                  $lookup: {
+                    from: 'categories',
+                    localField: 'meta.category_id',
+                    foreignField: '_id',
+                    as: 'category'
+                  }
+                },
+                { $unwind: "$category" },
+                {
+                  $project: {
+                    _id: 1,
+                    basic: 1,
+                    location: 1,
+                    payment: 1,
+                    created: 1,
+                    'provider.first_name': 1,
+                    'provider.last_name': 1,
+                    'provider.full_name': 1,
+                    'provider.mobile': 1,
+                    'provider.callingmobile': 1,
+                    'provider.photo': 1,
+                    'provider.total_rating': 1,
+                    'provider.rated': 1,
+                    'provider.avg_rating': 1,
+                    'provider.image': 1,
+                    'category.thumb_3x': 1
+                  }
+                }
+              ]);
+
+              if (!rides || rides.length === 0) {
+                ack({
+                  status: 200,
+                  message: 'Authentication Successful',
+                  in_ride: false,
+                  data: []
+                });
+                return;
               }
 
-              await client.set(`socket_user:${userData._id.toString()}`, socket.id);
+              // Load provider locations
+              const providerIds = rides.map(ride => ride.basic.provider_id._id);
+              const locations = await Location.find({
+                provider_id: { $in: providerIds }
+              }).lean();
 
-              socket.emit('authenticationSuccess', {
-                status: 200,
-                message: 'Authentication successful',
-                data: userData,
+              const locationMap = new Map();
+              locations.forEach(loc => {
+                locationMap.set(loc.provider_id.toString(), loc);
               });
 
-            } catch (err) {
-              console.error('Error during authentication:', err);
-              socket.emit('error', {
-                status: 500,
-                message: 'An error occurred during authentication',
-                error: err.message,
+              // Prepare ride data
+              const rideResults = rides.map(ride => {
+                const ride_data = {
+                  ride_id: ride._id.toString(),
+                  ride_type: ride.basic.ride_type,
+                  ride_status: ride.basic.ride_status,
+                  start_on: ride.created,
+                  load_sec: ride.basic.ridestationtype === "daily" ? 10 : 20,
+                  instruction: appSettings[`${ride.basic.ridestationtype}_instruction`] || "",
+                  source: ride.location.source,
+                  ride_edit_status: ride.basic.ride_edit_status,
+                  destination: ride.location.destination,
+                  stops: ride.location.stops,
+                  otp: ride.basic.otp,
+                  time_estimate: 5,
+                  payment_type: ride.basic.payment_type,
+                  fare_estimate: ride.payment.fare_estimate,
+                  airportcharge: ride.payment.airportcharge,
+                  airportstatus: ride.payment.airportstatus,
+                  base_fixed_fare: ride.payment.base_fixed_fare,
+                  per_km: ride.payment.per_km,
+                  car_title: ride.basic.vehicle.title,
+                  plateno: ride.basic.vehicle.plateno,
+                  color: ride.basic.vehicle.color,
+                  driver_name: ride.basic.provider_id.first_name + ' ' + ride.basic.provider_id.last_name,
+                  driver_image: "https://customer.ktscab.com/drivers/" + ride.basic.provider_id.image,
+                  avg_rating: ride.basic.provider_id.avg_rating,
+                  driver_mobile: ride.basic.provider_id.callingmobile,
+                  category_image: ride.meta.category_id.thumb_3x,
+                  created: ride.created
+                };
+
+                if (ride_data.payment_type === "Card") {
+                  ride_data.card = ride.payment.card;
+                }
+
+                const location_packet = locationMap.get(ride.basic.provider_id._id.toString());
+                if (location_packet) {
+                  ride_data.provider_location = {
+                    _id: location_packet.provider_id.toString(),
+                    longitude: location_packet.location[0],
+                    latitude: location_packet.location[1],
+                    bearing: location_packet.bearing,
+                    time_estimate: location_packet.time_estimate,
+                    speed: 0
+                  };
+
+                  // Join room
+                  const track_room = 'trackprovider_' + ride_data.provider_location._id;
+                  socket.join(track_room);
+                }
+
+                return ride_data;
+              });
+
+              // Return success
+              ack({
+                status: 200,
+                message: 'Authentication Successful',
+                in_ride: true,
+                data: rideResults
+              });
+
+            } else {
+              // Not in ride
+              ack({
+                status: 200,
+                message: 'Authentication Successful',
+                in_ride: false,
+                data: []
               });
             }
-          };
 
-          handleAuthentication();
-          return;
+          } catch (err) {
+            console.error("Error in authenticate:", err);
+            ack({
+              status: 500,
+              message: 'Internal server error'
+            });
+          }
         }
 
-        if (!socket.user_data) {
-          socket.emit('error', {
-            status: 401,
-            message: 'Authentication required',
-          });
-          return;
-        }
 
         switch (event) {
-          case "search_taxi":
-            var source = {
-              "longitude": data.longitude,
-              "latitude": data.latitude
-            };
-            let location_query = [
-              {
-                $geoNear: {
-                  near: { type: "Point", coordinates: [source.longitude, source.latitude] },
-                  distanceField: "distance",
-                  maxDistance: 4000,
-                  minDistance: 0,
-                  spherical: true,
-                  query: {
-                    ...(Array.isArray(data.category_id) && data.category_id.length > 0 ? { type_ids: data.category_id } : {}),
-                    available: true,
-                    blocked: false
-                  },
-                  key: 'locations.coordinates'
+          case "search_taxi": {
+            try {
+              const source = {
+                longitude: data.longitude,
+                latitude: data.latitude
+              };
+
+              // Perform $geoNear query — FASTER
+              let location_query = [
+                {
+                  $geoNear: {
+                    near: {
+                      type: "Point",
+                      coordinates: [source.longitude, source.latitude]  // [lng, lat]
+                    },
+                    distanceField: "distance", // result will include this field in meters
+                    maxDistance: 4000,         // in meters (4 km)
+                    minDistance: 0,            // optional, but included for clarity
+                    spherical: true,           // must be true when using GeoJSON
+                    query: {
+                      ...(Array.isArray(data.category_id) && data.category_id.length > 0
+                        ? { type_ids: { $in: data.category_id } } // Ensure it's a proper $in array filter
+                        : {}),
+                      available: true,
+                      blocked: false
+                    },
+                    key: "locations.coordinates" // path to 2dsphere index field
+                  }
+                }
+              ];
+
+              const locations = await Location.aggregate(location_query);
+
+              // Leave existing provider rooms
+              const rooms = io.sockets.adapter.sids[socket.id];
+              for (const room in rooms) {
+                if (room.indexOf("provider_") === 0) {
+                  socket.leave(room);
                 }
               }
-            ];
 
-            const locationData = await Location.aggregate(location_query);
+              if (locations.length > 0) {
+                for (const location of locations) {
+                  const location_packet = {
+                    _id: location.provider_id.toString(),
+                    longitude: location.location[0],
+                    latitude: location.location[1],
+                    bearing: location.bearing,
+                    speed: 0
+                  };
+                  const room_id = 'provider_' + location.provider_id.toString();
+                  socket.join(room_id);
 
-            if (locationData.length > 0) {
-              socket.emit('provider_location', {
-                status: 200,
-                message: 'Taxi found',
-                data: locationData
+                  socket.emit('provider_location', location_packet);
+                }
+                // If wallet → refund logic
+                if (data.payment_type === "wallet") {
+                  const ride_details = await Ride.findOne({ _id: ObjectId(data.ride_id) }).lean();
+                  if (!ride_details) {
+                    console.error("Ride not found for refund.");
+                    return;
+                  }
+                  await FUNC.processRefund(data.ride_id, socket.user_data._id, ride_details.payment.fare_estimate);
+                }
+                ack({
+                  status: 203,
+                  message: 'Please Try Again !!',
+                });
+                return;
+              } else {
+                // No taxi found — wallet refund if needed
+                if (data.payment_type === "wallet") {
+                  const ride_details = await Ride.findOne({ _id: ObjectId(data.ride_id) }).lean();
+                  if (!ride_details) {
+                    console.error("Ride not found for refund.");
+                    return;
+                  }
+                  await FUNC.processRefund(data.ride_id, socket.user_data._id, ride_details.payment.fare_estimate);
+                }
+
+                ack({
+                  status: 203,
+                  message: 'Please Try Again !!',
+                });
+                return;
+              }
+
+            } catch (err) {
+              console.error("Error in search_taxi:", err);
+              ack({
+                status: 500,
+                message: 'Internal server error'
               });
             }
-            break;
 
-          case 'book_ride':
+            break;
+          }
+
+
+          case 'book_ride': {
             console.log("==========book_ride============");
-            var source = data.source;
+            let source = data.source;
             let locationQuery = [
               {
                 $geoNear: {
@@ -189,7 +384,7 @@ async function runServer() {
             var distance = data?.distance?.split(" ")[0];
             var duration = data.duration;
             var razorpay_paymentId = data.razorpay_paymentId;
-            var schedule = data.schedule;
+            // var schedule = data.schedule;
             var ride_on = (data.ride_on) ? data.ride_on : moment().unix();
             var offercode = data.offercode;
             var offer_id = data.offer_id;
@@ -201,7 +396,7 @@ async function runServer() {
             var per_km = data.per_km;
             var fare_estimate = data.fare_estimate;
 
-            
+
             const location_data = await Location.aggregate(locationQuery);
             var allProviders = location_data;
             if (allProviders.length > 0) {
@@ -302,7 +497,7 @@ async function runServer() {
               const processProviders = async () => {
                 try {
                   for (let provider of allProviders) {
-                    
+
                     await client.rPush(`request_queue:${ride_id}`, provider.provider_id._id.toString());
 
                     await RequestRide.create({ ride_id: ride_id, provider_id: provider.provider_id._id });
@@ -333,20 +528,20 @@ async function runServer() {
 
             }
             break;
-
+          }
           default:
-            socket.emit('unknown_event', {
-              success: false,
-              message: 'Unknown event fired',
+            ack({
+              status: 500,
+              message: 'Unknown event fired'
             });
             break;
         }
 
       } catch (err) {
-        socket.emit('error', {
-          success: false,
-          message: 'An error occurred',
-          error: err.message,
+        console.log('err', err);
+        ack({
+          status: 500,
+          message: 'Internal server error'
         });
       }
     });
