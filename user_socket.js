@@ -22,6 +22,14 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 let totalUser = 0;
+client.on('error', (err) => console.error('Redis Client Error', err));
+
+async function connectRedis() {
+  if (!client.isOpen) {
+    await client.connect();
+    console.log('Redis connected!');
+  }
+}
 
 async function runServer() {
   await initializeSocket(server);
@@ -41,7 +49,7 @@ async function runServer() {
     socket.on("*", async function (event, data, ack) {
 
       try {
-        await client.connect();
+        await connectRedis();
         if (event === "test_socket") {
 
           io.to(data.socket_id).emit(data.event, data.message);
