@@ -77,7 +77,6 @@ async function runServer() {
               });
               return;
             }
-            console.log('socket.user', user);
 
             // Save socket ID in Redis
             try {
@@ -134,7 +133,6 @@ async function runServer() {
                   }
                 }
               ]);
-              console.log('rides', rides);
               if (!rides || rides.length === 0) {
                 ack({
                   status: 200,
