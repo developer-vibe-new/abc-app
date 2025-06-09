@@ -77,24 +77,21 @@ async function runServer() {
               });
               return;
             }
+            console.log('socket.user', user);
 
             // Save socket ID in Redis
-            await new Promise((resolve, reject) => {
-              client.set("socket_user:" + user._id.toString(), socket.id, (err, result) => {
-                if (err) {
-                  console.log("Redis error:", err);
-                  ack({
-                    status: 500,
-                    message: 'Internal server error (Redis)'
-                  });
-                  return reject(err);
-                }
-                resolve(result);
+            try {
+              await client.set("socket_user:" + user._id.toString(), socket.id);
+            } catch (err) {
+              console.log("Redis error:", err);
+              ack({
+                status: 500,
+                message: 'Internal server error (Redis)'
               });
-            });
+              return;
+            }
 
             socket.user_data = user;
-
             if (user.in_ride) {
               const rides = await Ride.aggregate([
                 { $match: { "basic.user_id": user._id, "basic.ride_status": { $in: ["accepted", "arrived", "running"] } } },
@@ -137,7 +134,7 @@ async function runServer() {
                   }
                 }
               ]);
-
+              console.log('rides', rides);
               if (!rides || rides.length === 0) {
                 ack({
                   status: 200,
