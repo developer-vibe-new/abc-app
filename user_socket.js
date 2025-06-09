@@ -41,7 +41,7 @@ async function runServer() {
     socket.on("*", async function (event, data, ack) {
 
       try {
-        await client.connect();
+        // await client.connect();
         if (event === "test_socket") {
 
           io.to(data.socket_id).emit(data.event, data.message);
