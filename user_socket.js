@@ -49,7 +49,6 @@ async function runServer() {
     socket.on("*", async function (event, data, ack) {
 
       try {
-        await connectRedis();
         if (event === "test_socket") {
 
           io.to(data.socket_id).emit(data.event, data.message);
@@ -562,7 +561,8 @@ async function runServer() {
     });
   });
 
-  server.listen(SOCKET_USER_PORT, () => {
+  server.listen(SOCKET_USER_PORT, async () => {
+    await connectRedis();
     console.log(`User listening on port ${SOCKET_USER_PORT}`);
   });
 }
