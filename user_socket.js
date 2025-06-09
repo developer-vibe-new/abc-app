@@ -253,11 +253,11 @@ async function runServer() {
                   $geoNear: {
                     near: {
                       type: "Point",
-                      coordinates: [source.longitude, source.latitude]  // [lng, lat]
+                      coordinates: [Number(source.longitude), Number(source.latitude)]  // [lng, lat]
                     },
                     distanceField: "distance", // result will include this field in meters
                     maxDistance: 4000,         // in meters (4 km)
-                    minDistance: 0,            // optional, but included for clarity
+                    // minDistance: 0,            // optional, but included for clarity
                     spherical: true,           // must be true when using GeoJSON
                     query: {
                       ...(Array.isArray(data.category_id) && data.category_id.length > 0
@@ -285,15 +285,15 @@ async function runServer() {
                 for (const location of locations) {
                   const location_packet = {
                     _id: location.provider_id.toString(),
-                    longitude: location.location[0],
-                    latitude: location.location[1],
+                    longitude: location.locations[0],
+                    latitude: location.locations[1],
                     bearing: location.bearing,
                     speed: 0
                   };
                   const room_id = 'provider_' + location.provider_id.toString();
                   socket.join(room_id);
-
                   socket.emit('provider_location', location_packet);
+                  ack();
                 }
                 // If wallet → refund logic
                 if (data.payment_type === "wallet") {
@@ -345,10 +345,9 @@ async function runServer() {
             let locationQuery = [
               {
                 $geoNear: {
-                  near: { type: "Point", coordinates: [source.longitude, source.latitude] },
+                  near: { type: "Point", coordinates: [Number(source.longitude), Number(source.latitude)] },
                   distanceField: "distance",
                   maxDistance: 4000,
-                  minDistance: 0,
                   spherical: true,
                   query: {
                     ...(Array.isArray(data.category_id) && data.category_id.length > 0 ? { type_ids: data.category_id } : {}),
