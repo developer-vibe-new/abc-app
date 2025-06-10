@@ -650,6 +650,56 @@ async function runServer() {
               }
 
               break; // The break for the switch case
+            };
+            case "nearbycars": {
+              try {
+                let location_query = [
+                  {
+                    $geoNear: {
+                      near: {
+                        type: "Point",
+                        coordinates: [Number(data.longitude), Number(data.latitude)]  // [lng, lat]
+                      },
+                      distanceField: "distance", // result will include this field in meters
+                      maxDistance: 4000,         // in meters (4 km)
+                      // minDistance: 0,            // optional, but included for clarity
+                      spherical: true,           // must be true when using GeoJSON
+                      query: {
+                        available: true,
+                        blocked: false
+                      },
+                      key: "locations.coordinates" // path to 2dsphere index field
+                    }
+                  },
+                  {
+                    $lookup: {
+                      from: "taxi_types",        // your car type collection
+                      localField: "type_ids",  // array of ObjectIds
+                      foreignField: "_id",
+                      as: "taxies",         // this will hold all matched types
+                    }
+                  },
+                  {
+                    $limit: 30
+                  }
+                ];
+                const providers = await Location.aggregate(location_query);
+
+                ack({
+                  status: 200,
+                  reply: 'Nearby Cars',
+                  data: providers,
+                });
+
+              } catch (err) {
+                console.log(err);
+                ack({
+                  status: 500,
+                  reply: 'An error occurred',
+                  data: err,
+                });
+              }
+              break;
             }
 
             default:
