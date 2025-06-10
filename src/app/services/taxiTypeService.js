@@ -129,7 +129,7 @@ exports.updateTaxiType = async (req) => {
 exports.taxiTypeList = async () => {
     try {
         // { operator_id: req.auth.id }
-        const data = await Taxitype.find();
+        const data = await Taxitype.find({ is_active: true });
         if (!data) {
             return {
                 status: statusCode.BAD_REQUEST,

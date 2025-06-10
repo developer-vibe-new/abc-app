@@ -677,6 +677,8 @@ async function runServer() {
                       localField: "type_ids",  // array of ObjectIds
                       foreignField: "_id",
                       pipeline: [{
+                        $match: { is_active: true }
+                      }, {
                         $project: {
                           _id: 1,
                           title: 1, icon: 1
