@@ -676,7 +676,22 @@ async function runServer() {
                       from: "taxi_types",        // your car type collection
                       localField: "type_ids",  // array of ObjectIds
                       foreignField: "_id",
+                      pipeline: [{
+                        $project: {
+                          _id: 1,
+                          title: 1, icon: 1
+                        }
+                      }],
                       as: "taxies",         // this will hold all matched types
+                    }
+                  },
+                  {
+                    $project: {
+                      _id: 1,
+                      provider_id: 1,
+                      available: 1,
+                      locations: 1,
+                      taxies: 1
                     }
                   },
                   {
