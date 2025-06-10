@@ -556,7 +556,7 @@ async function runServer() {
                   // Use the acknowledgment callback to send an error back to the client
                   ack({
                     status: 404,
-                    reply: "Ride or Provider not found."
+                    message: "Ride or Provider not found."
                   });
                 }
 
@@ -600,7 +600,7 @@ async function runServer() {
                 // 8. Send a success response back to the user via the callback
                 ack({
                   status: 200,
-                  reply: "Message Sent"
+                  message: "Message Sent"
                 });
 
               } catch (err) {
@@ -608,7 +608,7 @@ async function runServer() {
                 console.error("Error in User_msg_sent:", err);
                 ack({
                   status: 500, // Internal Server Error
-                  reply: "An error occurred while sending the message."
+                  message: "An error occurred while sending the message."
                 });
               }
               break; // The break for the switch case
@@ -704,7 +704,7 @@ async function runServer() {
 
                 ack({
                   status: 200,
-                  reply: 'Nearby Cars',
+                  message: 'Nearby Cars',
                   data: providers,
                 });
 
@@ -712,7 +712,7 @@ async function runServer() {
                 console.log(err);
                 ack({
                   status: 500,
-                  reply: 'An error occurred',
+                  message: 'An error occurred',
                   data: err,
                 });
               }
