@@ -24,7 +24,7 @@ require('./src/app/routes')(app);
 // require('./src/admin/routes')(app);
 
 // set port, listen for request s
-const PORT = 5000;
+const PORT = process.env.PORT;
 console.log('port: ' + PORT);
 
 

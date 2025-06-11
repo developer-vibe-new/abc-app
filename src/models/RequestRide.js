@@ -1,5 +1,4 @@
-const mongoose = require("mongoose"),
-ObjectId = mongoose.Types.ObjectId;
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 var RequestRideSchema = new Schema({
