@@ -7,7 +7,7 @@ const FUNC = require('./function');
 const User = require('../models/users');
 const { ObjectId } = require('mongoose').Types;
 const RequestLog = require('../models/RequestLogModel');
-google_distance.apiKey = 'AIzaSyAnrLQq4LPedUb4uI8MQQjyRU_23UvTfmQ';
+google_distance.apiKey = process.env.GOOGLE_APP_KEY;
 const moment = require('moment');
 const client = createClient({
     url: process.env.REDIS_URL,

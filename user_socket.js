@@ -1,5 +1,6 @@
 const express = require('express');
 const { createClient } = require('@redis/client');
+require('dotenv').config();
 // const client = createClient({
 //   url: process.env.REDIS_URL,
 // });
@@ -389,7 +390,7 @@ async function runServer() {
               var destination = data.destination;
               var payment_type = data.payment_type;
               var razorpay_orderId = data.razorpay_orderId;
-              var distance = data?.distance?.split(" ")[0];
+              var distance = data?.distance;
               var duration = data.duration;
               var razorpay_paymentId = data.razorpay_paymentId;
               // var schedule = data.schedule;
@@ -714,6 +715,113 @@ async function runServer() {
                   status: 500,
                   message: 'An error occurred',
                   data: err,
+                });
+              }
+              break;
+            }
+            case "cancel_ride": {
+              try {
+                const ride_id = data.ride_id;
+
+                const ride_details = await Ride.findOneAndUpdate(
+                  {
+                    _id: new ObjectId(ride_id),
+                    "basic.ride_status": { $in: ["accepted", "arrived", "requested"] }
+                  },
+                  {
+                    $set: {
+                      "basic.ride_status": "cancelled",
+                      "basic.cancelled_by": "user"
+                    }
+                  },
+                  { new: true }
+                ).populate("basic.provider_id").lean();
+
+                if (!ride_details) {
+                  return ack({
+                    status: 404,
+                    message: "Ride not found or not in a cancellable status."
+                  });
+                }
+
+                // Refund if payment type is wallet
+                if (ride_details.basic?.payment_type === "wallet") {
+                  const user = await User.findById(socket.user_data._id);
+                  if (!user) {
+                    return ack({ status: 404, message: "User not found" });
+                  }
+
+                  const newBalance = parseFloat(user.userbalance || 0) + parseFloat(ride_details.payment.fare_estimate || 0);
+
+                  await User.updateOne(
+                    { _id: user._id },
+                    { $set: { userbalance: newBalance } }
+                  );
+
+                  await Ride.updateOne(
+                    { _id: ride_details._id },
+                    {
+                      $set: {
+                        "basic.razorpay_refundId": "REFUND" + Date.now() + FUNC.randomString(4, "123456789"),
+                        "payment.refund": ride_details.payment.fare_estimate,
+                        "payment.onlinepayment": ride_details.payment.fare_estimate
+                      }
+                    }
+                  );
+                }
+
+                // Notify driver via socket if connected
+                if (ride_details.basic?.provider_id?._id) {
+                  client.get("socket_provider:" + ride_details.basic.provider_id._id.toString(), async (err, provider_socket) => {
+                    if (provider_socket) {
+                      socket.to(provider_socket).emit("request_cancelled", { ride_id });
+
+                      const track_room = "trackprovider_" + ride_details.basic.provider_id._id.toString();
+                      socket.leave(track_room);
+
+                      await FUNC.updateInRide(ride_details._id, socket.user_data._id, ride_details.basic.provider_id._id, false);
+
+                      ack({
+                        status: 200,
+                        message: "Ride cancelled Successfully"
+                      });
+
+                      // Send notifications to user and driver
+                      // await notification.PushNotifications({
+                      //   receiverId: socket.user_data._id,
+                      //   deviceTokens: socket.user_data.fcm_token,
+                      //   type: "BONUS",
+                      //   title: "Ride cancelled Successfully",
+                      //   message: "Ride cancelled Successfully",
+                      //   entityId: socket.user_data._id
+                      // });
+
+                      // await notification.PushNotificationsDriver({
+                      //   receiverId: ride_details.basic.provider_id._id.toString(),
+                      //   type: "BONUS",
+                      //   title: "Ride cancelled by user",
+                      //   message: "Ride cancelled by user",
+                      //   entityId: ride_details.basic.provider_id._id.toString()
+                      // });
+                    } else {
+                      ack({
+                        status: 200,
+                        message: "Ride cancelled Successfully"
+                      });
+                    }
+                  });
+                } else {
+                  ack({
+                    status: 200,
+                    message: "Ride cancelled Successfully"
+                  });
+                }
+
+              } catch (err) {
+                console.error("Error during ride cancel:", err);
+                ack({
+                  status: 500,
+                  message: "Error occurred while canceling the ride."
                 });
               }
               break;

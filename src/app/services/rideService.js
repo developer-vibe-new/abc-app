@@ -76,6 +76,7 @@ exports.CategoriesPrice = async (req) => {
 
                 if (i > 0) {
                     const distanceData = await calculateDistance(locations[i - 1], locations[i]);
+                    console.log('distanceData', distanceData);
                     distanceValue += distanceData.distanceValue;
                     durationValue += distanceData.durationValue;
                     origind[i] = distanceData;

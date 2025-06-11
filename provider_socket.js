@@ -111,7 +111,7 @@ async function runServer() {
         }
 
         switch (event) {
-          case "updateLocation":
+          case "updateLocation": {
             console.log("=====Update Location =====");
             var now_date = moment().toDate();
             let locations = data.locations;
@@ -130,7 +130,7 @@ async function runServer() {
                 $set: locationData
               },
               { upsert: true }
-            )
+            );
 
             const location_packet = {
               _id: socket.providerDetail._id.toString(),
@@ -142,8 +142,8 @@ async function runServer() {
 
             socket.emit('location_update', location_packet);
             break;
-
-          case 'accept_ride':
+          }
+          case 'accept_ride': {
             console.log("===== Accept Ride =====");
             var now_date = moment().toDate();
             const providerTaxiData = await ProviderTaxi.aggregate([
@@ -163,7 +163,7 @@ async function runServer() {
               {
                 $unwind: "$car_id"
               }
-            ])
+            ]);
 
             if (providerTaxiData.length === 0) {
               socket.emit('error', {
@@ -258,8 +258,8 @@ async function runServer() {
               let customer_location = rideData[0].location.source;
               const distanceObj = await FUNC.time_estimate(driver_location, customer_location);
               var estimate_time = distanceObj.estimated_time;
-              const timeEstimateOBJ = await FUNC.time_estimate(customer_location, rideData[0].location.destination);
-              var timeEstimate = timeEstimateOBJ.estimated_time;
+              // const timeEstimateOBJ = await FUNC.time_estimate(customer_location, rideData[0].location.destination);
+              // var timeEstimate = timeEstimateOBJ.estimated_time;
 
               const user_socket = await client.get('socket_user:' + rideData[0].basic.user_id._id.toString());
               var track_room = 'trackProvider_' + socket.providerDetail._id.toString();
@@ -281,6 +281,8 @@ async function runServer() {
             } else {
               console.log("No matching ride found or ride data is empty.");
             }
+            break;
+          };
 
           default:
             socket.emit('unknown_event', {
