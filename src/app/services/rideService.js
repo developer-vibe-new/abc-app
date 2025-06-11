@@ -154,7 +154,7 @@ exports.CategoriesPrice = async (req) => {
                 // stops,
                 origin: origind[1]?.origin || "",
                 destination: origind[locations.length - 1]?.destination || "",
-                image: `https://admin.xyz.com/icons/${taxiType.icon}`,
+                image: taxiType.icon,
             });
         }
         return {
