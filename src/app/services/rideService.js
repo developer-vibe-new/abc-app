@@ -16,7 +16,6 @@ var options = {
     apiKey: process.env.GOOGLE_APP_KEY, // for Mapquest, OpenCage, Google Premier 
     formatter: null // 'gpx', 'string', ... 
 };
-console.log('options', options);
 var geocoder = NodeGeocoder(options);
 exports.CategoriesPrice = async (req) => {
     try {

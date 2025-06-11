@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '/public')));
 app.use((req, res, next) => {
     console.log(req.method, req.protocol + '://' + req.get('host') + req.originalUrl);
-    console.log('body :', req.body, 'query :', req.query);
+    // console.log('body :', req.body, 'query :', req.query);
     req.date = new Date();
     next();
 });
