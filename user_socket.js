@@ -17,7 +17,8 @@ const { ObjectId } = require('mongoose').Types;
 const Location = require('./src/models/locationModel');
 const chatModel = require('./src/models/chatModel');
 const cityModel = require('./src/models/city');
-const { client } = require('./src/utils/redis');
+const { getClient } = require('./src/config/redis');
+const client = getClient();
 connectDB();
 const app = express();
 const server = http.createServer(app);
@@ -334,20 +335,16 @@ async function runServer() {
             case 'book_ride': {
               console.log("==========book_ride============");
 
-              const { source, category_id, ride_type, ridestationtype, planId, way,
-                city_id,
+              const { source, ridestationtype, planId, way,
                 destination,
                 payment_type,
                 razorpay_orderId,
-                distance,
-                duration,
                 razorpay_paymentId,
                 ride_on = moment().unix(),
                 offercode,
                 offer_id,
-                base_fixed_fare,
-                per_km,
-                fare_estimate
+                taxi_data: { id: category_id, per_km, fare_estimate, base_fixed_fare, city_id, name, distance,
+                  duration, }
               } = data;
 
               const locationQuery = [
@@ -394,7 +391,7 @@ async function runServer() {
 
               const new_ride = {
                 basic: {
-                  ride_type,
+                  ride_type: name,
                   ridestationtype,
                   planId,
                   way,

@@ -8,7 +8,8 @@ const { ObjectId } = require('mongoose').Types;
 const RequestLog = require('../models/RequestLogModel');
 google_distance.apiKey = process.env.GOOGLE_APP_KEY;
 const moment = require('moment');
-const { client } = require('../utils/redis');
+const { getClient } = require('../config/redis');
+const client = getClient();
 exports.send_request = async function (ride_id, io, appSettings) {
     try {
         const request_data_str = await client.get("request_data:" + ride_id);
