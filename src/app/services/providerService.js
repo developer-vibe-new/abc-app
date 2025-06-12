@@ -543,7 +543,10 @@ exports.getDocuments = async (req) => {
             status: statusCode.OK,
             success: true,
             message: resMessage.Documents_Retrieved_Successfully,
-            data: data.documents
+            data: {
+                documents: data.documents,
+                providerTaxiDocuments: data.providerTaxiDocuments
+            }
         };
     } catch (error) {
         return {
