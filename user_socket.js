@@ -333,16 +333,35 @@ async function runServer() {
 
             case 'book_ride': {
               console.log("==========book_ride============");
-              let source = data.source;
-              let locationQuery = [
+
+              const { source, category_id, ride_type, ridestationtype, planId, way,
+                city_id,
+                destination,
+                payment_type,
+                razorpay_orderId,
+                distance,
+                duration,
+                razorpay_paymentId,
+                ride_on = moment().unix(),
+                offercode,
+                offer_id,
+                base_fixed_fare,
+                per_km,
+                fare_estimate
+              } = data;
+
+              const locationQuery = [
                 {
                   $geoNear: {
-                    near: { type: "Point", coordinates: [Number(source.longitude), Number(source.latitude)] },
+                    near: {
+                      type: "Point",
+                      coordinates: [Number(source.longitude), Number(source.latitude)]
+                    },
                     distanceField: "distance",
                     maxDistance: 4000,
                     spherical: true,
                     query: {
-                      ...(Array.isArray(data.category_id) && data.category_id.length > 0 ? { type_ids: data.category_id } : {}),
+                      ...(Array.isArray(category_id) && category_id.length > 0 ? { type_ids: category_id } : {}),
                       available: true,
                       blocked: false
                     },
@@ -363,156 +382,113 @@ async function runServer() {
                     preserveNullAndEmptyArrays: true
                   }
                 },
-                {
-                  $limit: 10
-                }
+                { $limit: 10 }
               ];
 
-              var category_id = data.category_id;
-              var ride_type = data.ride_type;
-              var ridestationtype = data.ridestationtype;
-              var planId = data.planId;
-              var way = data.way;
-              var city_id = data.city_id;
-              var destination = data.destination;
-              var payment_type = data.payment_type;
-              var razorpay_orderId = data.razorpay_orderId;
-              var distance = data?.distance;
-              var duration = data.duration;
-              var razorpay_paymentId = data.razorpay_paymentId;
-              // var schedule = data.schedule;
-              var ride_on = (data?.ride_on) ? data.ride_on : moment().unix();
-              var offercode = data.offercode;
-              var offer_id = data.offer_id;
-              var base_fixed_fare = data.base_fixed_fare;
-              var per_km = data.per_km;
-              var fare_estimate = data.fare_estimate;
-
-
               const location_data = await Location.aggregate(locationQuery);
-              var allProviders = location_data;
-              if (allProviders.length > 0) {
-                var provider_ids = [];
-                var provider_addrs = [];
-                for (let provider of allProviders) {
-                  provider = provider.toObject ? provider.toObject() : provider;
-                  provider_ids.push(provider.provider_id._id);
-                  console.log("========provider_ids--------", provider_ids);
-                  provider_addrs.push({
-                    longitude: provider.locations[0],
-                    latitude: provider.locations[1],
-                  });
-                  var new_ride = {
-                    basic: {
-                      ride_type: ride_type,
-                      ridestationtype: ridestationtype,
-                      planId: planId,
-                      way: way,
-                      ride_status: "requested",
-                      // payment_type: payment_type,
-                      // razorpay_orderId: razorpay_orderId,
-                      // razorpay_paymentId: razorpay_paymentId,
-                      user_id: socket.user_data._id,
-                      instructions: "",
-                      // stripe_id: user.stripe_id,
-                      bookdistance: distance,
-                    },
-                    location: {
-                      source: source,
-                      destination: destination
-                    },
-                    meta: {
-                      category_id: category_id,
-                      city_id: city_id,
-                      zone_id: city_id,
-                      search_providers: provider_ids
-                    },
-                    payment: {
-                      fare_estimate: fare_estimate,
-                      base_fixed_fare: base_fixed_fare,
-                      per_km: per_km,
-                      // onlinepayment: onlinepayment,
-                      // offlinepayment: offlinepayment,
-                    },
-                    time: {
-                      ride_on: ride_on
-                    },
-                    offer: {
-                      offercode: offercode,
-                      offer_id: offer_id
-                    }
-                  };
-                  var NewRide = new Ride(new_ride);
-                  await NewRide.save();
-                  socket.emit('booking_in_progress', {
-                    success: true,
-                    message: 'Booking in progress',
-                    data: {
-                      ride_id: NewRide._id
-                    }
-                  });
+              const allProviders = location_data.map(p => p.toObject ? p.toObject() : p);
 
-                  var request_data = {};
-                  var ride_id = NewRide._id.toString();
-                  request_data.ride_id = ride_id;
-                  request_data.ride_status = NewRide.basic.ride_status;
-                  request_data.ride_edit_status = NewRide.basic.ride_edit_status;
-                  request_data.ride_type = NewRide.basic.ride_type;
-                  request_data.load_sec = 60;
-                  request_data.ridestationtype = NewRide.basic.ridestationtype;
-                  request_data.planId = NewRide.basic.planId;
-                  request_data.way = NewRide.basic.way;
-                  request_data.start_on = moment().unix();
-                  request_data.user_name = socket.user_data.full_name;
-                  request_data.user_mobile = socket.user_data.mobile;
-                  request_data.source = source;
-                  request_data.distance = distance;
-                  request_data.duration = duration;
-                  request_data.destination = destination;
-                  request_data.payment_type = payment_type;
-                  request_data.razorpay_orderId = razorpay_orderId;
-                  request_data.razorpay_paymentId = razorpay_paymentId;
-                  request_data.fare_estimate = fare_estimate;
-                  request_data.base_fixed_fare = base_fixed_fare;
-                  request_data.per_km = per_km;
-                  request_data.instructions = "";
-                }
+              if (allProviders.length === 0) break;
 
-                const processProviders = async () => {
-                  try {
-                    for (let provider of allProviders) {
+              const provider_ids = allProviders.map(p => p.provider_id._id);
 
-                      await client.rPush(`request_queue:${ride_id}`, provider.provider_id._id.toString());
+              const new_ride = {
+                basic: {
+                  ride_type,
+                  ridestationtype,
+                  planId,
+                  way,
+                  ride_status: "requested",
+                  user_id: socket.user_data._id,
+                  instructions: "",
+                  bookdistance: distance
+                },
+                location: { source, destination },
+                meta: {
+                  category_id,
+                  city_id,
+                  zone_id: city_id,
+                  search_providers: provider_ids
+                },
+                payment: {
+                  fare_estimate,
+                  base_fixed_fare,
+                  per_km
+                },
+                time: { ride_on },
+                offer: { offercode, offer_id }
+              };
 
-                      await RequestRide.create({ ride_id: ride_id, provider_id: provider.provider_id._id });
-                    }
+              const NewRide = new Ride(new_ride);
+              await NewRide.save();
 
-                    await client.set(`request_data:${ride_id}`, JSON.stringify(request_data));
+              socket.emit('booking_in_progress', {
+                success: true,
+                message: 'Booking in progress',
+                data: { ride_id: NewRide._id }
+              });
 
-                    const settingData = await appSettings.findOne();
-                    await client.set(`ride_attempt:${ride_id}`, settingData.ride_settings.ride_attempt);
+              const ride_id = NewRide._id.toString();
+              const request_data = {
+                ride_id,
+                ride_status: NewRide.basic.ride_status,
+                ride_edit_status: NewRide.basic.ride_edit_status,
+                ride_type: NewRide.basic.ride_type,
+                load_sec: 60,
+                ridestationtype: NewRide.basic.ridestationtype,
+                planId: NewRide.basic.planId,
+                way: NewRide.basic.way,
+                start_on: moment().unix(),
+                user_name: socket.user_data.full_name,
+                user_mobile: socket.user_data.mobile,
+                source,
+                distance,
+                duration,
+                destination,
+                payment_type,
+                razorpay_orderId,
+                razorpay_paymentId,
+                fare_estimate,
+                base_fixed_fare,
+                per_km,
+                instructions: ""
+              };
 
-                    await FUNC.send_request(ride_id, io, appSettings);
+              const processProviders = async () => {
+                try {
+                  await Promise.all(allProviders.map(provider => {
+                    return Promise.all([
+                      client.rPush(`request_queue:${ride_id}`, provider.provider_id._id.toString()),
+                      RequestRide.create({ ride_id, provider_id: provider.provider_id._id })
+                    ]);
+                  }));
 
-                  } catch (err) {
-                    const rideDetails = await Ride.findOneAndUpdate(
-                      { _id: ride_id, "basic.ride_status": "requested" },
-                      { $set: { "basic.ride_status": "declined" } },
-                      { new: true }
-                    );
+                  await client.set(`request_data:${ride_id}`, JSON.stringify(request_data));
 
-                    if (rideDetails) {
-                      socket.emit('ride_declined', { ride_id: ride_id });
-                    }
-                    console.error('Error in processProviders:', err);
+                  const settingData = await appSettings.findOne();
+                  await client.set(`ride_attempt:${ride_id}`, settingData.ride_settings.ride_attempt);
+
+                  await FUNC.send_request(ride_id, io, appSettings);
+
+                } catch (err) {
+                  const rideDetails = await Ride.findOneAndUpdate(
+                    { _id: ride_id, "basic.ride_status": "requested" },
+                    { $set: { "basic.ride_status": "declined" } },
+                    { new: true }
+                  );
+
+                  if (rideDetails) {
+                    socket.emit('ride_declined', { ride_id });
                   }
-                };
 
-                processProviders();
+                  console.error('Error in processProviders:', err);
+                }
+              };
 
-              }
+              await processProviders();
               break;
             }
+
             // Assuming this is inside an async function or a Socket.IO event handler
             case "User_msg_sent": {
               // Use an immediately-invoked async function to handle the logic
