@@ -1,4 +1,3 @@
-const { createClient } = require('@redis/client');
 const google_distance = require('google-distance');
 const Location = require('../models/locationModel');
 const Provider = require('../models/providerModel');
@@ -9,16 +8,9 @@ const { ObjectId } = require('mongoose').Types;
 const RequestLog = require('../models/RequestLogModel');
 google_distance.apiKey = process.env.GOOGLE_APP_KEY;
 const moment = require('moment');
-const client = createClient({
-    url: process.env.REDIS_URL,
-});
-
+const { client } = require('../utils/redis');
 exports.send_request = async function (ride_id, io, appSettings) {
     try {
-        if (!client.isOpen) {
-            await client.connect();
-        }
-
         const request_data_str = await client.get("request_data:" + ride_id);
         const request_data = JSON.parse(request_data_str);
 

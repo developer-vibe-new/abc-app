@@ -1,10 +1,6 @@
 const express = require('express');
-const { createClient } = require('@redis/client');
 require('dotenv').config();
-// const client = createClient({
-//   url: process.env.REDIS_URL,
-// });
-const client = createClient({ url: `redis://${process.env.REDIS_HOST || '127.0.0.1'}:${process.env.REDIS_PORT || 6379}` });
+
 const appSettings = require('./src/models/settingModel');
 const RequestRide = require('./src/models/RequestRide');
 const FUNC = require('./src/functions/function');
@@ -21,19 +17,11 @@ const { ObjectId } = require('mongoose').Types;
 const Location = require('./src/models/locationModel');
 const chatModel = require('./src/models/chatModel');
 const cityModel = require('./src/models/city');
-
+const { client } = require('./src/utils/redis');
 connectDB();
 const app = express();
 const server = http.createServer(app);
 let totalUser = 0;
-client.on('error', (err) => console.error('Redis Client Error', err));
-
-async function connectRedis() {
-  if (!client.isOpen) {
-    await client.connect();
-    console.log('Redis connected!');
-  }
-}
 
 async function runServer() {
   await initializeSocket(server);
@@ -386,7 +374,6 @@ async function runServer() {
               var planId = data.planId;
               var way = data.way;
               var city_id = data.city_id;
-              var stops = data.stops;
               var destination = data.destination;
               var payment_type = data.payment_type;
               var razorpay_orderId = data.razorpay_orderId;
@@ -397,10 +384,6 @@ async function runServer() {
               var ride_on = (data?.ride_on) ? data.ride_on : moment().unix();
               var offercode = data.offercode;
               var offer_id = data.offer_id;
-              var beforefare = data.beforefare;
-              var afterfare = data.afterfare;
-              var airportstatus = data.airportstatus;
-              var airportcharge = data.airportcharge;
               var base_fixed_fare = data.base_fixed_fare;
               var per_km = data.per_km;
               var fare_estimate = data.fare_estimate;
@@ -436,8 +419,7 @@ async function runServer() {
                     },
                     location: {
                       source: source,
-                      destination: destination,
-                      stops: stops,
+                      destination: destination
                     },
                     meta: {
                       category_id: category_id,
@@ -447,8 +429,6 @@ async function runServer() {
                     },
                     payment: {
                       fare_estimate: fare_estimate,
-                      airportcharge: airportcharge,
-                      airportstatus: airportstatus,
                       base_fixed_fare: base_fixed_fare,
                       per_km: per_km,
                       // onlinepayment: onlinepayment,
@@ -459,9 +439,7 @@ async function runServer() {
                     },
                     offer: {
                       offercode: offercode,
-                      offer_id: offer_id,
-                      beforefare: beforefare,
-                      afterfare: afterfare,
+                      offer_id: offer_id
                     }
                   };
                   var NewRide = new Ride(new_ride);
@@ -491,13 +469,10 @@ async function runServer() {
                   request_data.distance = distance;
                   request_data.duration = duration;
                   request_data.destination = destination;
-                  request_data.stops = stops;
                   request_data.payment_type = payment_type;
                   request_data.razorpay_orderId = razorpay_orderId;
                   request_data.razorpay_paymentId = razorpay_paymentId;
                   request_data.fare_estimate = fare_estimate;
-                  request_data.airportcharge = airportcharge;
-                  request_data.airportstatus = airportstatus;
                   request_data.base_fixed_fare = base_fixed_fare;
                   request_data.per_km = per_km;
                   request_data.instructions = "";
@@ -853,7 +828,6 @@ async function runServer() {
   });
 
   server.listen(SOCKET_USER_PORT, async () => {
-    await connectRedis();
     console.log(`User listening on port ${SOCKET_USER_PORT}`);
   });
 }
