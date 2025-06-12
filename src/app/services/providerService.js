@@ -302,6 +302,7 @@ exports.providerOtpVerification = async (req) => {
 
         driverData.otp = null;
         driverData.login_token = token;
+        console.log('driverData', driverData);
         await driverData.save();
 
         return {
@@ -368,8 +369,8 @@ exports.updateDocuments = async (req) => {
                 message: resMessage.Invalid_document_type
             };
         }
-
         const provider = await Provider.findById(_id);
+
         if (!provider) {
             return {
                 status: statusCode.NOT_FOUND,
@@ -379,13 +380,13 @@ exports.updateDocuments = async (req) => {
         }
 
         // Check if the provider has an operator_id and deny access if set
-        if (provider.operator_id !== null) {
-            return {
-                status: statusCode.UNAUTHORIZED,
-                success: false,
-                message: resMessage.Unauthorized_Access,
-            };
-        }
+        // if (provider.operator_id !== null) {
+        //     return {
+        //         status: statusCode.UNAUTHORIZED,
+        //         success: false,
+        //         message: resMessage.Unauthorized_Access,
+        //     };
+        // }
 
         // Handling other documents
         switch (documentType) {
