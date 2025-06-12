@@ -483,6 +483,11 @@ async function runServer() {
               };
 
               await processProviders();
+              ack({
+                status: 200,
+                success: true,
+                message: "Booking in progress"
+              });
               break;
             }
 
