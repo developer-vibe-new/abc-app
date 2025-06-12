@@ -297,7 +297,7 @@ exports.providerOtpVerification = async (req) => {
         const token = jwt.sign(
             { _id: driverData._id, mobile: driverData.mobile },
             process.env.SECRET_KEY,
-            { expiresIn: "1h" }
+            { expiresIn: "30d" }
         );
 
         driverData.otp = null;

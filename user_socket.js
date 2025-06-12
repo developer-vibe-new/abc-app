@@ -419,12 +419,6 @@ async function runServer() {
               const NewRide = new Ride(new_ride);
               await NewRide.save();
 
-              socket.emit('booking_in_progress', {
-                success: true,
-                message: 'Booking in progress',
-                data: { ride_id: NewRide._id }
-              });
-
               const ride_id = NewRide._id.toString();
               const request_data = {
                 ride_id,
@@ -486,7 +480,8 @@ async function runServer() {
               ack({
                 status: 200,
                 success: true,
-                message: "Booking in progress"
+                message: "Booking in progress",
+                data: { ride_id: NewRide._id }
               });
               break;
             }
