@@ -28,7 +28,6 @@ exports.send_request = async function (ride_id, io, appSettings) {
         }
 
         // await client.lRem("request_queue:" + ride_id, 1, provider_id);
-        console.log('provider_id--->>>', provider_id);
         const location_data = await Location.findOne({
             provider_id: provider_id,
             available: true,
@@ -68,8 +67,6 @@ exports.send_request = async function (ride_id, io, appSettings) {
 
                 } else {
                     console.log("New Request Socket Emit");
-                    console.log('request_data', JSON.stringify(request_data));
-                    console.log('provider_socket', provider_socket);
                     io.to(provider_socket).emit('new_request', request_data);
                 }
 

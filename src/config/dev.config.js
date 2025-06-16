@@ -12,8 +12,8 @@ module.exports = {
         from_address: process.env.from_address
     },
     HOST: process.env.HOST || 'http://play2plus.prometteur.in',
-    PORT: process.env.PORT || 6262,
-    ADMINPORT: process.env.ADMINPORT || 6161,
+    PORT: process.env.PORT || 5000,
+    ADMINPORT: process.env.ADMINPORT || 6262,
     CRONPORT: process.env.CRONPORT || 6363,
     DB_URL: process.env.DB_URL,
     FCM_SERVER_KEY: process.env.FCM_SERVER_KEY,

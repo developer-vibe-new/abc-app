@@ -33,7 +33,7 @@ app.use(session({
     cookie: { secure: false }
 }));
 // set port, listen for requests
-const PORT = devConfig.ADMINPORT || 6161;
+const PORT = devConfig.ADMINPORT || 6262;
 
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
