@@ -73,7 +73,7 @@ async function runServer() {
               });
             }
             let provider = providers[0];
-            socket.user_data = provider;
+            socket.providerDetail = provider;
             socket.join("provider_room");
 
             await client.set(`socket_provider:${provider._id}`, socket.id);
@@ -231,35 +231,45 @@ async function runServer() {
 
         switch (event) {
           case "updateLocation": {
-            console.log("=====Update Location =====");
-            let now_date = moment().toDate();
-            let locations = data.locations;
-            locations.forEach(location => {
-              location.coordinates = [location.coordinates[1], location.coordinates[0]];
-            });
-            const locationData = {
-              bearing: data.bearing,
-              speed: data.speed,
-              locations: locations,
-              lastupdatedlocation: now_date
-            };
-            await Location.findOneAndUpdate(
-              { provider_id: socket.providerDetail._id },
-              {
-                $set: locationData
-              },
-              { upsert: true }
-            );
+            console.log("=====Update Location =====", data);
+            try {
+              let now_date = moment().toDate();
+              let locations = data.locations;
+              locations.forEach(location => {
+                location.coordinates = [location.coordinates[1], location.coordinates[0]];
+              });
+              const locationData = {
+                bearing: data.bearing,
+                speed: data.speed,
+                locations: locations,
+                lastupdatedlocation: now_date
+              };
+              await Location.findOneAndUpdate(
+                { provider_id: socket.providerDetail._id },
+                {
+                  $set: locationData
+                },
+                { upsert: true }
+              );
 
-            const location_packet = {
-              _id: socket.providerDetail._id.toString(),
-              longitude: data.longitude,
-              latitude: data.latitude,
-              firstName: socket.providerDetail.first_name,
-              lastName: socket.providerDetail.last_name
-            };
+              const location_packet = {
+                _id: socket.providerDetail._id.toString(),
+                longitude: data.longitude,
+                latitude: data.latitude,
+                firstName: socket.providerDetail.first_name,
+                lastName: socket.providerDetail.last_name
+              };
 
-            socket.emit('location_update', location_packet);
+              socket.emit('location_update', location_packet);
+
+            } catch (error) {
+              console.error("Auth Error:", error);
+              ack({
+                status: 500,
+                success: false,
+                message: "Internal server error"
+              });
+            }
             break;
           }
           case 'accept_ride': {
