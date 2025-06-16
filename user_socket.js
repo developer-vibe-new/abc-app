@@ -381,8 +381,9 @@ async function runServer() {
                 },
                 { $limit: 10 }
               ];
-
+              console.log('locationQuery', JSON.stringify(locationQuery));
               const location_data = await Location.aggregate(locationQuery);
+              console.log('location_data', location_data.length);
               const allProviders = location_data.map(p => p.toObject ? p.toObject() : p);
 
               if (allProviders.length === 0) break;
