@@ -1,6 +1,6 @@
 var bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { SECRET_Key } = process.env;
+const { SECRET_KEY } = process.env;
 const User = require("../../models/users");
 const Car = require("../../models/cars");
 const Taxitype = require("../../models/taxiTypeModel");
@@ -73,10 +73,10 @@ exports.login = async (req) => {
       };
     }
 
-    // const auth_key = jwt.sign({ _id: findData._id }, SECRET_Key, {
+    // const auth_key = jwt.sign({ _id: findData._id }, SECRET_KEY, {
     //   expiresIn: "24h",
     // });
-    const auth_key = jwt.sign({ _id: findData._id }, SECRET_Key, {
+    const auth_key = jwt.sign({ _id: findData._id }, SECRET_KEY, {
       expiresIn: "24h", // Token will expire in 1 day
     });
     await adminRegisterModel.updateOne(
@@ -178,7 +178,7 @@ exports.updateOperator = async (req) => {
 
 exports.dashboardData = async (req) => {
   try {
-    const  adminData = await adminModel.findById(req.auth._id);
+    const adminData = await adminModel.findById(req.auth._id);
     const totalProviders = await Provider.find({ city_id: adminData.city_id }).countDocuments();
     const totalUsers = await User.find().countDocuments();
     const totalCars = await Car.find({ city_id: adminData.city_id }).countDocuments();
@@ -367,7 +367,7 @@ exports.checkAuthService = async (req) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, SECRET_Key);
+    const decoded = jwt.verify(token, SECRET_KEY);
 
     const adminData = await adminModel.findById(decoded._id);
 
@@ -385,7 +385,7 @@ exports.checkAuthService = async (req) => {
       message: resMessage.Data_Fetch_Successfully,
       data: adminData
     };
-  
+
   } catch (error) {
     return {
       status: statusCode.UNAUTHORIZED,
