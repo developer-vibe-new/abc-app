@@ -426,7 +426,6 @@ async function runServer() {
                 ride_status: NewRide.basic.ride_status,
                 ride_edit_status: NewRide.basic.ride_edit_status,
                 ride_type: NewRide.basic.ride_type,
-                load_sec: 60,
                 ridestationtype: NewRide.basic.ridestationtype,
                 planId: NewRide.basic.planId,
                 way: NewRide.basic.way,
@@ -454,10 +453,9 @@ async function runServer() {
                       RequestRide.create({ ride_id, provider_id: provider.provider_id._id })
                     ]);
                   }));
-
-                  await client.set(`request_data:${ride_id}`, JSON.stringify(request_data));
-
                   const settingData = await appSettings.findOne();
+                  request_data.load_sec = settingData.ride_settings.load_sec;
+                  await client.set(`request_data:${ride_id}`, JSON.stringify(request_data));
                   await client.set(`ride_attempt:${ride_id}`, settingData.ride_settings.ride_attempt);
 
                   await FUNC.send_request(ride_id, io, appSettings);
