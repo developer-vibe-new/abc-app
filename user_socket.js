@@ -453,11 +453,10 @@ async function runServer() {
                     ]);
                   }));
                   const settingData = await appSettings.findOne();
-                  request_data.load_sec = settingData.ride_settings.load_sec;
                   await client.set(`request_data:${ride_id}`, JSON.stringify(request_data));
                   await client.set(`ride_attempt:${ride_id}`, settingData.ride_settings.ride_attempt);
 
-                  await FUNC.send_request(ride_id, io, appSettings);
+                  await FUNC.send_request(ride_id, io, settingData);
 
                 } catch (err) {
                   const rideDetails = await Ride.findOneAndUpdate(
