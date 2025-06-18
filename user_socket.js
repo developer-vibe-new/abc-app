@@ -342,16 +342,10 @@ async function runServer() {
                 razorpay_paymentId,
                 ride_on = moment().unix(),
                 offercode,
-                offer_id
+                offer_id,
+                taxi_data: { id: category_id, per_km, price: fare_estimate, base_fixed_fare, city_id, name, distance,
+                  duration }
               } = data;
-              console.log('data-->>--', data);
-              console.log('fare_estimate-->>--', data.taxi_data);
-              let fare_estimate = data.taxi_data?.price;
-              let category_id = data.taxi_data?.id;
-              console.log('fare_estimate-->>', fare_estimate);
-              console.log('name-->>', data.taxi_data.name);
-              console.log('category_id-->>', category_id);
-
               const locationQuery = [
                 {
                   $geoNear: {
