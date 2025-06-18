@@ -343,10 +343,13 @@ async function runServer() {
                 ride_on = moment().unix(),
                 offercode,
                 offer_id,
-                taxi_data: { id: category_id, per_km, price: fare_estimate, base_fixed_fare, city_id, name, distance,
+                taxi_data: { id: category_id, per_km, price, base_fixed_fare, city_id, name, distance,
                   duration, }
               } = data;
+              console.log('fare_estimate-->>', data.taxi_data);
+              let fare_estimate = price;
               console.log('fare_estimate-->>', fare_estimate);
+              console.log('category_id-->>', category_id);
               const locationQuery = [
                 {
                   $geoNear: {
