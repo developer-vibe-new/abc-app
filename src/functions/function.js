@@ -69,7 +69,7 @@ exports.send_request = async function (ride_id, io, appSettings) {
                 } else {
                     console.log("New Request Socket Emit");
                     request_data.timer = appSettings.ride_settings.load_sec;
-                    console.log('request_data--->>>', request_data);
+                    console.log('moment().unix();--->>>', moment().unix());
                     io.to(provider_socket).emit('new_request', request_data);
                 }
 
