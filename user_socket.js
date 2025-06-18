@@ -137,7 +137,7 @@ async function runServer() {
                   });
                   return;
                 }
-
+                const settingData = await appSettings.findOne();
                 // Load provider locations
                 const providerIds = rides.map(ride => ride.basic.provider_id._id);
                 const locations = await Location.find({
@@ -157,7 +157,7 @@ async function runServer() {
                     ride_status: ride.basic.ride_status,
                     start_on: ride.created,
                     load_sec: ride.basic.ridestationtype === "daily" ? 10 : 20,
-                    instruction: appSettings[`${ride.basic.ridestationtype}_instruction`] || "",
+                    instruction: settingData[`${ride.basic.ridestationtype}_instruction`] || "",
                     source: ride.location.source,
                     ride_edit_status: ride.basic.ride_edit_status,
                     destination: ride.location.destination,

@@ -10,7 +10,7 @@ exports.addNotification = async (req) => {
             success: true,
             message: "Notification added successfully",
             data
-        }
+        };
     } catch (error) {
         return {
             statusCode: statusCode.BAD_REQUEST,
@@ -19,7 +19,7 @@ exports.addNotification = async (req) => {
             error: error.message || "Internal Server Error",
         };
     }
-}
+};
 
 exports.viewNotification = async (req) => {
     try {
@@ -89,19 +89,19 @@ exports.deleteNotification = async (req) => {
     try {
         const { id } = req.body;
         const data = await Notification.findById(id);
-        if(!data) {
+        if (!data) {
             return {
                 status: statusCode.NOT_FOUND,
                 success: false,
                 message: resMessage.Data_Not_Found,
-            }
+            };
         }
         await Notification.findByIdAndUpdate(id, { is_active: false });
         return {
             status: statusCode.OK,
             success: true,
             message: resMessage.Data_Deleted_Successfully,
-        }
+        };
     } catch (error) {
         return {
             status: statusCode.INTERNAL_SERVER_ERROR,
@@ -110,4 +110,4 @@ exports.deleteNotification = async (req) => {
             error: error.message || "Internal Server Error",
         };
     }
-}
+};

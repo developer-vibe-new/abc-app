@@ -10,6 +10,7 @@ google_distance.apiKey = process.env.GOOGLE_APP_KEY;
 const moment = require('moment');
 const { getClient } = require('../config/redis');
 const client = getClient();
+const Path = require('../models/pathModel');
 exports.send_request = async function (ride_id, io, appSettings) {
     try {
         const request_data_str = await client.get("request_data:" + ride_id);
@@ -173,7 +174,7 @@ exports.processRefund = async (ride_id, user_id, refund_amount, isRequestLog = f
     );
 
     const updateData = {
-        'basic.razorpay_refundId': "KTSREFUND" + Date.now() + FUNC.randomString(4, "123456789"),
+        'basic.razorpay_refundId': "TAXIREFUND" + Date.now() + FUNC.randomString(4, "123456789"),
         'payment.refund': refund_amount,
         'payment.onlinepayment': refund_amount
     };
@@ -185,4 +186,33 @@ exports.processRefund = async (ride_id, user_id, refund_amount, isRequestLog = f
     }
 
     console.log("Refund processed for ride:", ride_id);
+};
+exports.unlockDriver = async (provider_id) => {
+    try {
+        await client.del(`provider_available:${provider_id}`);
+    } catch (err) {
+        console.error(`unlockDriver error for ${provider_id}:`, err);
+    }
+};
+
+exports.checkDriver = async (provider_id) => {
+    try {
+        const ride_id = await client.get(`provider_available:${provider_id}`);
+        return ride_id !== null;
+    } catch (err) {
+        console.error(`checkDriver error for ${provider_id}:`, err);
+        return false;
+    }
+};
+
+exports.insertPath = async (ride_id, ride_status, longitude, latitude) => {
+    try {
+        await new Path({
+            ride_id,
+            ride_status,
+            loc: [latitude, longitude]
+        }).save();
+    } catch (err) {
+        console.error(`insertPath error for ride ${ride_id}:`, err);
+    }
 };
