@@ -68,8 +68,7 @@ exports.send_request = async function (ride_id, io, appSettings) {
 
                 } else {
                     console.log("New Request Socket Emit");
-                    request_data.start_on = moment().unix();
-                    request_data.start_on = request_data.load_sec;
+                    request_data.timer = appSettings.ride_settings.load_sec;
                     console.log('request_data--->>>', request_data);
                     io.to(provider_socket).emit('new_request', request_data);
                 }
@@ -96,7 +95,7 @@ exports.send_request = async function (ride_id, io, appSettings) {
                         await FUNC.send_request(ride_id, io, appSettings);
                     }
                     console.log("No Modified Data");
-                }, request_data.load_sec * 1000);
+                }, appSettings.ride_settings.load_sec * 1000);
                 console.log("Data has been loaded");
 
             } catch (err) {
