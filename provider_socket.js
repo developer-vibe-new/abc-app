@@ -71,9 +71,7 @@ async function runServer() {
                   }
                 }
               ];
-              console.log('pipeline', JSON.stringify(pipeline));
               const providers = await Provider.aggregate(pipeline);
-              console.log('pipeline', JSON.stringify(providers));
               if (providers.length <= 0) {
                 return ack({
                   status: 440,
