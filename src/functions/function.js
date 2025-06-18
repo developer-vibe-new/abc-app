@@ -68,6 +68,9 @@ exports.send_request = async function (ride_id, io, appSettings) {
 
                 } else {
                     console.log("New Request Socket Emit");
+                    request_data.start_on = moment().unix();
+                    request_data.start_on = request_data.load_sec;
+                    console.log('request_data--->>>', request_data);
                     io.to(provider_socket).emit('new_request', request_data);
                 }
 
