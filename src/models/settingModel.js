@@ -94,6 +94,11 @@ var SettingSchema = new Schema({
 			type: Number,
 			default: 2,
 			required: true
+		},
+		load_sec: {
+			type: Number,
+			default: 15,
+			required: true
 		}
 	},
 	payment: {
