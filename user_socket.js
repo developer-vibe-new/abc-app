@@ -343,7 +343,7 @@ async function runServer() {
                 ride_on = moment().unix(),
                 offercode,
                 offer_id,
-                taxi_data: { id: category_id, per_km, fare_estimate, base_fixed_fare, city_id, name, distance,
+                taxi_data: { id: category_id, per_km, price: fare_estimate, base_fixed_fare, city_id, name, distance,
                   duration, }
               } = data;
               console.log('fare_estimate-->>', fare_estimate);
