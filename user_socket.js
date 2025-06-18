@@ -346,7 +346,7 @@ async function runServer() {
                 taxi_data: { id: category_id, per_km, fare_estimate, base_fixed_fare, city_id, name, distance,
                   duration, }
               } = data;
-
+              console.log('fare_estimate-->>', fare_estimate);
               const locationQuery = [
                 {
                   $geoNear: {
