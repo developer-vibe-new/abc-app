@@ -1,9 +1,8 @@
 const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
-const { ObjectId } = require('mongoose').Types;
 const moment = require('moment');
-const { initializeSocket, getIO } = require('./socket');
+const { initializeSocket, getIO, remoteJoinUserToRoom } = require('./socket');
 const { SOCKET_DELIVERY_PORT } = require('./src/config/dev.config');
 const { getClient } = require('./src/config/redis');
 const client = getClient();
@@ -16,6 +15,8 @@ const connectDB = require('./src/config/db.config');
 // const User = require('./src/models/users');
 const Location = require('./src/models/locationModel');
 const rentalModel = require('./src/models/rentalModel');
+require('./src/models/users');
+require('./src/models/taxiTypeModel');
 
 const ProviderTaxi = require('./src/models/providerTaxi');
 const Ride = require('./src/models/ride');
@@ -65,9 +66,14 @@ async function runServer() {
                 {
                   $lookup: {
                     from: "provider_taxis",
-                    localField: "online_taxi",
+                    localField: "providerTaxi_id",
                     foreignField: "_id",
-                    as: "result"
+                    as: "online_taxi"
+                  }
+                }, {
+                  $unwind: {
+                    path: "$online_taxi",
+                    preserveNullAndEmptyArrays: true
                   }
                 }
               ];
@@ -282,16 +288,31 @@ async function runServer() {
             // Converted ES7+ async/await version of `accept_ride` socket handler
             case "accept_ride": {
               try {
-                console.log('----------accept_ride-------');
+                console.log('----------accept_ride-------', socket.providerDetail.online_taxi._id);
                 const now_date = moment().toDate();
-                const taxi_detail = await ProviderTaxi.findOne({
-                  _id: ObjectId(socket.user_data.online_taxi._id)
-                }).populate('car_id').lean();
+                let taxi_detail = await ProviderTaxi.aggregate([
+                  {
+                    $match: {
+                      _id: new mongoose.Types.ObjectId(socket.providerDetail.online_taxi._id)
+                    }
+                  },
+                  {
+                    $lookup: {
+                      from: "cars",
+                      localField: "car_id",
+                      foreignField: "_id",
+                      as: "car_id"
+                    }
+                  },
+                  {
+                    $unwind: "$car_id"
+                  }
+                ]);
 
-                if (!taxi_detail) return ack({ status: 203, message: "Your taxi not found" });
-
+                if (taxi_detail.length <= 0) return ack({ status: 203, message: "Your taxi not found" });
+                taxi_detail = taxi_detail[0];
                 const provider_detail = await Provider.findOne({
-                  _id: ObjectId(socket.user_data._id)
+                  _id: socket.providerDetail._id
                 });
 
                 if (!provider_detail) return ack({ status: 203, message: "Your driver not found" });
@@ -306,33 +327,34 @@ async function runServer() {
                 //   });
 
                 //   stripe_id = account.id;
-                //   await Provider.findByIdAndUpdate(socket.user_data._id, { stripe_id });
+                //   await Provider.findByIdAndUpdate(socket.providerDetail._id, { stripe_id });
                 // }
-
-                const ride_update = await Ride.findOneAndUpdate({
-                  _id: ObjectId(data.ride_id),
+                let obj = {
+                  _id: new mongoose.Types.ObjectId(data.ride_id),
                   "basic.ride_status": "requested",
-                  "meta.search_providers": ObjectId(socket.user_data._id)
-                }, {
-                  $pull: { "meta.search_providers": ObjectId(socket.user_data._id) },
+                  "meta.search_providers": socket.providerDetail._id
+                };
+                const ride_update = await Ride.findOneAndUpdate(obj, {
+                  $pull: {
+                    "meta.search_providers": socket.providerDetail._id
+                  },
                   $set: {
-                    "basic.provider_id": ObjectId(socket.user_data._id),
+                    "basic.provider_id": socket.providerDetail._id,
                     "basic.ride_status": "accepted",
                     "basic.otp": Math.floor(1000 + Math.random() * 9000),
-                    "basic.vehicle.title": taxi_detail.car_id.make + ' ' + taxi_detail.car_id.title,
+                    "basic.vehicle.title": `${taxi_detail.car_id.make} ${taxi_detail.car_id.title}`,
                     "basic.vehicle.plateno": taxi_detail.plateno,
                     "basic.vehicle.color": taxi_detail.color,
                     "time.accepted": now_date,
                     "meta.taxi_id": taxi_detail._id,
                     "meta.category_id": taxi_detail.type_ids[0],
-                    "basic.merchantStripe_id": '',
                     "basic.providername": `${provider_detail.first_name} ${provider_detail.last_name}`,
                     "basic.pickup_distance": data.pickup_distance,
+                    // ...(stripe_id && { "basic.merchantStripe_id": stripe_id })  // only set if available
                   }
                 }, { new: true })
                   .populate("meta.category_id")
                   .populate("basic.user_id");
-
                 if (!ride_update) return ack({ status: 203, message: "Something went wrong, please try again" });
 
                 socket.ride_details = {
@@ -340,7 +362,7 @@ async function runServer() {
                   ride_status: "accepted",
                   otp: ride_update.basic.otp,
                   providername: `${provider_detail.first_name} ${provider_detail.last_name}`,
-                  driver_image: `https://customer.ktscab.com/drivers/${provider_detail.image}`,
+                  driver_image: `https://driver.taxiride.com/drivers/${provider_detail.image}`,
                   source: ride_update.location.source,
                   destination: ride_update.location.destination,
                   stops: ride_update.location.stops,
@@ -351,18 +373,15 @@ async function runServer() {
                 const customer_location = ride_update.location.source;
                 const distanceObj = await FUNC.time_estimate(driver_location, customer_location).catch(() => ({ estimated_time: 5, pickup_distance: null }));
                 const estimated_time = distanceObj.estimated_time;
-
-                const user_socket = await new Promise(resolve => client.get("socket_user:" + ride_update.basic.user_id._id.toString(), (err, val) => resolve(val)));
-                const track_room = 'trackprovider_' + socket.user_data._id.toString();
-                await new Promise(resolve => io.of('/').adapter.remoteJoin(user_socket, track_room, () => resolve()));
-
+                const user_socket = await client.get("socket_user:" + ride_update.basic.user_id._id.toString());
+                const track_room = 'trackprovider_' + socket.providerDetail._id.toString();
+                await remoteJoinUserToRoom(user_socket, track_room);
                 const request_data = await FUNC.buildRideRequestData(ride_update, provider_detail, socket, data, distanceObj, now_date, estimated_time);
-
                 socket.to(user_socket).emit('ride_accepted', request_data);
 
-                await Location.update({ provider_id: ObjectId(socket.user_data._id) }, { $set: { 'time_estimate': estimated_time } });
+                await Location.updateOne({ provider_id: new mongoose.Types.ObjectId(socket.providerDetail._id) }, { $set: { 'time_estimate': estimated_time } });
 
-                await new Promise(resolve => FUNC.updateInRide(ride_update._id, ride_update.basic.user_id._id, socket.user_data._id, true, resolve));
+                await FUNC.updateInRide(ride_update._id, ride_update.basic.user_id._id, socket.providerDetail._id, true);
 
                 await FUNC.insertPath(ride_update._id, "accepted", data.longitude, data.latitude);
 
@@ -377,7 +396,6 @@ async function runServer() {
                 const driver_object = JSON.parse(JSON.stringify(request_data));
                 driver_object.user_name = ride_update.basic.user_id.full_name;
                 driver_object.user_mobile = ride_update.basic.user_id.mobile;
-
                 ack({ status: 200, message: "Ride Accepted Successfully", data: driver_object });
 
               } catch (error) {
@@ -390,11 +408,11 @@ async function runServer() {
             case "decline_ride": {
               try {
                 const rideId = data.ride_id;
-                const providerId = ObjectId(socket.user_data._id);
+                const providerId = new mongoose.Types.ObjectId(socket.providerDetail._id);
 
                 const updateResult = await Ride.updateOne(
                   {
-                    _id: ObjectId(rideId),
+                    _id: new mongoose.Types.ObjectId(rideId),
                     "basic.ride_status": "requested",
                     "meta.search_providers": providerId
                   },
@@ -425,7 +443,7 @@ async function runServer() {
                     if (err) {
                       const ride = await Ride.findOneAndUpdate(
                         {
-                          _id: ObjectId(rideId),
+                          _id: new mongoose.Types.ObjectId(rideId),
                           "basic.ride_status": "requested"
                         },
                         {
@@ -462,11 +480,11 @@ async function runServer() {
                 const now_date = new Date();
                 const ride_id = data.ride_id;
                 const cancel_reason = data.cancel_reason;
-                const providerId = socket.user_data._id;
+                const providerId = socket.providerDetail._id;
 
                 const ride_details = await Ride.findOneAndUpdate(
                   {
-                    _id: ObjectId(ride_id),
+                    _id: new mongoose.Types.ObjectId(ride_id),
                     "basic.ride_status": { $in: ["accepted", "arrived"] }
                   },
                   {
@@ -491,7 +509,7 @@ async function runServer() {
                 // If wallet payment, prepare refund logic (commented block shows original logic)
                 if (ride_details.basic.payment_type === "wallet") {
                   try {
-                    const user = await userModel.findById(ObjectId(ride_details.basic.user_id._id));
+                    const user = await userModel.findById(new mongoose.Types.ObjectId(ride_details.basic.user_id._id));
                     if (user) {
                       const newBalance = parseFloat(user.userbalance) + parseFloat(ride_details.payment.onlinepayment || 0);
 

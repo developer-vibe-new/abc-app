@@ -6,7 +6,7 @@ const appSettingsModel = require('../models/settingModel');
 const Ride = require('../models/ride');
 const FUNC = require('./function');
 const User = require('../models/users');
-const { ObjectId } = require('mongoose').Types;
+const mongoose = require('mongoose');
 const RequestLog = require('../models/RequestLogModel');
 google_distance.apiKey = process.env.GOOGLE_APP_KEY;
 const moment = require('moment');
@@ -60,7 +60,7 @@ exports.send_request = async function (ride_id, io, appSettings) {
                     await client.expire("ride_request:" + provider_id, request_data.load_sec);
 
                     await Provider.findOne({
-                        _id: ObjectId(provider_id)
+                        _id: new mongoose.Types.ObjectId(provider_id)
                     }, {
                         os: 1,
                         badge: 1,
@@ -164,7 +164,7 @@ exports.time_estimate = async (origin, destination) => {
 
 };
 exports.processRefund = async (ride_id, user_id, refund_amount, isRequestLog = false) => {
-    const user = await User.findOne({ _id: ObjectId(user_id) });
+    const user = await User.findOne({ _id: new mongoose.Types.ObjectId(user_id) });
     if (!user) {
         console.error("User not found for refund.");
         return;
@@ -173,7 +173,7 @@ exports.processRefund = async (ride_id, user_id, refund_amount, isRequestLog = f
     const newBalance = parseFloat(user.userbalance) + parseFloat(refund_amount);
 
     await User.updateOne(
-        { _id: ObjectId(user_id) },
+        { _id: new mongoose.Types.ObjectId(user_id) },
         { $set: { userbalance: newBalance } }
     );
 
@@ -184,9 +184,9 @@ exports.processRefund = async (ride_id, user_id, refund_amount, isRequestLog = f
     };
 
     if (isRequestLog) {
-        await RequestLog.updateOne({ _id: ObjectId(ride_id) }, { $set: updateData });
+        await RequestLog.updateOne({ _id: new mongoose.Types.ObjectId(ride_id) }, { $set: updateData });
     } else {
-        await Ride.updateOne({ _id: ObjectId(ride_id) }, { $set: updateData });
+        await Ride.updateOne({ _id: new mongoose.Types.ObjectId(ride_id) }, { $set: updateData });
     }
 
     console.log("Refund processed for ride:", ride_id);
@@ -245,13 +245,13 @@ exports.buildRideRequestData = async (ride, provider, socket, data, distanceObj,
         plateno: ride.basic.vehicle.plateno,
         color: ride.basic.vehicle.color,
         driver_name: `${provider.first_name} ${provider.last_name}`,
-        driver_image: `https://customer.ktscab.com/drivers/${provider.image}`,
+        driver_image: `https://driver.taxiride.com/drivers/${provider.image}`,
         category_image: ride.meta.category_id.thumb_3x,
-        driver_mobile: socket.user_data.callingmobile,
-        avg_rating: socket.user_data.avg_rating,
+        driver_mobile: socket.providerDetail.callingmobile,
+        avg_rating: socket.providerDetail.avg_rating,
         created: ride.created,
         provider_location: {
-            _id: socket.user_data._id.toString(),
+            _id: socket.providerDetail._id.toString(),
             longitude: data.longitude,
             latitude: data.latitude,
             bearing: data.bearing,
@@ -274,4 +274,59 @@ exports.buildRideRequestData = async (ride, provider, socket, data, distanceObj,
     }
 
     return request_data;
+};
+
+exports.updateInRide = async (ride_id, user_id, provider_id, in_ride) => {
+    try {
+        const inverse_in_ride = !in_ride;
+
+        const rides = await Ride.find({
+            "basic.user_id": new mongoose.Types.ObjectId(user_id),
+            "basic.ride_status": { $in: ["accepted", "arrived", "running"] }
+        })
+            .populate('basic.provider_id', 'first_name last_name full_name mobile callingmobile photo total_rating rated avg_rating image')
+            .populate("meta.category_id");
+
+        const hasActiveRide = rides && rides.length > 0;
+        const finalInRideStatus = hasActiveRide;
+        await User.updateOne(
+            { _id: new mongoose.Types.ObjectId(user_id) },
+            {
+                $set: {
+                    in_ride: finalInRideStatus,
+                    ride_id: hasActiveRide ? new mongoose.Types.ObjectId(ride_id) : null
+                }
+            }
+        );
+
+        await Provider.updateOne(
+            { _id: new mongoose.Types.ObjectId(provider_id) },
+            {
+                $set: {
+                    in_ride: in_ride,
+                    ride_id: new mongoose.Types.ObjectId(ride_id)
+                }
+            }
+        );
+
+        await Location.updateOne(
+            { provider_id: new mongoose.Types.ObjectId(provider_id) },
+            {
+                $set: {
+                    available: inverse_in_ride
+                }
+            }
+        );
+
+        if (inverse_in_ride) {
+            await new Promise((resolve) => {
+                FUNC.unlockDriver(provider_id.toString(), () => resolve());
+            });
+        }
+
+        return true; // final callback after all updates
+    } catch (error) {
+        console.error("Error in updateInRide:", error);
+        return true;
+    }
 };
