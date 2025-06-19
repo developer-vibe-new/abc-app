@@ -282,6 +282,7 @@ async function runServer() {
             // Converted ES7+ async/await version of `accept_ride` socket handler
             case "accept_ride": {
               try {
+                console.log('----------accept_ride-------');
                 const now_date = moment().toDate();
                 const taxi_detail = await ProviderTaxi.findOne({
                   _id: ObjectId(socket.user_data.online_taxi._id)
