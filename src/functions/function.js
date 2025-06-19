@@ -1,6 +1,8 @@
 const google_distance = require('google-distance');
 const Location = require('../models/locationModel');
 const Provider = require('../models/providerModel');
+const rentalModel = require('../models/rentalModel');
+const appSettingsModel = require('./src/models/settingModel');
 const Ride = require('../models/ride');
 const FUNC = require('./function');
 const User = require('../models/users');
@@ -217,4 +219,59 @@ exports.insertPath = async (ride_id, ride_status, longitude, latitude) => {
     } catch (err) {
         console.error(`insertPath error for ride ${ride_id}:`, err);
     }
+};
+
+// Helper to construct ride request data
+exports.buildRideRequestData = async (ride, provider, socket, data, distanceObj, now_date, estimated_time) => {
+    const settingData = await appSettingsModel.findOne();
+    const request_data = {
+        ride_id: ride._id.toString(),
+        ride_status: ride.basic.ride_status,
+        otp: ride.basic.otp,
+        ride_type: ride.basic.ride_type,
+        ridestationtype: ride.basic.ridestationtype,
+        start_on: ride.created,
+        updated_at: Math.floor(now_date.valueOf() / 1000),
+        load_sec: ride.basic.ridestationtype === "daily" ? 10 : 20,
+        instruction: settingData[`${ride.basic.ridestationtype}_instruction`],
+        source: ride.location.source,
+        destination: ride.location.destination,
+        stops: ride.location.stops,
+        time_estimate: estimated_time,
+        pickup_distance: distanceObj.pickup_distance,
+        payment_type: ride.basic.payment_type,
+        fare_estimate: ride.payment.fare_estimate,
+        car_title: ride.basic.vehicle.title,
+        plateno: ride.basic.vehicle.plateno,
+        color: ride.basic.vehicle.color,
+        driver_name: `${provider.first_name} ${provider.last_name}`,
+        driver_image: `https://customer.ktscab.com/drivers/${provider.image}`,
+        category_image: ride.meta.category_id.thumb_3x,
+        driver_mobile: socket.user_data.callingmobile,
+        avg_rating: socket.user_data.avg_rating,
+        created: ride.created,
+        provider_location: {
+            _id: socket.user_data._id.toString(),
+            longitude: data.longitude,
+            latitude: data.latitude,
+            bearing: data.bearing,
+            speed: data.speed,
+            time_estimate: estimated_time,
+            pickup_distance: distanceObj.pickup_distance
+        }
+    };
+
+    if (ride.basic.payment_type === "Card") {
+        request_data.card = ride.payment.card;
+    }
+
+    if (ride.basic.ridestationtype === "rentals") {
+        const rental = await rentalModel.findById(ride.basic.planId);
+        if (rental) {
+            request_data.planhour = rental.packages.hour;
+            request_data.plankm = rental.packages.distance;
+        }
+    }
+
+    return request_data;
 };
