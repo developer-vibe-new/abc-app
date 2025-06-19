@@ -84,5 +84,19 @@ function getIO() {
     }
     return global.io;
 }
+async function remoteLeaveUserFromRoom(userSocketId, roomName) {
+    const namespace = io.of("/");
+    if (typeof namespace.adapter.remoteLeave === "function") {
+        await new Promise((resolve, reject) => {
+            namespace.adapter.remoteLeave(userSocketId, roomName, (err) => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
+        console.log(`🚪 User ${userSocketId} removed from room ${roomName}`);
+    } else {
+        console.warn("⚠️ remoteLeave is not available. Check adapter setup.");
+    }
+}
 
-module.exports = { initializeSocket, getIO, remoteJoinUserToRoom };
+module.exports = { initializeSocket, getIO, remoteJoinUserToRoom, remoteLeaveUserFromRoom };

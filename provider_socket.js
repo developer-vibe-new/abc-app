@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
 const moment = require('moment');
-const { initializeSocket, getIO, remoteJoinUserToRoom } = require('./socket');
+const { initializeSocket, getIO, remoteJoinUserToRoom, remoteLeaveUserFromRoom } = require('./socket');
 const { SOCKET_DELIVERY_PORT } = require('./src/config/dev.config');
 const { getClient } = require('./src/config/redis');
 const client = getClient();
@@ -540,7 +540,7 @@ async function runServer() {
 
                   // Leave tracking room
                   const trackRoom = `trackprovider_${providerId}`;
-                  await io.of("/").adapter.remoteLeave(userSocketId, trackRoom);
+                  await remoteLeaveUserFromRoom(userSocketId, trackRoom);
                 }
 
                 // Update ride state
