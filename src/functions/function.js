@@ -3,6 +3,7 @@ const Location = require('../models/locationModel');
 const Provider = require('../models/providerModel');
 const rentalModel = require('../models/rentalModel');
 const appSettingsModel = require('../models/settingModel');
+const Transaction = require('../models/transactionsModel');
 const Ride = require('../models/ride');
 const FUNC = require('./function');
 const User = require('../models/users');
@@ -330,3 +331,141 @@ exports.updateInRide = async (ride_id, user_id, provider_id, in_ride) => {
         return true;
     }
 };
+exports.splitFare = function (fare, airportCharge) {
+    fare = parseFloat(parseFloat(fare - airportCharge).toFixed(2));
+
+    const gst_value = parseFloat(fare - (fare / (1 + 5 / 100))).toFixed(2);
+    const fare_after_tax_but_before_gst = fare - gst_value;
+
+    const base_fare_before_tax = parseFloat(fare_after_tax_but_before_gst / 1.13).toFixed(2);
+    const earnratiodata = parseFloat((fare_after_tax_but_before_gst - base_fare_before_tax)).toFixed(2);
+    const base_fare = parseFloat((fare - gst_value - earnratiodata).toFixed(2));
+
+    return {
+        base_fare: base_fare,
+        gst_per: 5,
+        gst_value: gst_value,
+        earnratiodata: earnratiodata,
+        fare_charged: fare + airportCharge
+    };
+};
+
+exports.ride_transaction_driver = async function (ride_id, fareObj) {
+    let onlinepayment = 0;
+    let offlinepayment = 0;
+    let refund = 0;
+
+    try {
+        const transaction_detail = await Transaction.findOne({ ride_id: ride_id });
+
+        if (transaction_detail) {
+            if (!transaction_detail.charge_id) {
+                return {
+                    card_to_cash: true,
+                    transaction_detail,
+                    payment_type: "cash",
+                    chargeObj: null
+                };
+            } else {
+                return {
+                    card_to_cash: false,
+                    transaction_detail,
+                    payment_type: "wallet",
+                    chargeObj: null
+                };
+            }
+        }
+
+        const ride_details = await Ride.findOne({ _id: ride_id })
+            .populate({ path: "basic.user_id" })
+            .lean();
+
+        const { payment_type, chargeObj } = await FUNC.ride_payment(ride_details, fareObj);
+
+        if (payment_type === "wallet") {
+            onlinepayment = ride_details.payment.onlinepayment;
+
+            if (fareObj.fare_charged < onlinepayment) {
+                refund = onlinepayment - fareObj.fare_charged;
+
+                const user = await User.findOne({ _id: ride_details.basic.user_id });
+                if (!user) throw new Error("User not found");
+
+                const newBalance = parseFloat(user.userbalance) + parseFloat(refund);
+                await User.updateOne(
+                    { _id: user._id },
+                    { $set: { userbalance: newBalance } }
+                );
+
+                await Ride.updateOne(
+                    { _id: ride_id },
+                    {
+                        $set: {
+                            'basic.razorpay_refundId': "KTSREFUND" + Date.now() + FUNC.randomString(4, "123456789"),
+                            'payment.refund': refund,
+                        }
+                    }
+                );
+            } else {
+                offlinepayment = fareObj.fare_charged - onlinepayment;
+            }
+        } else {
+            offlinepayment = fareObj.fare_charged;
+        }
+
+        const lastTransaction = await Transaction.find({
+            provider_id: ride_details.basic.provider_id
+        }).sort({ _id: -1 }).limit(1);
+
+        const precede_by = lastTransaction.length > 0 ? lastTransaction[0].transaction_no : "000000";
+
+        const p_earn = fareObj.base_fare;
+        const total = fareObj.fare_charged;
+
+        const transaction_data = {
+            ride_id: ride_id,
+            provider_id: ride_details.basic.provider_id,
+            total,
+            onlinepayment,
+            offlinepayment,
+            refund,
+            p_earn,
+            precede_by,
+            type: payment_type
+        };
+
+        if (payment_type === "wallet") {
+            transaction_data.charge_id = chargeObj.id;
+        }
+
+        const new_transaction = new Transaction(transaction_data);
+        const transaction = await new_transaction.save();
+        const card_to_cash = ride_details.basic.payment_type !== payment_type;
+
+        const providerdetail = await Provider.findOne({ _id: ride_details.basic.provider_id });
+
+        if (payment_type === "cash") {
+            const newBalance = providerdetail.balance - fareObj.gst_value - fareObj.earnratiodata;
+            await Provider.updateOne({ _id: providerdetail._id }, {
+                $set: { balance: newBalance }
+            });
+        } else {
+            const amt = p_earn - offlinepayment;
+            await Provider.updateOne({ _id: providerdetail._id }, {
+                $set: { balance: providerdetail.balance + amt }
+            });
+        }
+
+        return {
+            card_to_cash,
+            transaction_detail: transaction,
+            payment_type,
+            chargeObj
+        };
+
+    } catch (error) {
+        console.error("ride_transaction_driver error:", error);
+        throw error;
+    }
+};
+

@@ -381,6 +381,12 @@ async function runServer() {
                 { $limit: 10 }
               ];
               const location_data = await Location.aggregate(locationQuery);
+              if (!location_data) {
+                ack({
+                  status: 404,
+                  message: "Provider not found."
+                });
+              }
               console.log('location_data', location_data.length);
               const allProviders = location_data.map(p => p.toObject ? p.toObject() : p);
 

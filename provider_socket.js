@@ -2,6 +2,8 @@ const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
 const moment = require('moment');
+const Polyline = require('polyline');
+const axios = require('axios');
 const { initializeSocket, getIO, remoteJoinUserToRoom, remoteLeaveUserFromRoom } = require('./socket');
 const { SOCKET_DELIVERY_PORT } = require('./src/config/dev.config');
 const { getClient } = require('./src/config/redis');
@@ -571,7 +573,315 @@ async function runServer() {
               }
               break;
             }
+            case "arrived": {
+              try {
+                const now_date = moment().toDate();
+                const { ride_id, longitude, latitude } = data;
 
+                const ride_details = await Ride.findOneAndUpdate(
+                  {
+                    _id: new mongoose.Types.ObjectId(ride_id),
+                    "basic.ride_status": "accepted",
+                    "basic.provider_id": socket.user_data._id
+                  },
+                  {
+                    $set: {
+                      "basic.ride_status": "arrived",
+                      "time.arrived": now_date
+                    }
+                  },
+                  { new: true }
+                );
+
+                if (!ride_details) {
+                  return ack({
+                    status: 204,
+                    message: "Ride not found 1"
+                  });
+                }
+
+                socket.ride_details.ride_status = "arrived";
+                socket.ride_details.arrived_time = now_date;
+
+                const ride = ride_details.toObject();
+
+                let user_socket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
+                if (!user_socket) {
+                  console.error("Socket not found for user:");
+                  ack({
+                    status: 500,
+                    message: "Something went wrong",
+                  });
+
+                } else {
+                  socket.to(user_socket).emit("ride_arrived", { ride_id });
+                }
+
+                ack({
+                  status: 200,
+                  message: ride.basic.booked_by,
+                  data: { arrived: now_date },
+                });
+
+                FUNC.insertPath(ride_id, "arrived", longitude, latitude, () => { });
+                // const notificationObject = {
+                //   receiverId: ride.basic.user_id._id.toString(),
+                //   type: "BONUS",
+                //   title: "Ride arrived Successfully",
+                //   message: "Ride arrived Successfully",
+                //   entityId: ride.basic.user_id._id.toString(),
+                // };
+
+                // try {
+                //   await notification.PushNotificationsUserwise(notificationObject);
+                // } catch (notifyErr) {
+                //   console.error("Notification send failed:", notifyErr);
+                // }
+
+              } catch (error) {
+                console.error("Error in ride arrival flow:", error);
+                ack({
+                  status: 500,
+                  message: "Something went wrong",
+                });
+              }
+
+              break;
+
+            }
+            case "start_ride": {
+              try {
+                const now_date = moment().toDate();
+                const { ride_id, longitude, latitude, destination } = data;
+                const location_start = { longitude, latitude };
+
+                const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${latitude},${longitude}&destination=${destination.latitude},${destination.longitude}&mode=driving&key=${process.env.GOOGLE_APP_KEY}`;
+
+                let decodedPolyline = "";
+                try {
+                  const response = await axios.get(url);
+                  if (response.data?.routes[0]?.overview_polyline) {
+                    decodedPolyline = JSON.stringify(Polyline.decode(response.data.routes[0].overview_polyline.points));
+                  }
+                } catch (err) {
+                  console.error("Google Maps API Error:", err.message);
+                }
+
+                const ride_details = await Ride.findOneAndUpdate(
+                  {
+                    _id: new mongoose.Types.ObjectId(ride_id),
+                    "basic.ride_status": "arrived",
+                    "basic.provider_id": socket.user_data._id
+                  },
+                  {
+                    $set: {
+                      "basic.ride_status": "running",
+                      "time.started": now_date,
+                      "location.started": location_start,
+                      "location.destination": destination,
+                      "location.googlePath": decodedPolyline
+                    }
+                  },
+                  { new: true }
+                );
+
+                if (!ride_details) {
+                  return ack({
+                    status: 204,
+                    reply: "Ride not found 2"
+                  });
+                }
+
+                socket.ride_details.ride_status = "running";
+                const ride = ride_details.toObject();
+
+                // 🟡 Convert client.get to await-style using Promise
+                const user_socket = await new Promise((resolve, reject) => {
+                  client.get("socket_user:" + ride.basic.user_id.toString(), (err, result) => {
+                    if (err) reject(err);
+                    else resolve(result);
+                  });
+                });
+
+                if (user_socket) {
+                  socket.to(user_socket).emit("ride_started", { ride_id });
+                }
+
+                ack({
+                  status: 200,
+                  reply: "User notified successfully"
+                });
+
+                FUNC.insertPath(ride_id, "start_ride", longitude, latitude, () => { });
+
+                // const notificationObject = {
+                //   receiverId: ride.basic.user_id._id.toString(),
+                //   type: "BONUS",
+                //   title: "Ride started Successfully",
+                //   message: "Ride started Successfully",
+                //   entityId: ride.basic.user_id._id.toString(),
+                // };
+
+                // try {
+                //   await notification.PushNotificationsUserwise(notificationObject);
+                // } catch (notifyErr) {
+                //   console.error("Notification send failed:", notifyErr);
+                // }
+
+              } catch (error) {
+                console.error("start_ride error:", error);
+                ack({
+                  status: 500,
+                  reply: "Something went wrong"
+                });
+              }
+              break;
+
+            }
+            case "finish_ride": {
+              try {
+                const now_date = moment().toDate();
+                const { ride_id, airportCharge = 0, longitude, latitude } = data;
+
+                const rideDetails = await Ride.findOne({ _id: ride_id });
+                if (!rideDetails) {
+                  return ack({
+                    status: 203,
+                    reply: "Ride not found 3"
+                  });
+                }
+
+                const fare_charged = rideDetails.payment.fare_charged;
+                const fareObj = FUNC.splitFare(fare_charged, airportCharge, appSettings);
+
+                const appSettings = await appSettings.findOne();
+
+                const location_finish = { longitude, latitude };
+                function rideTransactionDriverAsync(ride_id, fareObj, appSettings) {
+                  return new Promise((resolve, reject) => {
+                    FUNC.ride_transaction_driver(ride_id, fareObj, appSettings, (err, card_to_cash, transaction_detail, payment_type, chargeObj) => {
+                      if (err) return reject(err);
+                      resolve({ card_to_cash, transaction_detail, payment_type, chargeObj });
+                    });
+                  });
+                }
+
+                // 🔁 Now using async version of ride_transaction_driver
+                const {
+                  card_to_cash,
+                  transaction_detail,
+                  payment_type,
+                  chargeObj
+                } = await rideTransactionDriverAsync(ride_id, fareObj, appSettings);
+
+                const update_ride_data = {
+                  "basic.ride_status": "finished",
+                  "time.finished": now_date,
+                  "location.finished": location_finish,
+                  "payment.base_fare": fareObj.base_fare,
+                  "payment.gst_per": fareObj.gst_per,
+                  "payment.gst_value": fareObj.gst_value,
+                  "payment.fare_charged": fareObj.fare_charged,
+                  "payment.totalcharges": fareObj.fare_charged - fareObj.base_fare,
+                  "payment.earnratiodata": fareObj.earnratiodata,
+                  "payment.onlinepayment": transaction_detail.onlinepayment,
+                  "payment.offlinepayment": transaction_detail.offlinepayment,
+                  "payment.refund": transaction_detail.refund
+                };
+
+                if (card_to_cash) {
+                  update_ride_data["basic.payment_type"] = "cash";
+                }
+
+                const ride_details = await Ride.findOneAndUpdate(
+                  {
+                    _id: ride_id,
+                    "basic.ride_status": "running",
+                    "basic.provider_id": socket.user_data._id
+                  },
+                  { $set: update_ride_data },
+                  { new: true }
+                );
+
+                if (!ride_details) {
+                  return ack({
+                    status: 203,
+                    reply: "Ride not found 3"
+                  });
+                }
+
+                delete socket.ride_details;
+                const ride = ride_details.toObject();
+
+                const user_socket = await new Promise((resolve) => {
+                  client.get("socket_user:" + ride.basic.user_id.toString(), (err, result) => {
+                    resolve(result || null);
+                  });
+                });
+
+                if (user_socket) {
+                  socket.to(user_socket).emit('ride_finished', {
+                    ride_id,
+                    fare: Math.round(fare_charged),
+                    refundamount: ride.payment.refund,
+                    offlinepayment: ride.payment.offlinepayment,
+                  });
+
+                  const track_room = 'trackprovider_' + socket.user_data._id.toString();
+                  await remoteLeaveUserFromRoom(user_socket, track_room);
+                  await FUNC.updateInRide(ride._id, ride.basic.user_id, socket.user_data._id, false);
+
+                  await Provider.updateOne(
+                    { _id: socket.user_data._id },
+                    {
+                      $inc: {
+                        total_earnings: transaction_detail.p_earn,
+                        total_rides: 1
+                      }
+                    }
+                  );
+
+                  const messageText = card_to_cash || ride.basic.payment_type === "cash"
+                    ? "Ride finished Successfully, Please collect money from passenger"
+                    : "Ride finished Successfully, Payment has been done online";
+
+                  ack({
+                    status: 200,
+                    paymentObj: transaction_detail, payment_type, chargeObj,
+                    reply: messageText
+                  });
+
+                  FUNC.insertPath(ride_id, "finish_ride", longitude, latitude, () => { });
+
+                  // const locations = await Path.find(
+                  //   { ride_id: ride_id, ride_status: "running" },
+                  //   { loc: 1 },
+                  //   { sort: { _id: 1 } }
+                  // );
+
+                  // const path_array = locations.map(location => [location.loc[0], location.loc[1]]);
+                  // const poly_encode = Polyline.encode(path_array); // optional use
+
+                  // const notificationObject = {
+                  //   receiverId: ride.basic.user_id._id.toString(),
+                  //   type: "BONUS",
+                  //   title: "Ride finished Successfully",
+                  //   message: "Ride finished Successfully",
+                  //   entityId: ride.basic.user_id._id.toString(),
+                  // };
+
+                  // await notification.PushNotificationsUserwise(notificationObject);
+                }
+
+              } catch (error) {
+                console.error("finish_ride error:", error);
+                ack({
+                  status: 500,
+                  reply: "Something went wrong"
+                });
+              }
+              break;
+            }
 
             default:
               socket.emit('unknown_event', {
