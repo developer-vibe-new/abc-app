@@ -35,4 +35,4 @@ var PathSchema = new Schema({
 
 
 //make this available to our users in Node applications
-module.exports.Path = mongoose.model('Path', PathSchema);
+module.exports = mongoose.model('Path', PathSchema);
