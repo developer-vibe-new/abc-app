@@ -13,7 +13,7 @@ google_distance.apiKey = process.env.GOOGLE_APP_KEY;
 const moment = require('moment');
 const { getClient } = require('../config/redis');
 const client = getClient();
-const Path = require('../models/pathModel');
+const pathModel = require('../models/pathModel');
 exports.send_request = async function (ride_id, io, appSettings) {
     try {
         const request_data_str = await client.get("request_data:" + ride_id);
@@ -212,11 +212,11 @@ exports.checkDriver = async (provider_id) => {
 
 exports.insertPath = async (ride_id, ride_status, longitude, latitude) => {
     try {
-        await new Path({
+        await pathModel.create({
             ride_id,
             ride_status,
             loc: [latitude, longitude]
-        }).save();
+        });
     } catch (err) {
         console.error(`insertPath error for ride ${ride_id}:`, err);
     }

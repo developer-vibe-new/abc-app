@@ -56,18 +56,23 @@ async function initializeSocket(server) {
 }
 
 async function remoteJoinUserToRoom(user_socket_id, room_name) {
-    const namespace = io.of("/");
+    try {
+        // const namespace = io.of("/");
+        await io.of("/").adapter.remoteJoin(user_socket_id, room_name);
 
-    if (typeof namespace.adapter.remoteJoin === "function") {
-        await new Promise((resolve, reject) => {
-            namespace.adapter.remoteJoin(user_socket_id, room_name, (err) => {
-                if (err) return reject(err);
-                resolve();
-            });
-        });
-        console.log(`🔗 Remote joined ${user_socket_id} to room ${room_name}`);
-    } else {
-        console.warn("⚠️ remoteJoin is not available. Check adapter setup.");
+        // if (typeof namespace.adapter.remoteJoin === "function") {
+        //     await new Promise((resolve, reject) => {
+        //         namespace.adapter.remoteJoin(user_socket_id, room_name, (err) => {
+        //             if (err) return reject(err);
+        //             resolve();
+        //         });
+        //     });
+        //     console.log(`🔗 Remote joined ${user_socket_id} to room ${room_name}`);
+        // } else {
+        //     console.warn("⚠️ remoteJoin is not available. Check adapter setup.");
+        // }
+    } catch (error) {
+        console.log('error', error);
     }
 }
 
