@@ -59,6 +59,7 @@ async function remoteJoinUserToRoom(user_socket_id, room_name) {
     try {
         // const namespace = io.of("/");
         await io.of("/").adapter.remoteJoin(user_socket_id, room_name);
+        console.log(`🔗 Remote joined ${user_socket_id} to room ${room_name}`);
 
         // if (typeof namespace.adapter.remoteJoin === "function") {
         //     await new Promise((resolve, reject) => {
