@@ -688,7 +688,7 @@ async function runServer() {
                 if (!ride_details) {
                   return ack({
                     status: 204,
-                    reply: "Ride not found 2"
+                    message: "Ride not found 2"
                   });
                 }
 
@@ -709,7 +709,7 @@ async function runServer() {
 
                 ack({
                   status: 200,
-                  reply: "User notified successfully"
+                  message: "User notified successfully"
                 });
 
                 FUNC.insertPath(ride_id, "start_ride", longitude, latitude, () => { });
@@ -732,7 +732,7 @@ async function runServer() {
                 console.error("start_ride error:", error);
                 ack({
                   status: 500,
-                  reply: "Something went wrong"
+                  message: "Something went wrong"
                 });
               }
               break;
@@ -747,7 +747,7 @@ async function runServer() {
                 if (!rideDetails) {
                   return ack({
                     status: 203,
-                    reply: "Ride not found 3"
+                    message: "Ride not found 3"
                   });
                 }
 
@@ -806,7 +806,7 @@ async function runServer() {
                 if (!ride_details) {
                   return ack({
                     status: 203,
-                    reply: "Ride not found 3"
+                    message: "Ride not found 3"
                   });
                 }
 
@@ -848,7 +848,7 @@ async function runServer() {
                   ack({
                     status: 200,
                     paymentObj: transaction_detail, payment_type, chargeObj,
-                    reply: messageText
+                    message: messageText
                   });
 
                   FUNC.insertPath(ride_id, "finish_ride", longitude, latitude, () => { });
@@ -877,7 +877,7 @@ async function runServer() {
                 console.error("finish_ride error:", error);
                 ack({
                   status: 500,
-                  reply: "Something went wrong"
+                  message: "Something went wrong"
                 });
               }
               break;
