@@ -815,14 +815,14 @@ async function runServer() {
                 const settings = await appSettings.findOne();
                 const fareObj = FUNC.splitFare(fare_charged, airportCharge, settings);
                 const location_finish = { longitude, latitude };
-                function rideTransactionDriverAsync(ride_id, fareObj, settings) {
-                  return new Promise((resolve, reject) => {
-                    FUNC.ride_transaction_driver(ride_id, fareObj, settings, (err, card_to_cash, transaction_detail, payment_type, chargeObj) => {
-                      if (err) return reject(err);
-                      resolve({ card_to_cash, transaction_detail, payment_type, chargeObj });
-                    });
-                  });
-                }
+                // function rideTransactionDriverAsync(ride_id, fareObj, settings) {
+                //   return new Promise((resolve, reject) => {
+                //     FUNC.ride_transaction_driver(ride_id, fareObj, settings, (err, card_to_cash, transaction_detail, payment_type, chargeObj) => {
+                //       if (err) return reject(err);
+                //       resolve({ card_to_cash, transaction_detail, payment_type, chargeObj });
+                //     });
+                //   });
+                // }
                 console.log('rideTransactionDriverAsync--->>');
 
                 // 🔁 Now using async version of ride_transaction_driver
@@ -830,7 +830,7 @@ async function runServer() {
                   transaction_detail,
                   payment_type,
                   chargeObj
-                } = await rideTransactionDriverAsync(ride_id, fareObj, settings);
+                } = await FUNC.ride_transaction_driver(ride_id, fareObj, settings);
                 console.log('rideTransactionDriverAsync--->>', payment_type);
                 const update_ride_data = {
                   "basic.ride_status": "finished",
