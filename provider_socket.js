@@ -289,7 +289,7 @@ async function runServer() {
                     const isRunning = status === "running";
                     console.log('isRunning', isRunning);
                     console.log('isAccepted', isAccepted);
-                    console.log('socket.ride_detail', socket.ride_detail);
+                    console.log('socket.ride_detail', socket.ride_details);
                     if (isAccepted || isRunning) {
                       const targetPoint = isAccepted
                         ? socket.ride_details.source
