@@ -269,8 +269,8 @@ async function runServer() {
 
                 const location_packet = {
                   _id: socket.providerDetail._id.toString(),
-                  longitude: data.locations[0].coordinates[0],
-                  latitude: data.locations[0].coordinates[1],
+                  longitude: data.locations[0].coordinates[1],
+                  latitude: data.locations[0].coordinates[0],
                   firstName: socket.providerDetail.first_name,
                   lastName: socket.providerDetail.last_name
                 };
