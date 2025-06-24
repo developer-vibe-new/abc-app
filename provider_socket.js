@@ -253,14 +253,14 @@ async function runServer() {
                   ...loc,
                   coordinates: [loc.coordinates[1], loc.coordinates[0]]
                 }));
-                console.log('locations', JSON.stringify(locations));
+                // console.log('locations', JSON.stringify(locations));
                 const locationData = {
                   bearing: data.bearing,
                   speed: data.speed,
                   locations: locations,
                   lastupdatedlocation: now_date
                 };
-
+                console.log("=====Update Location =====", data.locations[0]);
                 await Location.findOneAndUpdate(
                   { provider_id: socket.providerDetail._id },
                   { $set: locationData },
