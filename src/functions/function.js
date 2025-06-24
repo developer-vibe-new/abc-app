@@ -320,9 +320,10 @@ exports.updateInRide = async (ride_id, user_id, provider_id, in_ride) => {
         );
 
         if (inverse_in_ride) {
-            await new Promise((resolve) => {
-                FUNC.unlockDriver(provider_id.toString(), () => resolve());
-            });
+            await FUNC.unlockDriver(provider_id.toString());
+            // await new Promise((resolve) => {
+            //     FUNC.unlockDriver(provider_id.toString(), () => resolve());
+            // });
         }
 
         return true; // final callback after all updates

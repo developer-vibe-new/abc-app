@@ -859,7 +859,7 @@ async function runServer() {
                 delete socket.ride_details;
                 const ride = ride_details.toObject();
                 const user_socket = await client.get("socket_user:" + ride.basic.user_id.toString());
-                console.log('user_socket', user_socket);
+
                 if (user_socket) {
                   socket.to(user_socket).emit('ride_finished', {
                     ride_id,
@@ -867,6 +867,7 @@ async function runServer() {
                     refundamount: ride.payment.refund,
                     offlinepayment: ride.payment.offlinepayment,
                   });
+                  console.log('user_socket', user_socket);
 
                   // const track_room = 'trackprovider_' + socket.providerDetail._id.toString();
                   // await remoteLeaveUserFromRoom(user_socket, track_room);
@@ -881,6 +882,7 @@ async function runServer() {
                       }
                     }
                   );
+                  console.log('user_socket', user_socket);
 
                   const messageText = card_to_cash || ride.basic.payment_type === "cash"
                     ? "Ride finished Successfully, Please collect money from passenger"
