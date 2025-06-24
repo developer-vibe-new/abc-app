@@ -307,10 +307,16 @@ async function runServer() {
                           { $set: { time_estimate: estimated_time } }
                         );
                       } else if (isRunning) {
-                        await Ride.updateOne(
-                          { _id: socket.ride_details.ride_id },
-                          { $set: { "location.path": data.path } }
-                        );
+                        // await Ride.updateOne(
+                        //   { _id: socket.ride_details.ride_id },
+                        //   { $set: { "location.path": data.path } }
+                        // );
+                        let redisKey = `ride:${socket.ride_details.ride_id}:path`;
+                        let location = {
+                          lat: data.latitude,
+                          lng: data.longitude
+                        };
+                        await client.rPush(redisKey, JSON.stringify(location));
                       }
 
                       return ack({
