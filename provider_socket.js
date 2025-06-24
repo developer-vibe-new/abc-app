@@ -815,15 +815,6 @@ async function runServer() {
                 const settings = await appSettings.findOne();
                 const fareObj = FUNC.splitFare(fare_charged, airportCharge, settings);
                 const location_finish = { longitude, latitude };
-                // function rideTransactionDriverAsync(ride_id, fareObj, settings) {
-                //   return new Promise((resolve, reject) => {
-                //     FUNC.ride_transaction_driver(ride_id, fareObj, settings, (err, card_to_cash, transaction_detail, payment_type, chargeObj) => {
-                //       if (err) return reject(err);
-                //       resolve({ card_to_cash, transaction_detail, payment_type, chargeObj });
-                //     });
-                //   });
-                // }
-                console.log('rideTransactionDriverAsync--->>');
 
                 // 🔁 Now using async version of ride_transaction_driver
                 const { card_to_cash,
@@ -846,21 +837,18 @@ async function runServer() {
                   "payment.offlinepayment": transaction_detail.offlinepayment,
                   "payment.refund": transaction_detail.refund
                 };
-                console.log('update_ride_data', update_ride_data);
                 if (card_to_cash) {
                   update_ride_data["basic.payment_type"] = "cash";
                 }
 
-                const ride_details = await Ride.findOneAndUpdate(
-                  {
-                    _id: ride_id,
-                    "basic.ride_status": "running",
-                    "basic.provider_id": socket.providerDetail._id
-                  },
+                const ride_details = await Ride.findOneAndUpdate({
+                  _id: ride_id,
+                  "basic.ride_status": "running",
+                  "basic.provider_id": socket.providerDetail._id
+                },
                   { $set: update_ride_data },
                   { new: true }
                 );
-                console.log('ride_details', ride_details);
                 if (!ride_details) {
                   return ack({
                     status: 203,
@@ -880,8 +868,8 @@ async function runServer() {
                     offlinepayment: ride.payment.offlinepayment,
                   });
 
-                  const track_room = 'trackprovider_' + socket.providerDetail._id.toString();
-                  await remoteLeaveUserFromRoom(user_socket, track_room);
+                  // const track_room = 'trackprovider_' + socket.providerDetail._id.toString();
+                  // await remoteLeaveUserFromRoom(user_socket, track_room);
                   await FUNC.updateInRide(ride._id, ride.basic.user_id, socket.providerDetail._id, false);
 
                   await Provider.updateOne(
