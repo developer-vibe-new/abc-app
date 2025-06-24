@@ -277,9 +277,9 @@ async function runServer() {
 
                 socket.emit('location_update', location_packet);
 
-                const track_room = 'trackprovider_' + socket.user_data._id.toString();
+                const track_room = 'trackprovider_' + socket.providerDetail._id.toString();
 
-                if (socket.user_data.in_ride && socket.ride_details) {
+                if (socket.providerDetail.in_ride && socket.ride_details) {
                   let estimated_time = 5;
                   let distanceObj = {};
 
@@ -305,7 +305,7 @@ async function runServer() {
 
                       if (isAccepted) {
                         await Location.update(
-                          { provider_id: socket.user_data._id },
+                          { provider_id: socket.providerDetail._id },
                           { $set: { time_estimate: estimated_time } }
                         );
                       } else if (isRunning) {
