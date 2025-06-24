@@ -253,7 +253,7 @@ async function runServer() {
                   ...loc,
                   coordinates: [loc.coordinates[1], loc.coordinates[0]]
                 }));
-
+                console.log('locations', JSON.stringify(locations));
                 const locationData = {
                   bearing: data.bearing,
                   speed: data.speed,
