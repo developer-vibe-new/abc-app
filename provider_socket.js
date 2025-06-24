@@ -287,7 +287,9 @@ async function runServer() {
                     const status = socket.ride_details.ride_status;
                     const isAccepted = status === "accepted";
                     const isRunning = status === "running";
-
+                    console.log('isRunning', isRunning);
+                    console.log('isAccepted', isAccepted);
+                    console.log('socket.ride_detail', socket.ride_detail);
                     if (isAccepted || isRunning) {
                       const targetPoint = isAccepted
                         ? socket.ride_details.source
