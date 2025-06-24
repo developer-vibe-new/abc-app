@@ -27,17 +27,12 @@ var SequenceSchema = new Schema({
 });
 
 
-SequenceSchema.statics.getNext = function getNext(model_name, cb) {
-    return this.findOneAndUpdate({
-        model_name: model_name
-    }, {
-        $inc: {
-            seq: 1
-        }
-    }, {
-        upsert: true,
-        new: true
-    }, cb);
+SequenceSchema.statics.getNext = async function getNext(model_name) {
+    return await this.findOneAndUpdate(
+        { model_name: model_name },
+        { $inc: { seq: 1 } },
+        { upsert: true, new: true }
+    );
 };
 
 

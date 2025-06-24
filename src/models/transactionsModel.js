@@ -98,20 +98,18 @@ const TransactionSchema = new mongoose.Schema({
 // TransactionSchema.path('updated').get(MODALFUNC.string_ts);
 
 
-TransactionSchema.pre('save', function (next) {
+TransactionSchema.pre('save', async function () {
+	try {
+		const transaction = this;
+		const seqObj = await Sequence.getNext("transaction");
 
-	var transaction = this;
-	// eslint-disable-next-line no-undef
-	Sequence.getNext("transaction", function (err, seqObj) {
-		if (err) {
-			if (err) return next(err);
-		} else {
-			var str = "" + seqObj.seq;
-			var pad = "00000";
-			transaction.transaction_no = pad.substring(0, pad.length - str.length) + str;
-			next();
-		}
-	});
+		const str = "" + seqObj.seq;
+		const pad = "00000";
+		transaction.transaction_no = pad.substring(0, pad.length - str.length) + str;
+	} catch (err) {
+		console.log('err', err);
+		throw err;
+	}
 });
 
 
