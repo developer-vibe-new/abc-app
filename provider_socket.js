@@ -583,7 +583,7 @@ async function runServer() {
                   {
                     _id: new mongoose.Types.ObjectId(ride_id),
                     "basic.ride_status": "accepted",
-                    "basic.provider_id": socket.user_data._id
+                    "basic.provider_id": socket.providerDetail._id
                   },
                   {
                     $set: {
@@ -672,7 +672,7 @@ async function runServer() {
                   {
                     _id: new mongoose.Types.ObjectId(ride_id),
                     "basic.ride_status": "arrived",
-                    "basic.provider_id": socket.user_data._id
+                    "basic.provider_id": socket.providerDetail._id
                   },
                   {
                     $set: {
@@ -798,7 +798,7 @@ async function runServer() {
                   {
                     _id: ride_id,
                     "basic.ride_status": "running",
-                    "basic.provider_id": socket.user_data._id
+                    "basic.provider_id": socket.providerDetail._id
                   },
                   { $set: update_ride_data },
                   { new: true }
@@ -828,12 +828,12 @@ async function runServer() {
                     offlinepayment: ride.payment.offlinepayment,
                   });
 
-                  const track_room = 'trackprovider_' + socket.user_data._id.toString();
+                  const track_room = 'trackprovider_' + socket.providerDetail._id.toString();
                   await remoteLeaveUserFromRoom(user_socket, track_room);
-                  await FUNC.updateInRide(ride._id, ride.basic.user_id, socket.user_data._id, false);
+                  await FUNC.updateInRide(ride._id, ride.basic.user_id, socket.providerDetail._id, false);
 
                   await Provider.updateOne(
-                    { _id: socket.user_data._id },
+                    { _id: socket.providerDetail._id },
                     {
                       $inc: {
                         total_earnings: transaction_detail.p_earn,
