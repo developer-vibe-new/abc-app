@@ -846,7 +846,7 @@ async function runServer() {
                   "payment.offlinepayment": transaction_detail.offlinepayment,
                   "payment.refund": transaction_detail.refund
                 };
-
+                console.log('update_ride_data', update_ride_data);
                 if (card_to_cash) {
                   update_ride_data["basic.payment_type"] = "cash";
                 }
@@ -860,7 +860,7 @@ async function runServer() {
                   { $set: update_ride_data },
                   { new: true }
                 );
-
+                console.log('ride_details', ride_details);
                 if (!ride_details) {
                   return ack({
                     status: 203,
@@ -870,12 +870,7 @@ async function runServer() {
 
                 delete socket.ride_details;
                 const ride = ride_details.toObject();
-
-                const user_socket = await new Promise((resolve) => {
-                  client.get("socket_user:" + ride.basic.user_id.toString(), (err, result) => {
-                    resolve(result || null);
-                  });
-                });
+                const user_socket = await client.get("socket_user:" + ride.basic.user_id.toString());
 
                 if (user_socket) {
                   socket.to(user_socket).emit('ride_finished', {
@@ -902,7 +897,7 @@ async function runServer() {
                   const messageText = card_to_cash || ride.basic.payment_type === "cash"
                     ? "Ride finished Successfully, Please collect money from passenger"
                     : "Ride finished Successfully, Payment has been done online";
-
+                  console.log('messageText', messageText);
                   ack({
                     status: 200,
                     paymentObj: transaction_detail, payment_type, chargeObj,
