@@ -380,6 +380,7 @@ async function runServer() {
                 },
                 { $limit: 10 }
               ];
+              console.log('locationQuery', JSON.stringify(locationQuery));
               const location_data = await Location.aggregate(locationQuery);
               if (!location_data) {
                 ack({
