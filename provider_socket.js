@@ -287,42 +287,35 @@ async function runServer() {
                     const status = socket.ride_details.ride_status;
                     const isAccepted = status === "accepted";
                     const isRunning = status === "running";
-                    if (isAccepted || isRunning) {
-                      const targetPoint = isAccepted
-                        ? socket.ride_details.source
-                        : socket.ride_details.destination;
 
+                    const targetPoint = isAccepted
+                      ? socket.ride_details.source
+                      : socket.ride_details.destination;
+                    if (isAccepted) {
                       distanceObj = await FUNC.time_estimate(location_packet, targetPoint);
                       estimated_time = distanceObj?.estimated_time || 5;
 
                       location_packet.time_estimate = estimated_time;
-                      location_packet.pickup_distance = distanceObj.pickup_distance;
-
+                      location_packet.pickup_distance = distanceObj?.pickup_distance || 0;
+                      await Location.update(
+                        { provider_id: socket.providerDetail._id },
+                        { $set: { time_estimate: estimated_time } }
+                      );
                       socket.broadcast.to(track_room).emit("track_provider", location_packet);
-
-                      if (isAccepted) {
-                        await Location.update(
-                          { provider_id: socket.providerDetail._id },
-                          { $set: { time_estimate: estimated_time } }
-                        );
-                      } else if (isRunning) {
-                        // await Ride.updateOne(
-                        //   { _id: socket.ride_details.ride_id },
-                        //   { $set: { "location.path": data.path } }
-                        // );
-                        let redisKey = `ride:${socket.ride_details.ride_id}:path`;
-                        let location = {
-                          lat: data.latitude,
-                          lng: data.longitude
-                        };
-                        await client.rPush(redisKey, JSON.stringify(location));
-                      }
-
-                      return ack({
-                        status: 200,
-                        message: "location updated"
-                      });
                     }
+                    if (isRunning) {
+                      let redisKey = `ride:${socket.ride_details.ride_id}:path`;
+                      let location = {
+                        lat: data.latitude,
+                        lng: data.longitude
+                      };
+                      await client.rPush(redisKey, JSON.stringify(location));
+                    }
+                    return ack({
+                      status: 200,
+                      message: "location updated"
+                    });
+
                   } catch (err) {
                     console.error("Time estimate error:", err);
                   }
