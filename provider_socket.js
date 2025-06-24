@@ -308,7 +308,6 @@ async function runServer() {
                         lat: data.latitude,
                         lng: data.longitude
                       };
-                      console.log('redisKey', redisKey);
                       await client.rPush(redisKey, JSON.stringify(location));
                     }
                     return ack({

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const Sequence = require('./sequenceModel').Sequence;
 const TransactionSchema = new mongoose.Schema({
 
 	transaction_no: {
