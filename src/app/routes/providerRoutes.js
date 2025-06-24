@@ -15,6 +15,7 @@ router.post('/updateDrive/:id', verifyToken, upload.single('image'), responseHan
 router.post('/deleteDriver', verifyToken, responseHandler(controller.deleteDriverController));
 router.post('/uploadDocuments', verifyToken, responseHandler(controller.updateDocumentsController));
 router.get('/getDocuments', verifyToken, responseHandler(controller.getDocumentsController));
+router.get('/timeFareEstimate', verifyToken, responseHandler(controller.timeFareEstimate));
 
 //otp routes api for  providers
 router.post('/register', responseHandler(controller.registerController));

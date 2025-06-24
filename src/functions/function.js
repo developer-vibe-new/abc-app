@@ -3,7 +3,7 @@ const Location = require('../models/locationModel');
 const Provider = require('../models/providerModel');
 const rentalModel = require('../models/rentalModel');
 const appSettingsModel = require('../models/settingModel');
-const Transaction = require('../models/transactionsModel');
+const Transaction = require('../models/transactionsModel').Transaction;
 const Ride = require('../models/ride');
 const FUNC = require('./function');
 const User = require('../models/users');
@@ -14,6 +14,7 @@ const moment = require('moment');
 const { getClient } = require('../config/redis');
 const client = getClient();
 const pathModel = require('../models/pathModel');
+const Taxitype = require('../models/taxiTypeModel');
 exports.send_request = async function (ride_id, io, appSettings) {
     try {
         const request_data_str = await client.get("request_data:" + ride_id);
@@ -331,7 +332,8 @@ exports.updateInRide = async (ride_id, user_id, provider_id, in_ride) => {
         return true;
     }
 };
-exports.splitFare = function (fare, airportCharge) {
+exports.splitFare = function (fare, airportCharge = 0) {
+    console.log('fare', fare);
     fare = parseFloat(parseFloat(fare - airportCharge).toFixed(2));
 
     const gst_value = parseFloat(fare - (fare / (1 + 5 / 100))).toFixed(2);
@@ -340,20 +342,22 @@ exports.splitFare = function (fare, airportCharge) {
     const base_fare_before_tax = parseFloat(fare_after_tax_but_before_gst / 1.13).toFixed(2);
     const earnratiodata = parseFloat((fare_after_tax_but_before_gst - base_fare_before_tax)).toFixed(2);
     const base_fare = parseFloat((fare - gst_value - earnratiodata).toFixed(2));
-
-    return {
+    let obj = {
         base_fare: base_fare,
         gst_per: 5,
         gst_value: gst_value,
         earnratiodata: earnratiodata,
         fare_charged: fare + airportCharge
     };
+    console.log('obj', obj);
+    return obj;
 };
 
 exports.ride_transaction_driver = async function (ride_id, fareObj) {
     let onlinepayment = 0;
     let offlinepayment = 0;
     let refund = 0;
+    console.log('fareObj', fareObj);
 
     try {
         const transaction_detail = await Transaction.findOne({ ride_id: ride_id });
@@ -381,7 +385,7 @@ exports.ride_transaction_driver = async function (ride_id, fareObj) {
             .lean();
 
         const { payment_type, chargeObj } = await FUNC.ride_payment(ride_details, fareObj);
-
+        console.log('payment_type', payment_type);
         if (payment_type === "wallet") {
             onlinepayment = ride_details.payment.onlinepayment;
 
@@ -401,7 +405,7 @@ exports.ride_transaction_driver = async function (ride_id, fareObj) {
                     { _id: ride_id },
                     {
                         $set: {
-                            'basic.razorpay_refundId': "KTSREFUND" + Date.now() + FUNC.randomString(4, "123456789"),
+                            'basic.razorpay_refundId': "TAXIREFUND" + Date.now() + FUNC.randomString(4, "123456789"),
                             'payment.refund': refund,
                         }
                     }
@@ -410,8 +414,9 @@ exports.ride_transaction_driver = async function (ride_id, fareObj) {
                 offlinepayment = fareObj.fare_charged - onlinepayment;
             }
         } else {
-            offlinepayment = fareObj.fare_charged;
+            offlinepayment = Number(fareObj.fare_charged);
         }
+        console.log('offlinepayment', offlinepayment);
 
         const lastTransaction = await Transaction.find({
             provider_id: ride_details.basic.provider_id
@@ -469,3 +474,219 @@ exports.ride_transaction_driver = async function (ride_id, fareObj) {
     }
 };
 
+
+exports.ride_payment = async function (ride_details) {
+    let chargeObj = {
+        id: ride_details.basic.user_id?.stripe_id || ''
+    };
+
+    if (ride_details.basic.payment_type === "cash") {
+        return { type: "cash", chargeObj };
+    } else if (ride_details.basic.payment_type === "wallet") {
+        return { type: "wallet", chargeObj };
+    }
+
+    // optional: handle unknown payment type
+    throw new Error("Unsupported payment type");
+};
+exports.ride_fare_estimate_rental = async function (category_id,
+    origin,
+    duration,
+    distance,
+    planId,
+    hour,
+    onlinepayment,
+    ride_id,
+    rentalKm,
+    rentalHour,
+    rentalPrice
+) {
+    try {
+        // const rentalPlans = await rentalModel.find({ _id: planId });
+        const categoryData = await Taxitype.findOne({ _id: category_id });
+        if (!categoryData) throw new Error("Price Not Found");;
+        let totalDistance = parseFloat(distance) / 1000; // convert meters to km
+        let extraDistance = 0;
+        let extraDistanceAmount = 0;
+        let total_fare = 0;
+
+        if (parseFloat(rentalKm) >= totalDistance) {
+            total_fare = parseFloat(rentalPrice);
+        } else {
+            extraDistance = totalDistance - parseFloat(rentalKm);
+            extraDistanceAmount = extraDistance * parseFloat(categoryData.rental_distance_fare);
+            total_fare = parseFloat(rentalPrice) + extraDistanceAmount;
+        }
+
+        // Extra time calculation (duration is in seconds)
+        let allowedMinutes = parseFloat(rentalHour) * 60;
+        let rideMinutes = parseFloat(duration) / 60;
+        let extraTime = Math.max(0, rideMinutes - allowedMinutes);
+        let extraTimeAmount = extraTime * parseFloat(categoryData.time_fare);
+
+        total_fare += extraTimeAmount;
+
+        // Make note for extra charges
+        let note = 'No extra charges';
+        if (extraDistance > 0 && extraTime > 0) {
+            note = `Extra distance: ${extraDistance.toFixed(2)} km, Extra time: ${extraTime.toFixed(2)} min. Extra for distance: ${extraDistanceAmount.toFixed(2)}, Extra for time: ${extraTimeAmount.toFixed(2)}`;
+        } else if (extraDistance > 0) {
+            note = `Extra distance: ${extraDistance.toFixed(2)} km. Extra amount: ${extraDistanceAmount.toFixed(2)}`;
+        } else if (extraTime > 0) {
+            note = `Extra time: ${extraTime.toFixed(2)} min. Extra amount: ${extraTimeAmount.toFixed(2)}`;
+        }
+
+        // Update ride fare in DB
+        await Ride.updateOne(
+            { _id: ride_id },
+            {
+                $set: {
+                    'payment.fare_charged': Math.round(total_fare),
+                    'payment.extrapaynote': note
+                }
+            }
+        );
+
+        return {
+            currency: categoryData.currency,
+            bookdistance: totalDistance,
+            type: "rentals",
+            total_fare: Math.round(total_fare),
+            onlinepayment: Math.round(onlinepayment),
+            offlinepayment: Math.round(total_fare) - Math.round(onlinepayment)
+        };
+
+    } catch (error) {
+        console.log('errror', error);
+        throw error;
+    }
+};
+
+exports.ride_fare_estimate = async function (
+    category_id,
+    origin,
+    destination,
+    duration,
+    distance,
+    discount,
+    bookdistance,
+    start_fare,
+    airportCharge,
+    onlinepayment,
+    ride_id
+) {
+    try {
+        // 1. Get distance and duration from Google
+        // const distanceData = await google_distance.get({
+        //     index: 1,
+        //     origin: `${origin.latitude},${origin.longitude}`,
+        //     destination: `${destination.latitude},${destination.longitude}`,
+        // });
+
+        // 2. Fetch vehicle category details
+        const categoryData = await Taxitype.findOne({ _id: category_id });
+        if (!categoryData) return { status: 404, message: "category is not available" };
+
+        let totalDistance = parseFloat(bookdistance);
+        let total_fare = 0;
+
+        // 3. Base fare calculation
+        if (totalDistance <= 3) {
+            total_fare = Math.round((categoryData.base_fare * 1.13) * 1.05);
+        } else {
+            const extraDistanceFare = (totalDistance - 3) * categoryData.distance_fare;
+            total_fare = Math.round((categoryData.base_fare + extraDistanceFare) * 1.13 * 1.05);
+        }
+
+        // (Optional: add time fare or other logic using distanceData.durationValue if needed)
+
+        // 4. Apply discount logic (if fare after discount < 0, set to 0)
+        const finalFare = total_fare - discount < 0 ? 0 : start_fare;
+
+        // 5. Update fare in DB
+        await Ride.updateOne(
+            { _id: ride_id },
+            {
+                $set: {
+                    'payment.fare_charged': Math.round(finalFare),
+                },
+            }
+        );
+
+        // 6. Return estimated fare details
+        return {
+            currency: categoryData.currency,
+            bookdistance: totalDistance,
+            type: "daily",
+            total_fare: Math.round(finalFare),
+            onlinepayment: Math.round(onlinepayment),
+            offlinepayment: Math.round(finalFare) - Math.round(onlinepayment),
+            airportCharge: airportCharge
+        };
+
+    } catch (err) {
+        console.log('err', err);
+        throw err;
+    }
+};
+
+exports.ride_fare_estimate_outstation = async function (
+    category_id,
+    origin,
+    destination,
+    duration,
+    distance,
+    way,
+    fare_estimate,
+    TravelDistance,
+    onlinepayment,
+    ride_id,
+    per_km
+) {
+    try {
+        // 1. Get distance from Google (optional use)
+        // const distanceData = await google_distance.get({
+        //     index: 1,
+        //     origin: `${origin.latitude},${origin.longitude}`,
+        //     destination: `${destination.latitude},${destination.longitude}`
+        // });
+
+        // 2. Get vehicle category info
+        const categoryData = await Taxitype.findOne({ _id: category_id });
+        if (!categoryData) throw new Error("Price Not Found");
+
+        // 3. Fare calculation
+        let totalDistance = parseFloat(TravelDistance);
+        let baseFare = totalDistance * parseFloat(per_km);
+        let total_fare = Math.round((baseFare * 1.13) * 1.05); // tax + service fee
+
+        // 4. Update fare in DB
+        await Ride.updateOne(
+            { _id: ride_id },
+            {
+                $set: {
+                    'payment.fare_charged': total_fare,
+                }
+            }
+        );
+
+        // 5. Calculate offline payment
+        const roundedOnline = Math.round(onlinepayment);
+        let offlinepayment = total_fare - roundedOnline;
+        if (offlinepayment < 0) offlinepayment = 0;
+
+        // 6. Return final result
+        return {
+            currency: categoryData.currency,
+            bookdistance: totalDistance,
+            type: "outstation",
+            total_fare: total_fare,
+            onlinepayment: roundedOnline,
+            offlinepayment: offlinepayment
+        };
+
+    } catch (err) {
+        console.log('err', err);
+        throw err;
+    }
+};

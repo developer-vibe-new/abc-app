@@ -1,8 +1,11 @@
 const { statusCode, resMessage } = require('../../config/default.json');
 const Provider = require('../../models/providerModel');
+const Ride = require('../../models/ride');
 const mongoose = require('mongoose');
 const jwt = require("jsonwebtoken");
-
+const moment = require('moment');
+const FUNC = require('../../functions/function');
+const rentalModel = require('../../models/rentalModel');
 exports.addDriver = async (req) => {
     try {
         const driver = req.body;
@@ -555,5 +558,115 @@ exports.getDocuments = async (req) => {
             message: resMessage.Internal_Server_Error,
             error: error.message || "Internal Server Error",
         };
+    }
+};
+exports.timeFareEstimate = async function (req, res, next) {
+    try {
+        const reqdata = req.body;
+        const ride_id = reqdata.ride_id;
+        const distance = reqdata.distance;
+        const location_coordinates = reqdata.location_coordinates;
+
+        const ride_details = await Ride.findOneAndUpdate(
+            { _id: ride_id },
+            {
+                $set: {
+                    "basic.distance": distance,
+                    "location.path": location_coordinates
+                }
+            },
+            { new: true }
+        );
+
+        if (!ride_details) {
+            return res.status(203).json({
+                data: {},
+                reply: "Not able to find associated ride with ride_id",
+                meta: req.phoneMeta
+            });
+        }
+
+        const { time: { started }, meta: { category_id }, basic, payment, location, offer, outstation, _id: rideId } = ride_details;
+
+        const duration = moment().unix() - started;
+        const source = {
+            longitude: location.source.longitude,
+            latitude: location.source.latitude
+        };
+        const destination = {
+            longitude: reqdata.destination_long,
+            latitude: reqdata.destination_lat
+        };
+
+        let fareObj;
+
+        switch (basic.ridestationtype) {
+            case "rentals": {
+                const RentalDetails = await rentalModel.findOne({ _id: basic.planId });
+                if (!RentalDetails) throw new Error("Rental plan not found");
+
+                fareObj = await FUNC.ride_fare_estimate_rental(
+                    category_id.toString(),
+                    source,
+                    duration,
+                    distance,
+                    basic.planId,
+                    RentalDetails.hour,
+                    payment.onlinepayment,
+                    rideId,
+                    basic.rentalKm,
+                    basic.rentalHour,
+                    basic.rentalPrice
+                );
+                break;
+            }
+
+            case "outstation": {
+                const TravelDistance = outstation.endkm - outstation.startkm;
+
+                fareObj = await FUNC.ride_fare_estimate_outstation(
+                    category_id.toString(),
+                    source,
+                    destination,
+                    duration,
+                    distance,
+                    basic.way,
+                    payment.fare_estimate,
+                    TravelDistance,
+                    payment.onlinepayment,
+                    rideId,
+                    payment.per_km
+                );
+                break;
+            }
+
+            default: {
+                const discount = offer.beforefare - offer.afterfare;
+
+                fareObj = await FUNC.ride_fare_estimate(
+                    category_id.toString(),
+                    source,
+                    destination,
+                    duration,
+                    distance,
+                    discount,
+                    basic.bookdistance,
+                    payment.fare_estimate,
+                    payment.airportcharge,
+                    payment.onlinepayment,
+                    rideId
+                );
+                break;
+            }
+        }
+
+        return res.status(200).json({
+            data: fareObj,
+            reply: "",
+            meta: req.phoneMeta
+        });
+
+    } catch (err) {
+        return next(err);
     }
 };
