@@ -697,12 +697,13 @@ async function runServer() {
                 const ride = ride_details.toObject();
 
                 // 🟡 Convert client.get to await-style using Promise
-                const user_socket = await new Promise((resolve, reject) => {
-                  client.get("socket_user:" + ride.basic.user_id.toString(), (err, result) => {
-                    if (err) reject(err);
-                    else resolve(result);
-                  });
-                });
+                // const user_socket = await new Promise((resolve, reject) => {
+                //   client.get("socket_user:" + ride.basic.user_id.toString(), (err, result) => {
+                //     if (err) reject(err);
+                //     else resolve(result);
+                //   });
+                // });
+                const user_socket = await client.get("socket_user:" + ride.basic.user_id.toString());
 
                 if (user_socket) {
                   socket.to(user_socket).emit("ride_started", { ride_id });
