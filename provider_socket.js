@@ -246,7 +246,7 @@ async function runServer() {
 
           switch (event) {
             case "updateLocation": {
-              console.log("=====Update Location =====", data);
+              console.log("=====Update Location =====");
               try {
                 const now_date = moment().toDate();
                 const locations = data.locations.map(loc => ({
@@ -287,9 +287,6 @@ async function runServer() {
                     const status = socket.ride_details.ride_status;
                     const isAccepted = status === "accepted";
                     const isRunning = status === "running";
-                    console.log('isRunning', isRunning);
-                    console.log('isAccepted', isAccepted);
-                    console.log('socket.ride_detail', socket.ride_details);
                     if (isAccepted || isRunning) {
                       const targetPoint = isAccepted
                         ? socket.ride_details.source

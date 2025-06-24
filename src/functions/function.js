@@ -133,6 +133,8 @@ exports.lockDriver = async (provider_id, ride_id, ringTime) => {
 };
 
 exports.time_estimate = async (origin, destination) => {
+    console.log('origin', origin);
+    console.log('destination', destination);
     const distanceData = await new Promise((resolve, reject) => {
         google_distance.get({
             index: 1,
@@ -146,7 +148,7 @@ exports.time_estimate = async (origin, destination) => {
             resolve(data);
         });
     });
-
+    console.log('distanceData', distanceData);
     // Extracting the relevant data
     let estimated_time = Math.round(distanceData.durationValue / 60);
     const pickup_distance = distanceData.distance;
