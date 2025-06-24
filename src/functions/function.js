@@ -690,3 +690,41 @@ exports.ride_fare_estimate_outstation = async function (
         throw err;
     }
 };
+function haversineDistance(coord1, coord2) {
+    const R = 6371; // Earth's radius in km
+    const toRad = (deg) => deg * (Math.PI / 180);
+
+    const dLat = toRad(coord2.lat - coord1.lat);
+    const dLon = toRad(coord2.lng - coord1.lng);
+    const lat1 = toRad(coord1.lat);
+    const lat2 = toRad(coord2.lat);
+
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1) * Math.cos(lat2) *
+        Math.sin(dLon / 2) ** 2;
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+
+exports.calculateDistance = async (ride_id) => {
+    let redisKey = `ride:${ride_id}:path`;
+    let allData = await client.lRange(redisKey, 0, -1); // all points
+    if (!allData) return 0;
+    let coordsArray = allData.map(loc => JSON.parse(loc));
+    // const coordsArray = [
+    //     { lat: 28.7041, lng: 77.1025 },
+    //     { lat: 28.7048, lng: 77.1050 },
+    //     { lat: 28.7072, lng: 77.1100 },
+    //     { lat: 28.7101, lng: 77.1200 }
+    // ];
+
+    let totalDistanceKm = 0;
+
+    for (let i = 0; i < coordsArray.length - 1; i++) {
+        totalDistanceKm += haversineDistance(coordsArray[i], coordsArray[i + 1]);
+    }
+
+    console.log(`Total Distance traveled: ${totalDistanceKm.toFixed(2)} km`);
+};

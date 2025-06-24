@@ -564,26 +564,31 @@ exports.timeFareEstimate = async function (req, res, next) {
     try {
         const reqdata = req.body;
         const ride_id = reqdata.ride_id;
-        const distance = reqdata.distance;
-        const location_coordinates = reqdata.location_coordinates;
-
+        const distance = await FUNC.calculateDistance(ride_id);
+        // const location_coordinates = reqdata.location_coordinates;
+        if (distance == 0) return {
+            status: statusCode.BAD_REQUEST,
+            success: false,
+            message: 'Distance issue'
+        };
         const ride_details = await Ride.findOneAndUpdate(
             { _id: ride_id },
             {
                 $set: {
                     "basic.distance": distance,
-                    "location.path": location_coordinates
+                    // "location.path": location_coordinates
                 }
             },
             { new: true }
         );
 
         if (!ride_details) {
-            return res.status(203).json({
-                data: {},
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
                 message: "Not able to find associated ride with ride_id",
                 meta: req.phoneMeta
-            });
+            };
         }
 
         const { time: { started }, meta: { category_id }, basic, payment, location, offer, outstation, _id: rideId } = ride_details;
@@ -659,12 +664,12 @@ exports.timeFareEstimate = async function (req, res, next) {
                 break;
             }
         }
-
-        return res.status(200).json({
-            data: fareObj,
-            message: "",
-            meta: req.phoneMeta
-        });
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: "Fare calculated",
+            data: fareObj
+        };
 
     } catch (err) {
         return next(err);
