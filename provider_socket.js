@@ -248,22 +248,22 @@ async function runServer() {
             case "updateLocation": {
               console.log("=====Update Location =====", data);
               try {
-                let now_date = moment().toDate();
-                let locations = data.locations;
-                locations.forEach(location => {
-                  location.coordinates = [location.coordinates[1], location.coordinates[0]];
-                });
+                const now_date = moment().toDate();
+                const locations = data.locations.map(loc => ({
+                  ...loc,
+                  coordinates: [loc.coordinates[1], loc.coordinates[0]]
+                }));
+
                 const locationData = {
                   bearing: data.bearing,
                   speed: data.speed,
                   locations: locations,
                   lastupdatedlocation: now_date
                 };
+
                 await Location.findOneAndUpdate(
                   { provider_id: socket.providerDetail._id },
-                  {
-                    $set: locationData
-                  },
+                  { $set: locationData },
                   { upsert: true }
                 );
 
@@ -277,16 +277,77 @@ async function runServer() {
 
                 socket.emit('location_update', location_packet);
 
+                const track_room = 'trackprovider_' + socket.user_data._id.toString();
+
+                if (socket.user_data.in_ride && socket.ride_details) {
+                  let estimated_time = 5;
+                  let distanceObj = {};
+
+                  try {
+                    const status = socket.ride_details.ride_status;
+                    const isAccepted = status === "accepted";
+                    const isRunning = status === "running";
+
+                    if (isAccepted || isRunning) {
+                      const targetPoint = isAccepted
+                        ? socket.ride_details.source
+                        : socket.ride_details.destination;
+
+                      distanceObj = await FUNC.time_estimate(location_packet, targetPoint);
+                      estimated_time = distanceObj?.estimated_time || 5;
+
+                      location_packet.time_estimate = estimated_time;
+                      location_packet.pickup_distance = distanceObj.pickup_distance;
+
+                      socket.broadcast.to(track_room).emit("track_provider", location_packet);
+
+                      if (isAccepted) {
+                        await Location.update(
+                          { provider_id: socket.user_data._id },
+                          { $set: { time_estimate: estimated_time } }
+                        );
+                      } else if (isRunning) {
+                        await Ride.updateOne(
+                          { _id: socket.ride_details.ride_id },
+                          { $set: { "location.path": data.path } }
+                        );
+                      }
+
+                      return ack({
+                        status: 200,
+                        message: "location updated"
+                      });
+                    }
+                  } catch (err) {
+                    console.error("Time estimate error:", err);
+                  }
+
+                  // If not accepted or running (fallback)
+                  socket.broadcast.to(track_room).emit("track_provider", location_packet);
+                  return ack({
+                    status: 200,
+                    message: "location updated"
+                  });
+
+                } else {
+                  // Not in ride
+                  socket.broadcast.to(track_room).emit("track_provider", location_packet);
+                  return ack({
+                    status: 200,
+                    message: "location updated"
+                  });
+                }
+
               } catch (error) {
                 console.error("Auth Error:", error);
-                ack({
+                return ack({
                   status: 500,
                   success: false,
                   message: "Internal server error"
                 });
               }
-              break;
             }
+
             // Converted ES7+ async/await version of `accept_ride` socket handler
             case "accept_ride": {
               try {

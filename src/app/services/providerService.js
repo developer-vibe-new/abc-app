@@ -581,7 +581,7 @@ exports.timeFareEstimate = async function (req, res, next) {
         if (!ride_details) {
             return res.status(203).json({
                 data: {},
-                reply: "Not able to find associated ride with ride_id",
+                message: "Not able to find associated ride with ride_id",
                 meta: req.phoneMeta
             });
         }
@@ -662,7 +662,7 @@ exports.timeFareEstimate = async function (req, res, next) {
 
         return res.status(200).json({
             data: fareObj,
-            reply: "",
+            message: "",
             meta: req.phoneMeta
         });
 
