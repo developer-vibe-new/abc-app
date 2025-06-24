@@ -823,15 +823,15 @@ async function runServer() {
                     });
                   });
                 }
+                console.log('rideTransactionDriverAsync--->>');
 
                 // 🔁 Now using async version of ride_transaction_driver
-                const {
-                  card_to_cash,
+                const { card_to_cash,
                   transaction_detail,
                   payment_type,
                   chargeObj
                 } = await rideTransactionDriverAsync(ride_id, fareObj, settings);
-
+                console.log('rideTransactionDriverAsync--->>', payment_type);
                 const update_ride_data = {
                   "basic.ride_status": "finished",
                   "time.finished": now_date,
