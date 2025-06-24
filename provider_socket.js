@@ -260,7 +260,6 @@ async function runServer() {
                   locations: locations,
                   lastupdatedlocation: now_date
                 };
-                console.log("=====Update Location =====", data.locations[0]);
                 await Location.findOneAndUpdate(
                   { provider_id: socket.providerDetail._id },
                   { $set: locationData },
