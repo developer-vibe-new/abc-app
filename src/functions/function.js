@@ -78,11 +78,13 @@ exports.send_request = async function (ride_id, io, appSettings) {
 
                 setTimeout(async () => {
                     console.log("Coming in Set Timeout");
-                    const results = await Ride.updateOne({
+                    let obj = {
                         _id: ride_id,
                         "basic.ride_status": "requested",
                         "meta.search_providers": provider_id
-                    }, {
+                    };
+                    console.log('obj--->>', JSON.stringify(obj));
+                    const results = await Ride.updateOne(obj, {
                         $pull: {
                             "meta.search_providers": provider_id
                         },
