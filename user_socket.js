@@ -726,7 +726,10 @@ async function runServer() {
                   const provider_socket = await client.get(`socket_provider:${ride_details.basic.provider_id._id.toString()}`);
 
                   if (provider_socket) {
-                    socket.to(provider_socket).emit("request_cancelled", { ride_id });
+                    socket.to(provider_socket).emit("request_cancelled", {
+                      ride_id, status: 200,
+                      message: "Ride cancelled Successfully"
+                    });
 
                     const track_room = "trackprovider_" + ride_details.basic.provider_id._id.toString();
                     socket.leave(track_room);
