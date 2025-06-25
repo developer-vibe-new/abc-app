@@ -233,17 +233,6 @@ async function runServer() {
               });
             }
           }
-
-
-          // if (!socket.providerDetail) {
-          //   ack({
-          //     status: 500,
-          //     success: false,
-          //     message: 'Authentication required',
-          //   });
-          //   return;
-          // }
-
           switch (event) {
             case "updateLocation": {
               console.log("=====Update Location =====");
@@ -296,7 +285,7 @@ async function runServer() {
 
                       location_packet.time_estimate = estimated_time;
                       location_packet.pickup_distance = distanceObj?.pickup_distance || 0;
-                      await Location.update(
+                      await Location.updateOne(
                         { provider_id: socket.providerDetail._id },
                         { $set: { time_estimate: estimated_time } }
                       );

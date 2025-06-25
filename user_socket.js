@@ -380,7 +380,6 @@ async function runServer() {
                 },
                 { $limit: 10 }
               ];
-              console.log('locationQuery', JSON.stringify(locationQuery));
               const location_data = await Location.aggregate(locationQuery);
               if (!location_data) {
                 ack({
@@ -733,7 +732,6 @@ async function runServer() {
 
                     const track_room = "trackprovider_" + ride_details.basic.provider_id._id.toString();
                     socket.leave(track_room);
-                    console.log('provider_socket--->>>', provider_socket);
                     await FUNC.updateInRide(ride_details._id, socket.user_data._id, ride_details.basic.provider_id._id, false);
 
                     ack({
