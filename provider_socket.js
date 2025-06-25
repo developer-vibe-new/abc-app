@@ -504,7 +504,11 @@ async function runServer() {
 
                       if (ride) {
                         const userSocket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
-                        socket.to(userSocket).emit("ride_declined", { ride_id: rideId });
+                        socket.to(userSocket).emit("ride_declined", {
+                          ride_id: rideId, status: 200,
+                          success: true,
+                          message: "Ride declined Successfully"
+                        });
                       }
                     }
                   });
