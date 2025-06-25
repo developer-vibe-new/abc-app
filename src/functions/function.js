@@ -280,7 +280,7 @@ exports.buildRideRequestData = async (ride, provider, socket, data, distanceObj,
 exports.updateInRide = async (ride_id, user_id, provider_id, in_ride) => {
     try {
         const inverse_in_ride = !in_ride;
-
+        console.log('inverse_in_ride', inverse_in_ride);
         const rides = await Ride.find({
             "basic.user_id": new mongoose.Types.ObjectId(user_id),
             "basic.ride_status": { $in: ["accepted", "arrived", "running"] }

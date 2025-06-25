@@ -723,50 +723,45 @@ async function runServer() {
 
                 // Notify driver via socket if connected
                 if (ride_details.basic?.provider_id?._id) {
-                  client.get("socket_provider:" + ride_details.basic.provider_id._id.toString(), async (err, provider_socket) => {
-                    if (provider_socket) {
-                      socket.to(provider_socket).emit("request_cancelled", { ride_id });
+                  const provider_socket = await client.get(`socket_provider:${ride_details.basic.provider_id._id.toString()}`);
 
-                      const track_room = "trackprovider_" + ride_details.basic.provider_id._id.toString();
-                      socket.leave(track_room);
+                  if (provider_socket) {
+                    socket.to(provider_socket).emit("request_cancelled", { ride_id });
 
-                      await FUNC.updateInRide(ride_details._id, socket.user_data._id, ride_details.basic.provider_id._id, false);
+                    const track_room = "trackprovider_" + ride_details.basic.provider_id._id.toString();
+                    socket.leave(track_room);
+                    console.log('provider_socket--->>>', provider_socket);
+                    await FUNC.updateInRide(ride_details._id, socket.user_data._id, ride_details.basic.provider_id._id, false);
 
-                      ack({
-                        status: 200,
-                        message: "Ride cancelled Successfully"
-                      });
+                    ack({
+                      status: 200,
+                      message: "Ride cancelled Successfully"
+                    });
 
-                      // Send notifications to user and driver
-                      // await notification.PushNotifications({
-                      //   receiverId: socket.user_data._id,
-                      //   deviceTokens: socket.user_data.fcm_token,
-                      //   type: "BONUS",
-                      //   title: "Ride cancelled Successfully",
-                      //   message: "Ride cancelled Successfully",
-                      //   entityId: socket.user_data._id
-                      // });
 
-                      // await notification.PushNotificationsDriver({
-                      //   receiverId: ride_details.basic.provider_id._id.toString(),
-                      //   type: "BONUS",
-                      //   title: "Ride cancelled by user",
-                      //   message: "Ride cancelled by user",
-                      //   entityId: ride_details.basic.provider_id._id.toString()
-                      // });
-                    } else {
-                      ack({
-                        status: 200,
-                        message: "Ride cancelled Successfully"
-                      });
-                    }
-                  });
-                } else {
-                  ack({
-                    status: 200,
-                    message: "Ride cancelled Successfully"
-                  });
+                    // Send notifications to user and driver
+                    // await notification.PushNotifications({
+                    //   receiverId: socket.user_data._id,
+                    //   deviceTokens: socket.user_data.fcm_token,
+                    //   type: "BONUS",
+                    //   title: "Ride cancelled Successfully",
+                    //   message: "Ride cancelled Successfully",
+                    //   entityId: socket.user_data._id
+                    // });
+
+                    // await notification.PushNotificationsDriver({
+                    //   receiverId: ride_details.basic.provider_id._id.toString(),
+                    //   type: "BONUS",
+                    //   title: "Ride cancelled by user",
+                    //   message: "Ride cancelled by user",
+                    //   entityId: ride_details.basic.provider_id._id.toString()
+                    // });
+                  }
                 }
+                ack({
+                  status: 200,
+                  message: "Ride cancelled Successfully"
+                });
 
               } catch (err) {
                 console.error("Error during ride cancel:", err);
