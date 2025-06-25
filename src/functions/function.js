@@ -42,7 +42,6 @@ exports.send_request = async function (ride_id, io, appSettings) {
         if (location_data) {
             try {
                 // await FUNC.lockDriver(provider_id, ride_id, request_data.load_sec);
-
                 const provider_loc = {
                     longitude: location_data.locations[0].coordinates[0],
                     latitude: location_data.locations[0].coordinates[1]
@@ -71,7 +70,7 @@ exports.send_request = async function (ride_id, io, appSettings) {
                     });
 
                 } else {
-                    console.log("New Request Socket Emit");
+                    console.log("New Request Socket Emit", request_data);
                     request_data.timer = appSettings.ride_settings.load_sec;
                     console.log('moment().unix();--->>>', moment().unix());
                     io.to(provider_socket).emit('new_request', request_data);
@@ -226,6 +225,8 @@ exports.insertPath = async (ride_id, ride_status, longitude, latitude) => {
 exports.buildRideRequestData = async (ride, provider, socket, data, distanceObj, now_date, estimated_time) => {
     const settingData = await appSettingsModel.findOne();
     const request_data = {
+        status: 200,
+        message: "Ride Accepted Successfully",
         ride_id: ride._id.toString(),
         ride_status: ride.basic.ride_status,
         otp: ride.basic.otp,

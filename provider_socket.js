@@ -357,7 +357,6 @@ async function runServer() {
                     $unwind: "$car_id"
                   }
                 ]);
-                console.log('taxi_detail', taxi_detail);
                 if (taxi_detail.length <= 0) return ack({ status: 203, message: "Your taxi not found" });
                 taxi_detail = taxi_detail[0];
                 const provider_detail = await Provider.findOne({
@@ -405,7 +404,6 @@ async function runServer() {
                   .populate("meta.category_id")
                   .populate("basic.user_id");
                 if (!ride_update) return ack({ status: 203, message: "Something went wrong, please try again" });
-                console.log('ride_update', ride_update);
                 socket.ride_details = {
                   ride_id: ride_update._id.toString(),
                   ride_status: "accepted",
@@ -666,9 +664,12 @@ async function runServer() {
                   });
 
                 } else {
-                  socket.to(user_socket).emit("ride_arrived", { ride_id });
+                  socket.to(user_socket).emit("ride_arrived", {
+                    ride_id, status: 200,
+                    success: true,
+                    message: ride.basic.booked_by
+                  });
                 }
-
                 ack({
                   status: 200,
                   message: ride.basic.booked_by,
@@ -757,7 +758,10 @@ async function runServer() {
                 const user_socket = await client.get("socket_user:" + ride.basic.user_id.toString());
 
                 if (user_socket) {
-                  socket.to(user_socket).emit("ride_started", { ride_id });
+                  socket.to(user_socket).emit("ride_started", {
+                    ride_id, status: 200,
+                    message: "Ride started successfully"
+                  });
                 }
 
                 ack({
