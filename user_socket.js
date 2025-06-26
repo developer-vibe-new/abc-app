@@ -89,7 +89,7 @@ async function runServer() {
               socket.user_data = user;
               console.log('user in_ride', user.in_ride);
               if (user.in_ride) {
-                const rides = await Ride.aggregate([
+                let obj = [
                   { $match: { "basic.user_id": new mongoose.Types.ObjectId(user._id), "basic.ride_status": { $in: ["accepted", "arrived", "running"] } } },
                   {
                     $lookup: {
@@ -129,7 +129,9 @@ async function runServer() {
                       'category.thumb_3x': 1
                     }
                   }
-                ]);
+                ];
+                console.log('obj', JSON.stringify(obj));
+                const rides = await Ride.aggregate(obj);
                 console.log('rides', rides.length);
                 if (!rides || rides.length === 0) {
                   ack({
