@@ -129,6 +129,7 @@ async function runServer() {
                     }
                   }
                 ]);
+                console.log('rides', rides.length);
                 if (!rides || rides.length === 0) {
                   ack({
                     status: 200,
@@ -144,7 +145,7 @@ async function runServer() {
                 const locations = await Location.find({
                   provider_id: { $in: providerIds }
                 }).lean();
-
+                console.log('locations', locations.length);
                 const locationMap = new Map();
                 locations.forEach(loc => {
                   locationMap.set(loc.provider_id.toString(), loc);
