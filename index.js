@@ -21,14 +21,14 @@ app.use((req, res, next) => {
 });
 /* version V1 Routes */
 require('./src/app/routes')(app);
-// require('./src/admin/routes')(app);
+require('./src/admin/routes/index')(app);
 
 // set port, listen for request s
 const PORT = process.env.PORT;
 console.log('port: ' + PORT);
 
 
-console.log('sdf');
+
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
 });

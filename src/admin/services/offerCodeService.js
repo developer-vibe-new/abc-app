@@ -70,11 +70,12 @@ exports.viewOfferCode = async (req) => {
         );
         const data = await OfferCode.aggregate(pipeline);
         const totalCount = await OfferCode.countDocuments();
-        if(!data) {
+        if(!data || data.length === 0) {
             return {
                 status: statusCode.DATA_NOT_FOUND,
                 success: false,
-                message: resMessage.Data_Not_Found
+                message: resMessage.Data_Not_Found,
+                data: []
             }
         }
         return {

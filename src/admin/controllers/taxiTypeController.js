@@ -2,7 +2,9 @@ const services = require('../services/taxiTypeService');
 
 exports.viewTaxiType = async (req) => {
     try {
-        return await services.taxiTypeList(req);
+     const result = await services.taxiTypeList(req);
+     console.log(result,"dihfskh");
+     return result;
     } catch (error) {
         return {
             statusCode: statusCode.INTERNAL_SERVER_ERROR,

@@ -1,4 +1,4 @@
-const { apiV1Prefix } = require('../../config/default.json');
+const { apiV1Prefix,adminV1Prefix } = require('../../config/default.json');
 
 module.exports = (app) => {
   app.use(`${apiV1Prefix}/swagger`, require('./swaggerRoutes'));
