@@ -189,15 +189,12 @@ async function runServer() {
                   if (ride_data.payment_type === "Card") {
                     ride_data.card = ride.payment.card;
                   }
-                  console.log('locationMap', locationMap);
-                  console.log('ride.basic.provider_id._id', ride.basic.provider_id._id);
                   const location_packet = locationMap.get(ride.basic.provider_id._id.toString());
-                  console.log('location_packet.location[0]', location_packet.location[0]);
                   if (location_packet) {
                     ride_data.provider_location = {
                       _id: location_packet.provider_id.toString(),
-                      longitude: location_packet.location[0].coordinates[0],
-                      latitude: location_packet.location[0].coordinates[1],
+                      longitude: location_packet.locations[0].coordinates[0],
+                      latitude: location_packet.locations[0].coordinates[1],
                       bearing: location_packet.bearing,
                       time_estimate: location_packet.time_estimate,
                       speed: 0
