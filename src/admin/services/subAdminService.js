@@ -39,41 +39,32 @@ exports.addSubAdmin = async (req) => {
 
 exports.viewSubAdmin = async (req) => {
     try {
-        let page = req.query.page || 1;
+        let page = parseInt(req.query.page) || 1;
         let limit = parseInt(req.query.limit) || 10;
         let skip = (page - 1) * limit;
 
-        let pipeline = [];
-        pipeline.push({
-            $match: {
-              role_type: "sub-admin"
-            }
-          },
-          {
-            $project: {
-              first_name: 1,
-              last_name: 1,
-              email: 1,
-              mobile: 1,
-              is_active: 1
-            }
-        },
-        {
-            $skip: skip
-        },
-        {
-            $limit: limit
-        });
+        const matchCondition = { role_type: "sub-admin" };
+
+        const pipeline = [
+            { $match: matchCondition },
+            {
+                $project: {
+                    first_name: 1,
+                    last_name: 1,
+                    email: 1,
+                    mobile: 1,
+                    is_active: 1
+                }
+            },
+            { $skip: skip },
+            { $limit: limit }
+        ];
+
         const data = await Admin.aggregate(pipeline);
-        if(!data) {
-            return {
-                status: statusCode.BAD_REQUEST,
-                success: false,
-                message: resMessage.Data_Not_Found
-            }
-        }
-        const totalDocuments = await Admin.countDocuments({ role_type: "manager" });
+
+        const totalDocuments = await Admin.countDocuments(matchCondition);
         const totalPages = Math.ceil(totalDocuments / limit);
+
         return {
             status: statusCode.OK,
             success: true,
@@ -81,9 +72,9 @@ exports.viewSubAdmin = async (req) => {
             data,
             pagination: {
                 currentPage: page,
-                totalPages: totalPages,
+                pageSize: limit,
                 totalItems: totalDocuments,
-                itemsPerPage: limit
+                totalPages: totalPages
             }
         };
     } catch (error) {
@@ -93,7 +84,8 @@ exports.viewSubAdmin = async (req) => {
             error: error.message || "Internal Server Error",
         };
     }
-}
+};
+
 
 exports.editSubAdmin = async (req) => {
     try {

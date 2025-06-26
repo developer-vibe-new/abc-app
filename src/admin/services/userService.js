@@ -12,7 +12,7 @@ exports.login = async (body) => {
     // If user not found, return error
     if (!chkUser) {
       return {
-        statusCode: statusCode.OK,
+        statusCode:statusCode.OK,
         success: false,
         message: resMessage.Data_Not_Found
       };
@@ -58,6 +58,7 @@ exports.login = async (body) => {
         success: false,
         message: resMessage.Incorrect_Email_Password
       };
+
     }
   } catch (error) {
     // If any error occurs, return error

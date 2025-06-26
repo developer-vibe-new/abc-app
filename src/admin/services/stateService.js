@@ -3,6 +3,7 @@ const stateModel = require('../../models/stateModel');
 const cityModel = require('../../models/city');
 const { statusCode, resMessage } = require('../../config/default.json');
 
+
 exports.stateCreate = async (req) => {
     try {
         console.log(req.body.state);
@@ -73,44 +74,47 @@ exports.stateDelete = async (req) => {
         };
     }
 };
-
 exports.stateView = async (req) => {
     try {
-        var page = req.query.page || 1;
-        let pagesize = req.query.pagesize || 10;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.pagesize) || 10;
+        const skip = (page - 1) * limit;
+        const search = req.query.search || "";
 
-        let search_value = req.query.search || "";
-        var conditions = [];
+        const matchStage = search
+            ? { state: { $regex: search, $options: "i" } }
+            : {};
 
+        const totalRecords = await stateModel.countDocuments(matchStage);
+        const totalPages = Math.ceil(totalRecords / limit);
 
-        if (search_value) {
-            conditions.push({
-                $match: {
-                    state: { $regex: search_value, $options: "i" }
-                }
-            });
-        }
-        conditions.push(
-            { $sort: { state: -1 } },
-            { $skip: (page - 1) * pagesize },
-            { $limit: pagesize }
-        );
-        const allData = await stateModel.aggregate(conditions);
+        const data = await stateModel.aggregate([
+            { $match: matchStage },
+            { $sort: { state: 1 } },
+            { $skip: skip },
+            { $limit: limit }
+        ]);
 
-        if (allData) {
-            return {
-                success: true,
-                data: allData
-            };
-        }
+        return {
+            success: true,
+            message: "States fetched successfully",
+            data,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalRecords,
+                itemsPerPage: limit
+            }
+        };
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return {
             success: false,
-            message: "An error occured while fetching State Data "
+            message: "An error occurred while fetching states"
         };
     }
 };
+
 
 exports.cityCreate = async (req) => {
     try {
@@ -180,14 +184,14 @@ exports.cityUpdate = async (req) => {
         };
     }
 };
-
 exports.cityDelete = async (req) => {
     try {
-        const { id } = req.params;
-        const deleteData = await cityModel.findByIdAndUpdate(id,
-            { is_active: false },
-            { new: true }
+        const deleteData = await cityModel.findByIdAndUpdate(
+            req.params.id,
+            { is_delete: true },
+            {new : true } 
         );
+
         if (deleteData) {
             return {
                 status: statusCode.OK,
@@ -195,51 +199,68 @@ exports.cityDelete = async (req) => {
                 message: resMessage.City_Deleted_Successfully,
                 data: deleteData
             };
-        }
-    } catch (error) {
-        console.log(error);
-        return {
-            success: false,
-            message: "An error occured while deleting city data"
-        };
-    }
-};
-
-exports.cityView = async (req) => {
-    try {
-        var page = req.query.page || 1;
-        let pagesize = req.query.pagesize || 10;
-
-        let search_value = req.query.search || "";
-        var conditions = [];
-
-        if (search_value) {
-            conditions.push({
-                $match: {
-                    name: { $regex: search_value, $options: "i" }
-                }
-            });
-        }
-        conditions.push(
-            { $sort: { name: 1 } },
-            { $skip: (page - 1) * pagesize },
-            { $limit: pagesize }
-        );
-        const allData = await cityModel.aggregate(conditions);
-
-        if (allData) {
+        } else {
             return {
-                status: statusCode.OK,
-                success: true,
-                message: resMessage.Data_Fetch_Successfully,
-                data: allData
+                status: statusCode.NOT_FOUND,
+                success: false,
+                message: resMessage.Data_Not_Found
             };
         }
     } catch (error) {
         console.log(error);
         return {
             success: false,
-            message: "An error occured while fetching city data"
+            message: "An error occurred while deleting city data"
+        };
+    }
+};
+
+exports.cityView = async (req) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.pagesize) || 10;
+        const skip = (page - 1) * limit;
+        const search = req.query.search || "";
+   const status = req.query.status || "active";
+   console.log("Datasud", status);
+         
+const matchStage = {
+  is_delete: { $ne: true },
+  ...(status === "active"
+    ? { is_active: true }
+    : status === "inactive"
+    ? { is_active: false }
+    : {}), // if status = all, match all
+  ...(search && { name: { $regex: search, $options: "i" } }),
+};
+        const totalRecords = await cityModel.countDocuments(matchStage);
+        const totalPages = Math.ceil(totalRecords / limit);
+
+        const data = await cityModel.aggregate([
+            { $match: matchStage },
+            { $sort: { name: 1 } },
+            { $skip: skip },
+            { $limit: limit }
+        ]);
+
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Fetch_Successfully,
+            data,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalRecords,
+                itemsPerPage: limit
+            }
+        };
+    } catch (error) {
+        console.error(error);
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: "An error occurred while fetching cities"
         };
     }
 };
@@ -248,7 +269,8 @@ exports.viewCityById = async (req) => {
     try {
         const { id } = req.params;
         const cityData = await cityModel.findOne({ _id: id, is_active: true });
-        if(!cityData) {
+
+        if (!cityData) {
             return {
                 status: statusCode.NOT_FOUND,
                 success: false,
@@ -260,16 +282,16 @@ exports.viewCityById = async (req) => {
             success: true,
             message: resMessage.Data_Fetch_Successfully,
             data: cityData
-        }
+        };
+
     } catch (error) {
         return {
             statusCode: statusCode.INTERNAL_SERVER_ERROR,
-            status: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
             message: error.message
         };
     }
-}
+};
 
 exports.updateCityStatus = async (req) => {
     try {
@@ -288,7 +310,8 @@ exports.updateCityStatus = async (req) => {
             status: statusCode.OK,
             success: true,
             message: resMessage.City_Status_Updated_Successfully,
-            data: cityData
+            data: cityData,
+            
         }
     } catch (error) {
         return {

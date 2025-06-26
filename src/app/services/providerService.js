@@ -158,6 +158,14 @@ exports.driverOninerStatus = async (req) => {
     try {
         const { _id } = req.auth;
         const { is_online } = req.body;
+         var page = req.query.page || 1;
+        let pagesize = parseInt(req.query.pagesize) || 10;
+        const totalCount = await driverData.aggregate([
+                    ...conditions.slice(0, -2),
+                    { $count: "total" }
+                ]);
+         const totalRecords = totalCount.length > 0 ? totalCount[0].total : 0;
+        const totalPages = Math.ceil(totalRecords / pagesize);
         const driverData = await Provider.findByIdAndUpdate({ _id }, { is_online }, { new: true });
         if (!driverData) {
             return {
@@ -172,6 +180,11 @@ exports.driverOninerStatus = async (req) => {
             message: resMessage.Status_Updated_Successfully,
             data: {
                 is_online: driverData.is_online
+            },
+            pagination: {
+                currentPage: parseInt(page),
+                totalPages: totalPages,
+                totalRecords: totalRecords,
             }
         };
     } catch (error) {

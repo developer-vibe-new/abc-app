@@ -119,8 +119,6 @@ router.get('/taxiTypeDropDown', auth, responseHandler(driverController.taxiTypeD
 
 
 
-
-
 router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
 
 // Notification manager

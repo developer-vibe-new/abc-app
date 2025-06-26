@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-// Car Schema
 const CarSchema = new mongoose.Schema({
     title: {
         type: String
@@ -48,7 +47,8 @@ const CarSchema = new mongoose.Schema({
     toObject: {
         getters: true,
         virtuals: true
-    }
+    },
+    
 });
 
 const carModel = mongoose.model('Car', CarSchema);
