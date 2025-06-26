@@ -196,8 +196,8 @@ async function runServer() {
                   if (location_packet) {
                     ride_data.provider_location = {
                       _id: location_packet.provider_id.toString(),
-                      longitude: location_packet.location[0],
-                      latitude: location_packet.location[1],
+                      longitude: location_packet.location.coordinates[0],
+                      latitude: location_packet.location.coordinates[1],
                       bearing: location_packet.bearing,
                       time_estimate: location_packet.time_estimate,
                       speed: 0
