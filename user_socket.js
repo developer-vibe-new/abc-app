@@ -13,6 +13,7 @@ const User = require('./src/models/users');
 const Ride = require('./src/models/ride');
 // const redisKeyPrefix = 'UserSocket:';
 const connectDB = require('./src/config/db.config');
+const mongoose = require('mongoose');
 const { ObjectId } = require('mongoose').Types;
 const Location = require('./src/models/locationModel');
 const chatModel = require('./src/models/chatModel');
@@ -89,7 +90,7 @@ async function runServer() {
               console.log('user in_ride', user.in_ride);
               if (user.in_ride) {
                 const rides = await Ride.aggregate([
-                  { $match: { "basic.user_id": user._id, "basic.ride_status": { $in: ["accepted", "arrived", "running"] } } },
+                  { $match: { "basic.user_id": new mongoose.Types.ObjectId(user._id), "basic.ride_status": { $in: ["accepted", "arrived", "running"] } } },
                   {
                     $lookup: {
                       from: 'users',
