@@ -252,7 +252,7 @@ exports.buildRideRequestData = async (ride, provider, socket, data, distanceObj,
         driver_name: `${provider.first_name} ${provider.last_name}`,
         driver_image: `https://driver.taxiride.com/drivers/${provider.image}`,
         category_image: ride.meta.category_id.thumb_3x,
-        driver_mobile: socket.providerDetail.callingmobile,
+        driver_mobile: socket.providerDetail.mobile,
         avg_rating: socket.providerDetail.avg_rating,
         created: ride.created,
         provider_location: {

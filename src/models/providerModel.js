@@ -86,10 +86,10 @@ const documentSchema = new mongoose.Schema({
 	},
 	bank_details: {
 		account_number: { type: Number, default: null },
-        ifsc_code: { type: String, default: "" },
-        bank_name: { type: String, default: "" },
-        account_holder_name: { type: String, default: "" },
-        status: { type: Number, default: -1 }
+		ifsc_code: { type: String, default: "" },
+		bank_name: { type: String, default: "" },
+		account_holder_name: { type: String, default: "" },
+		status: { type: Number, default: -1 }
 	}
 });
 
@@ -99,7 +99,7 @@ const defaultDocuments = {
 		expiry_date: null,
 		front_image: "",
 		back_image: "",
-		status: -1 
+		status: -1
 	},
 	aadhaar_card: {
 		number: "",
@@ -295,9 +295,24 @@ const providerSchema = new mongoose.Schema({
 	status: {
 		type: String,
 		default: "Unblock"
-	}
+	},
+	total_rating: {
+		type: Number,
+		default: 0
+	},
+	rated: {
+		type: Number,
+		default: 0
+	},
 }, { timestamps: true, versionKey: false });
 
+providerSchema.virtual('avg_rating').get(function () {
+	if (this.total_rating == 0 || this.rated == 0) {
+		return 0;
+	} else {
+		return parseFloat((this.total_rating / this.rated).toFixed(1));
+	}
+});
 module.exports = mongoose.model('provider', providerSchema);
 
 // module.exports = provideModel;
