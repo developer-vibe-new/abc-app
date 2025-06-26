@@ -86,6 +86,7 @@ async function runServer() {
               }
 
               socket.user_data = user;
+              console.log('user in_ride', user.in_ride);
               if (user.in_ride) {
                 const rides = await Ride.aggregate([
                   { $match: { "basic.user_id": user._id, "basic.ride_status": { $in: ["accepted", "arrived", "running"] } } },
