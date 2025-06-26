@@ -93,7 +93,7 @@ async function runServer() {
                   { $match: { "basic.user_id": new mongoose.Types.ObjectId(user._id), "basic.ride_status": { $in: ["accepted", "arrived", "running"] } } },
                   {
                     $lookup: {
-                      from: 'users',
+                      from: 'providers',
                       localField: 'basic.provider_id',
                       foreignField: '_id',
                       as: 'provider'
@@ -102,7 +102,7 @@ async function runServer() {
                   { $unwind: "$provider" },
                   {
                     $lookup: {
-                      from: 'categories',
+                      from: 'taxi_types',
                       localField: 'meta.category_id',
                       foreignField: '_id',
                       as: 'category'
