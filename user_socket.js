@@ -451,6 +451,7 @@ async function runServer() {
 
               const processProviders = async () => {
                 try {
+                  console.log('allProviders--->>>>>>>', allProviders);
                   await Promise.all(allProviders.map(provider => {
                     return Promise.all([
                       client.rPush(`request_queue:${ride_id}`, provider.provider_id._id.toString()),

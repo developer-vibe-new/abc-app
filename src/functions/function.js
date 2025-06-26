@@ -20,19 +20,19 @@ exports.send_request = async function (ride_id, io, appSettings) {
         const request_data_str = await client.get("request_data:" + ride_id);
         const request_data = JSON.parse(request_data_str);
 
-        const remaining_attempt = await client.decrBy("ride_attempt:" + ride_id, 1);
+        const remaining_attempt = await client.decrBy(`ride_attempt:${ride_id}`, 1);
         if (remaining_attempt < 0) {
             console.error("Max attempts reachd for ride ID: ", ride_id);
             return "ERROR";
         }
 
-        const provider_id = await client.lIndex("request_queue:" + ride_id, 0);
+        const provider_id = await client.lIndex(`request_queue:${ride_id}`, 0);
         if (!provider_id) {
             console.error("No provider found for ride ID:", ride_id);
             return 'ERROR';
         }
 
-        // await client.lRem("request_queue:" + ride_id, 1, provider_id);
+        await client.lRem(`request_queue:${ride_id}`, 1, provider_id);
         const location_data = await Location.findOne({
             provider_id: provider_id,
             available: true,
@@ -41,6 +41,7 @@ exports.send_request = async function (ride_id, io, appSettings) {
 
         if (location_data) {
             try {
+                //i have to uncomment this line
                 // await FUNC.lockDriver(provider_id, ride_id, request_data.load_sec);
                 const provider_loc = {
                     longitude: location_data.locations[0].coordinates[0],
