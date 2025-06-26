@@ -87,7 +87,6 @@ async function runServer() {
               }
 
               socket.user_data = user;
-              console.log('user in_ride', user.in_ride);
               if (user.in_ride) {
                 let obj = [
                   { $match: { "basic.user_id": new mongoose.Types.ObjectId(user._id), "basic.ride_status": { $in: ["accepted", "arrived", "running"] } } },
@@ -175,8 +174,8 @@ async function runServer() {
                     car_title: ride.basic.vehicle.title,
                     plateno: ride.basic.vehicle.plateno,
                     color: ride.basic.vehicle.color,
-                    driver_name: ride.basic.provider_id.first_name + ' ' + ride.basic.provider_id.last_name,
-                    driver_image: "https://customer.ktscab.com/drivers/" + ride.basic.provider_id.image,
+                    driver_name: ride.provider.first_name + ' ' + ride.provider.last_name,
+                    driver_image: "https://customer.ktscab.com/drivers/" + ride.provider.image,
                     avg_rating: ride.basic.provider_id.avg_rating,
                     driver_mobile: ride.basic.provider_id.callingmobile,
                     category_image: ride.meta?.category_id?.thumb_3x || "",
