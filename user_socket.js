@@ -192,7 +192,7 @@ async function runServer() {
                   console.log('locationMap', locationMap);
                   console.log('ride.basic.provider_id._id', ride.basic.provider_id._id);
                   const location_packet = locationMap.get(ride.basic.provider_id._id.toString());
-                  console.log('location_packet', location_packet);
+                  console.log('location_packet.location[0]', location_packet.location[0]);
                   if (location_packet) {
                     ride_data.provider_location = {
                       _id: location_packet.provider_id.toString(),
