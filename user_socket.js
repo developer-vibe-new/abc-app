@@ -182,7 +182,7 @@ async function runServer() {
                     driver_image: "https://customer.ktscab.com/drivers/" + ride.basic.provider_id.image,
                     avg_rating: ride.basic.provider_id.avg_rating,
                     driver_mobile: ride.basic.provider_id.callingmobile,
-                    category_image: ride.meta.category_id.thumb_3x,
+                    category_image: ride.meta?.category_id?.thumb_3x || "",
                     created: ride.created
                   };
 
