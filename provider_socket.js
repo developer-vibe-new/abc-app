@@ -482,35 +482,33 @@ async function runServer() {
 
                   await FUNC.unlockDriver(providerId.toString());
 
-                  // ack({
-                  //   status: 200,
-                  //   success: true,
-                  //   message: "Ride declined Successfully"
-                  // });
-                  // await FUNC.send_request(rideId, io, appSettings);
 
-                  FUNC.send_request(rideId, io, appSettings, async (err) => {
-                    if (err) {
-                      const ride = await Ride.findOneAndUpdate(
-                        {
-                          _id: new mongoose.Types.ObjectId(rideId),
-                          "basic.ride_status": "requested"
-                        },
-                        {
-                          $set: { "basic.ride_status": "declined" }
-                        },
-                        { new: true }
-                      ).lean();
-                      console.log('ride--->>', ride);
-                      if (ride) {
-                        const userSocket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
-                        socket.to(userSocket).emit("ride_declined", {
-                          ride_id: rideId, status: 200,
-                          success: true,
-                          message: "Ride declined Successfully"
-                        });
-                      }
+                  let getData = await FUNC.send_request(rideId, io, appSettings);
+                  if (getData == 'ERROR') {
+                    const ride = await Ride.findOneAndUpdate(
+                      {
+                        _id: new mongoose.Types.ObjectId(rideId),
+                        "basic.ride_status": "requested"
+                      },
+                      {
+                        $set: { "basic.ride_status": "declined" }
+                      },
+                      { new: true }
+                    ).lean();
+                    console.log('ride', ride);
+                    if (ride) {
+                      const userSocket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
+                      socket.to(userSocket).emit("ride_declined", {
+                        ride_id: rideId, status: 200,
+                        success: true,
+                        message: "Ride declined Successfully"
+                      });
                     }
+                  }
+                  ack({
+                    status: 200,
+                    success: true,
+                    message: "Ride declined Successfully"
                   });
                 } else {
                   // Already removed or nothing to modify
