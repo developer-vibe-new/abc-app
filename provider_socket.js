@@ -455,6 +455,7 @@ async function runServer() {
 
             case "decline_ride": {
               try {
+                console.log('decline_ride--->>', data.ride_id);
                 const rideId = data.ride_id;
                 const providerId = new mongoose.Types.ObjectId(socket.providerDetail._id);
 
