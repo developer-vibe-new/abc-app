@@ -469,7 +469,7 @@ async function runServer() {
                     $addToSet: { "meta.declined_providers": providerId }
                   }
                 );
-
+                console.log('updateResult--->>', updateResult);
                 // If provider was in search_providers and now removed
                 if (updateResult.modifiedCount === 1) {
                   const requestKey = `request_data:${rideId}`;
@@ -499,7 +499,7 @@ async function runServer() {
                         },
                         { new: true }
                       ).lean();
-
+                      console.log('ride--->>', ride);
                       if (ride) {
                         const userSocket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
                         socket.to(userSocket).emit("ride_declined", {
