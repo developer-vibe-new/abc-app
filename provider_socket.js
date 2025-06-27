@@ -456,70 +456,70 @@ async function runServer() {
             case "decline_ride": {
               try {
                 console.log('decline_ride--->>', data.ride_id);
-                // const rideId = data.ride_id;
-                // const providerId = new mongoose.Types.ObjectId(socket.providerDetail._id);
-                // console.log('providerId--->>', providerId);
-                // const updateResult = await Ride.updateOne(
-                //   {
-                //     _id: new mongoose.Types.ObjectId(rideId),
-                //     "basic.ride_status": "requested",
-                //     "meta.search_providers": providerId
-                //   },
-                //   {
-                //     $pull: { "meta.search_providers": providerId },
-                //     $addToSet: { "meta.declined_providers": providerId }
-                //   }
-                // );
-                // console.log('updateResult--->>', updateResult);
+                const rideId = data.ride_id;
+                const providerId = new mongoose.Types.ObjectId(socket.providerDetail._id);
+                console.log('providerId--->>', providerId);
+                const updateResult = await Ride.updateOne(
+                  {
+                    _id: new mongoose.Types.ObjectId(rideId),
+                    "basic.ride_status": "requested",
+                    "meta.search_providers": providerId
+                  },
+                  {
+                    $pull: { "meta.search_providers": providerId },
+                    $addToSet: { "meta.declined_providers": providerId }
+                  }
+                );
+                console.log('updateResult--->>', updateResult);
                 // // If provider was in search_providers and now removed
-                // if (updateResult.modifiedCount === 1) {
-                //   const requestKey = `request_data:${rideId}`;
-                //   const requestDataRaw = await client.get(requestKey);
-                //   const requestData = JSON.parse(requestDataRaw || "{}");
+                if (updateResult.modifiedCount === 1) {
+                  const requestKey = `request_data:${rideId}`;
+                  const requestDataRaw = await client.get(requestKey);
+                  const requestData = JSON.parse(requestDataRaw || "{}");
 
-                //   requestData.start_on = moment().unix();
-                //   await client.set(requestKey, JSON.stringify(requestData));
+                  requestData.start_on = moment().unix();
+                  await client.set(requestKey, JSON.stringify(requestData));
 
-                //   await FUNC.unlockDriver(providerId.toString());
+                  await FUNC.unlockDriver(providerId.toString());
 
-                //   // ack({
-                //   //   status: 200,
-                //   //   success: true,
-                //   //   message: "Ride declined Successfully"
-                //   // });
-                //   // await FUNC.send_request(rideId, io, appSettings);
+                  // ack({
+                  //   status: 200,
+                  //   success: true,
+                  //   message: "Ride declined Successfully"
+                  // });
+                  // await FUNC.send_request(rideId, io, appSettings);
 
-                //   // FUNC.send_request(rideId, io, appSettings, async (err) => {
-                //   //   if (err) {
-                //   //     const ride = await Ride.findOneAndUpdate(
-                //   //       {
-                //   //         _id: new mongoose.Types.ObjectId(rideId),
-                //   //         "basic.ride_status": "requested"
-                //   //       },
-                //   //       {
-                //   //         $set: { "basic.ride_status": "declined" }
-                //   //       },
-                //   //       { new: true }
-                //   //     ).lean();
-                //   //     console.log('ride--->>', ride);
-                //   //     if (ride) {
-                //   //       const userSocket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
-                //   //       socket.to(userSocket).emit("ride_declined", {
-                //   //         ride_id: rideId, status: 200,
-                //   //         success: true,
-                //   //         message: "Ride declined Successfully"
-                //   //       });
-                //   //     }
-                //   //   }
-                //   // });
-                // } else {
-                //   // Already removed or nothing to modify
-                //   ack({
-                //     status: 200,
-                //     success: true,
-                //     message: "Ride declined Successfully"
-                //   });
-                // }
+                  FUNC.send_request(rideId, io, appSettings, async (err) => {
+                    if (err) {
+                      const ride = await Ride.findOneAndUpdate(
+                        {
+                          _id: new mongoose.Types.ObjectId(rideId),
+                          "basic.ride_status": "requested"
+                        },
+                        {
+                          $set: { "basic.ride_status": "declined" }
+                        },
+                        { new: true }
+                      ).lean();
+                      console.log('ride--->>', ride);
+                      if (ride) {
+                        const userSocket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
+                        socket.to(userSocket).emit("ride_declined", {
+                          ride_id: rideId, status: 200,
+                          success: true,
+                          message: "Ride declined Successfully"
+                        });
+                      }
+                    }
+                  });
+                } else {
+                  // Already removed or nothing to modify
+                  ack({
+                    status: 200,
+                    success: true,
+                    message: "Ride declined Successfully"
+                  });
+                }
               } catch (err) {
                 console.error("decline_ride error:", err);
                 ack({
