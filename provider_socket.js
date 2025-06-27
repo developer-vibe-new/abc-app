@@ -455,10 +455,8 @@ async function runServer() {
 
             case "decline_ride": {
               try {
-                console.log('decline_ride--->>', data.ride_id);
                 const rideId = data.ride_id;
                 const providerId = new mongoose.Types.ObjectId(socket.providerDetail._id);
-                console.log('providerId--->>', providerId);
                 const updateResult = await Ride.updateOne(
                   {
                     _id: new mongoose.Types.ObjectId(rideId),
@@ -470,7 +468,6 @@ async function runServer() {
                     $addToSet: { "meta.declined_providers": providerId }
                   }
                 );
-                console.log('updateResult--->>', updateResult);
                 // // If provider was in search_providers and now removed
                 if (updateResult.modifiedCount === 1) {
                   const requestKey = `request_data:${rideId}`;
@@ -481,8 +478,6 @@ async function runServer() {
                   await client.set(requestKey, JSON.stringify(requestData));
 
                   await FUNC.unlockDriver(providerId.toString());
-
-
                   let getData = await FUNC.send_request(rideId, io, appSettings);
                   if (getData == 'ERROR') {
                     const ride = await Ride.findOneAndUpdate(
@@ -495,7 +490,6 @@ async function runServer() {
                       },
                       { new: true }
                     ).lean();
-                    console.log('ride', ride);
                     if (ride) {
                       const userSocket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
                       socket.to(userSocket).emit("ride_declined", {
