@@ -458,7 +458,7 @@ async function runServer() {
                 console.log('decline_ride--->>', data.ride_id);
                 const rideId = data.ride_id;
                 const providerId = new mongoose.Types.ObjectId(socket.providerDetail._id);
-
+                console.log('providerId--->>', providerId);
                 const updateResult = await Ride.updateOne(
                   {
                     _id: new mongoose.Types.ObjectId(rideId),
@@ -482,11 +482,12 @@ async function runServer() {
 
                   await FUNC.unlockDriver(providerId.toString());
 
-                  ack({
-                    status: 200,
-                    success: true,
-                    message: "Ride declined Successfully"
-                  });
+                  // ack({
+                  //   status: 200,
+                  //   success: true,
+                  //   message: "Ride declined Successfully"
+                  // });
+                  // await FUNC.send_request(rideId, io, appSettings);
 
                   FUNC.send_request(rideId, io, appSettings, async (err) => {
                     if (err) {
