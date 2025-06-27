@@ -321,10 +321,10 @@ exports.driverView = async (req) => {
         const totalCount = await driverModel.aggregate([
             ...conditions.slice(0, -2),
             { $count: "total" }
-        ]);
-
-        const totalRecords = totalCount.length > 0 ? totalCount[0].total : 0;
+        ]); const totalRecords = totalCount.length > 0 ? totalCount[0].total : 0;
         const totalPages = Math.ceil(totalRecords / pagesize);
+
+       
 
         const viewAllData = await driverModel.aggregate(conditions);
 
@@ -729,12 +729,18 @@ exports.unblockDriver = async (req) => {
 exports.onlineDriverList = async (req) => {
     try {
         const adminData = await Admin.findById(req.auth._id);
+         var conditions = [];
+        const totalCount = await driverModel.aggregate([
+            ...conditions.slice(0, -2),
+            { $count: "total" }
+        ]);
         var page = req.query.page || 1;
         let pagesize = req.query.pagesize || 10;
-
+     
+        const totalRecords = totalCount.length > 0 ? totalCount[0].total : 0;
+        const totalPages = Math.ceil(totalRecords / pagesize);
         let search_value = req.query.search || "";
-        var conditions = [];
-
+        
         if (search_value) {
             conditions.push({
                 $match: {
@@ -855,12 +861,19 @@ exports.onlineDriverList = async (req) => {
             { $limit: pagesize }
         );
         const viewAllData = await driverModel.aggregate(conditions);
+    
 
         return {
             statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Fetch_Successfully,
-            data: viewAllData
+            data: viewAllData,
+              pagination: {
+                currentPage: parseInt(page),
+                totalPages: totalPages,
+                totalRecords: totalRecords,
+            }
+
         };
     } catch (error) {
         console.log(error);

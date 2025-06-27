@@ -14,7 +14,6 @@ const { autoSwagger } = require('./autoSwagger');
 module.exports = controllerFunction => async (request, response, next) => {
     try {
         const { statusCode = 200, ...resObj } = await controllerFunction(request, response, next);
-
         // Check if the request is coming from localhost or 127.0.0.1
         if (request.get('host').split(':')[0] === 'localhost' || request.get('host').split(':')[0] === '127.0.0.1') {
             let filePath;

@@ -10,5 +10,5 @@ router.post('/addTaxiType', verifyToken, responseHandler(controller.addTaxiTypeC
 router.post('/updateTaxiStatus/:id', verifyToken, responseHandler(controller.updateTaxiStatusController));
 router.post('/updateTaxiType/:id', verifyToken, upload.single('icon'), responseHandler(controller.updateTaxiTypeController));
 
-router.get('/taxiTypeList',verifyToken,responseHandler(controller.taxiTypeList));
+router.get('/viewTaxiType',verifyToken,responseHandler(controller.taxiTypeList));
 module.exports = router;

@@ -9,55 +9,49 @@ exports.taxiTypeList = async (req) => {
         let page = parseInt(req.query.page) || 1;
         let pagesize = parseInt(req.query.pagesize) || 10;
         let search_value = req.query.search || "";
-        var conditions = [];
+        let status = req.query.status || "all"; // Optional status filter
+
+        let matchConditions = {
+            city_id: adminData.city_id
+        };
 
         if (search_value) {
-            conditions.push({
-                $match: {
-                    title: { $regex: search_value, $options: "i" }
-                }
-            });
+            matchConditions.title = { $regex: search_value, $options: "i" };
         }
 
-        conditions.push({
-            $match: {
-                city_id: adminData.city_id
-            }
-        });
+        if (status !== "all") {
+            matchConditions.is_active = status === "true";
+        }
 
-        conditions.push({
-            $project: {
-                icon: 1,
-                title: 1,
-                currency: 1,
-                base_fare: 1,
-                time_fare: 1,
-                distance_fare: 1,
-                city: 1,
-                airportCharge: 1,
-                outstation_distance_fare: 1,
-                outstation_two_distance_fare: 1,
-                rental_distance_fare: 1,
-                is_active: 1,
-                outstation_status: 1
-            }
-        });
-
-        conditions.push({ $sort: { title: 1 } });
-
-        conditions.push({
-            $skip: (page - 1) * pagesize
-        });
-
-        conditions.push({ $limit: pagesize });
+        // Aggregate query
+        const conditions = [
+            { $match: matchConditions },
+            {
+                $project: {
+                    icon: 1,
+                    title: 1,
+                    currency: 1,
+                    base_fare: 1,
+                    time_fare: 1,
+                    distance_fare: 1,
+                    city: 1,
+                    airportCharge: 1,
+                    outstation_distance_fare: 1,
+                    outstation_two_distance_fare: 1,
+                    rental_distance_fare: 1,
+                    is_active: 1,
+                    outstation_status: 1
+                }
+            },
+            { $sort: { title: 1 } },
+            { $skip: (page - 1) * pagesize },
+            { $limit: pagesize }
+        ];
 
         const findTaxi = await taxiTypeModel.aggregate(conditions);
 
-        const totalCount = await taxiTypeModel.countDocuments({
-            title: { $regex: search_value, $options: "i" }
-        });
-
-        const totalPages = Math.ceil(totalCount / pagesize);
+        const totalRecords = await taxiTypeModel.countDocuments(matchConditions);
+        const totalPages = Math.ceil(totalRecords / pagesize);
 
         return {
             statusCode: statusCode.OK,
@@ -65,10 +59,10 @@ exports.taxiTypeList = async (req) => {
             message: resMessage.Data_Fetch_Successfully,
             data: findTaxi,
             pagination: {
-                totalCount: totalCount,
-                totalPages: totalPages,
                 currentPage: page,
-                pageSize: pagesize
+                pageSize: pagesize,
+                totalRecords: totalRecords,
+                totalPages: totalPages
             }
         };
     } catch (error) {
@@ -79,6 +73,7 @@ exports.taxiTypeList = async (req) => {
         };
     }
 };
+
 
 exports.updateTaxiTypeList = async (req) => {
     try {

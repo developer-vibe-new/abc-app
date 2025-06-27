@@ -126,10 +126,20 @@ exports.updateTaxiType = async (req) => {
     }
 };
 
-exports.taxiTypeList = async () => {
+exports.taxiTypeList = async (req) => {
     try {
         // { operator_id: req.auth.id }
-        const data = await Taxitype.find({ is_active: true });
+     var conditions = [];
+     var page = req.query.page || 1;
+     let pagesize = parseInt(req.query.pagesize) || 10;
+     const totalCount = await Taxitype.aggregate([
+      ...conditions.slice(0, -2),
+      { $count: "total" }
+      ]);
+              const totalRecords = totalCount.length > 0 ? totalCount[0].total : 0;
+              const totalPages = Math.ceil(totalRecords / pagesize);
+             const data = await Taxitype.find({ is_active: true });
+       
         if (!data) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -141,7 +151,12 @@ exports.taxiTypeList = async () => {
             status: statusCode.OK,
             success: true,
             message: resMessage.Data_Fetch_Successfully,
-            data
+            data,
+             pagination: {
+                currentPage: parseInt(page),
+                totalPages: totalPages,
+                totalRecords: totalRecords,
+            }
         };
     }
     catch (error) {

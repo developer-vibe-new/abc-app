@@ -1,7 +1,7 @@
 const { statusCode, resMessage } = require('../../config/default.json');
 const City = require('../../models/city');
 
-exports.getCity = async () => {
+exports.getCity = async (req) => {
     try {
         const data = await City.find();
         if(!data) {
