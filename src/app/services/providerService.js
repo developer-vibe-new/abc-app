@@ -178,6 +178,7 @@ exports.driverOninerStatus = async (req) => {
             }
         };
     } catch (error) {
+        console.log('error', error);
         return {
             status: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
