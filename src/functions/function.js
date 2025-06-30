@@ -15,6 +15,7 @@ const { getClient } = require('../config/redis');
 const client = getClient();
 const pathModel = require('../models/pathModel');
 const Taxitype = require('../models/taxiTypeModel');
+const { PushNotifications } = require('../config/notification');
 exports.send_request = async function (ride_id, io, appSettings) {
     try {
         const request_data_str = await client.get("request_data:" + ride_id);
@@ -60,21 +61,24 @@ exports.send_request = async function (ride_id, io, appSettings) {
                     console.error("Provider socket not found for provider ID");
                     await client.set("ride_request:" + provider_id, JSON.stringify(request_data));
                     await client.expire("ride_request:" + provider_id, request_data.load_sec);
-
-                    await Provider.findOne({
+                } else {
+                    let provider = await Provider.findOne({
                         _id: new mongoose.Types.ObjectId(provider_id)
                     }, {
                         os: 1,
-                        badge: 1,
-                        arn_token: 1,
+                        fcm_token: 1,
                         language: 1
                     });
-
-                } else {
-                    console.log("New Request Socket Emit", request_data);
+                    console.log("New Request Socket Emit");
                     request_data.timer = appSettings.ride_settings.load_sec;
-                    console.log('moment().unix();--->>>', moment().unix());
                     io.to(provider_socket).emit('new_request', request_data);
+                    await PushNotifications({
+                        receiverId: provider._id.toString(),
+                        type: "BONUS",
+                        title: 'New Request',
+                        message: "New Request",
+                        deviceTokens: provider.fcm_token,
+                    });
                 }
 
                 setTimeout(async () => {
@@ -84,7 +88,6 @@ exports.send_request = async function (ride_id, io, appSettings) {
                         "basic.ride_status": "requested",
                         "meta.search_providers": provider_id
                     };
-                    console.log('obj--->>', JSON.stringify(obj));
                     const results = await Ride.updateOne(obj, {
                         $pull: {
                             "meta.search_providers": provider_id
@@ -95,14 +98,11 @@ exports.send_request = async function (ride_id, io, appSettings) {
                     });
 
                     if (results.nModified === 1) {
-                        console.log("Modified Data");
                         request_data.start_on = moment().unix();
                         await client.set("request_data:" + ride_id, JSON.stringify(request_data));
                         await FUNC.send_request(ride_id, io, appSettings);
                     }
-                    console.log("No Modified Data");
                 }, appSettings.ride_settings.load_sec * 1000);
-                console.log("Data has been loaded");
 
             } catch (err) {
                 console.log("Error1", err);
@@ -121,7 +121,7 @@ exports.send_request = async function (ride_id, io, appSettings) {
 exports.lockDriver = async (provider_id, ride_id, ringTime) => {
     try {
         const result = await client.setNX("provider_available:" + provider_id.toString(), ride_id);
-        console.log("==========result---------", result);
+        console.log("==========lockDriver---------");
         if (result === false) {
             await client.expire("provider_available:" + provider_id.toString(), ringTime);
             throw new Error("Driver is not available");
@@ -148,7 +148,6 @@ exports.time_estimate = async (origin, destination) => {
             resolve(data);
         });
     });
-    console.log('distanceData', distanceData);
     // Extracting the relevant data
     let estimated_time = Math.round(distanceData.durationValue / 60);
     const pickup_distance = distanceData.distance;

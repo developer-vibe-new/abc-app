@@ -13,6 +13,7 @@ let fcm_fun = {
             try {
                 app2.messaging().send(message)
                     .then((response) => {
+                        console.log('response---->>>', response);
                         console.log('Successfully sent message');
                         resolve(response);
                     })

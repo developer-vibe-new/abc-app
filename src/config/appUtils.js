@@ -21,7 +21,7 @@ let appUtils = {
      */
     formatDataForPush: (payload, token) => {
         return {
-            registration_ids: token,
+            token,
             notification: {
                 title: payload['title'],
                 body: payload['body'],

@@ -25,8 +25,7 @@ const Ride = require('./src/models/ride');
 // const providerSocket = 'ProviderSocket:';
 const FUNC = require('./src/functions/function');
 const appSettings = require('./src/models/settingModel');
-// const notificationModel = require('./src/models/notificationModel');
-
+const { PushNotifications } = require('./src/config/notification');
 connectDB();
 
 const app = express();
@@ -432,13 +431,13 @@ async function runServer() {
 
                 await FUNC.insertPath(ride_update._id, "accepted", data.longitude, data.latitude);
 
-                // await notification.PushNotificationsUserwise({
-                //   receiverId: ride_update.basic.user_id._id.toString(),
-                //   type: "BONUS",
-                //   title: 'Ride accept Successfully',
-                //   message: "Ride accept Successfully",
-                //   entityId: ride_update.basic.user_id._id.toString(),
-                // });
+                await PushNotifications({
+                  receiverId: ride_update.basic.user_id._id.toString(),
+                  type: "BONUS",
+                  title: 'Ride accept Successfully',
+                  message: "Ride accept Successfully",
+                  deviceTokens: ride_update.basic.user_id.fcm_token,
+                });
 
                 const driver_object = JSON.parse(JSON.stringify(request_data));
                 driver_object.user_name = ride_update.basic.user_id.full_name;
@@ -593,14 +592,13 @@ async function runServer() {
                 await FUNC.updateInRide(ride_details._id, ride_details.basic.user_id._id, providerId, false);
 
                 // Push notification
-                // await notification.PushNotificationsUserwise({
-                //   receiverId: ride_details.basic.user_id._id.toString(),
-                //   type: "BONUS",
-                //   title: "Ride cancelled Successfully",
-                //   message: "Ride cancelled Successfully",
-                //   entityId: ride_details.basic.user_id._id.toString()
-                // });
-
+                await PushNotifications({
+                  receiverId: ride_details.basic.user_id._id.toString(),
+                  type: "BONUS",
+                  title: "Ride cancelled Successfully",
+                  message: "Ride cancelled Successfully",
+                  deviceTokens: ride_details.basic.user_id._fcm_token
+                });
                 ack({
                   status: 200,
                   success: true,
@@ -671,20 +669,14 @@ async function runServer() {
                 });
 
                 FUNC.insertPath(ride_id, "arrived", longitude, latitude, () => { });
-                // const notificationObject = {
-                //   receiverId: ride.basic.user_id._id.toString(),
-                //   type: "BONUS",
-                //   title: "Ride arrived Successfully",
-                //   message: "Ride arrived Successfully",
-                //   entityId: ride.basic.user_id._id.toString(),
-                // };
 
-                // try {
-                //   await notification.PushNotificationsUserwise(notificationObject);
-                // } catch (notifyErr) {
-                //   console.error("Notification send failed:", notifyErr);
-                // }
-
+                await PushNotifications({
+                  receiverId: ride.basic.user_id._id.toString(),
+                  type: "BONUS",
+                  title: "Ride arrived Successfully",
+                  message: "Ride arrived Successfully",
+                  deviceTokens: ride.basic.user_id._fcm_token
+                });
               } catch (error) {
                 console.error("Error in ride arrival flow:", error);
                 ack({
@@ -741,14 +733,6 @@ async function runServer() {
 
                 socket.ride_details.ride_status = "running";
                 const ride = ride_details.toObject();
-
-                // 🟡 Convert client.get to await-style using Promise
-                // const user_socket = await new Promise((resolve, reject) => {
-                //   client.get("socket_user:" + ride.basic.user_id.toString(), (err, result) => {
-                //     if (err) reject(err);
-                //     else resolve(result);
-                //   });
-                // });
                 const user_socket = await client.get("socket_user:" + ride.basic.user_id.toString());
 
                 if (user_socket) {
@@ -764,20 +748,13 @@ async function runServer() {
                 });
 
                 FUNC.insertPath(ride_id, "start_ride", longitude, latitude, () => { });
-
-                // const notificationObject = {
-                //   receiverId: ride.basic.user_id._id.toString(),
-                //   type: "BONUS",
-                //   title: "Ride started Successfully",
-                //   message: "Ride started Successfully",
-                //   entityId: ride.basic.user_id._id.toString(),
-                // };
-
-                // try {
-                //   await notification.PushNotificationsUserwise(notificationObject);
-                // } catch (notifyErr) {
-                //   console.error("Notification send failed:", notifyErr);
-                // }
+                await PushNotifications({
+                  receiverId: ride.basic.user_id._id.toString(),
+                  type: "BONUS",
+                  title: "Ride started Successfully",
+                  message: "Ride started Successfully",
+                  deviceTokens: ride.basic.user_id._fcm_token
+                });
 
               } catch (error) {
                 console.error("start_ride error:", error);
@@ -895,16 +872,13 @@ async function runServer() {
 
                   // const path_array = locations.map(location => [location.loc[0], location.loc[1]]);
                   // const poly_encode = Polyline.encode(path_array); // optional use
-
-                  // const notificationObject = {
-                  //   receiverId: ride.basic.user_id._id.toString(),
-                  //   type: "BONUS",
-                  //   title: "Ride finished Successfully",
-                  //   message: "Ride finished Successfully",
-                  //   entityId: ride.basic.user_id._id.toString(),
-                  // };
-
-                  // await notification.PushNotificationsUserwise(notificationObject);
+                  await PushNotifications({
+                    receiverId: ride.basic.user_id._id.toString(),
+                    type: "BONUS",
+                    title: "Ride finished Successfully",
+                    message: "Ride finished Successfully",
+                    deviceTokens: ride.basic.user_id._fcm_token
+                  });
                 }
 
               } catch (error) {

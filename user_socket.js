@@ -19,6 +19,7 @@ const Location = require('./src/models/locationModel');
 const chatModel = require('./src/models/chatModel');
 const cityModel = require('./src/models/city');
 const { getClient } = require('./src/config/redis');
+const { PushNotifications } = require('./src/config/notification');
 const client = getClient();
 connectDB();
 const app = express();
@@ -740,7 +741,13 @@ async function runServer() {
                       message: "Ride cancelled Successfully"
                     });
 
-
+                    await PushNotifications({
+                      receiverId: ride_details.basic.provider_id._id.toString(),
+                      type: "BONUS",
+                      title: "Ride cancelled by user",
+                      message: "Ride cancelled by user",
+                      deviceTokens: ride_details.basic.provider_id.fcm_token,
+                    });
                     // Send notifications to user and driver
                     // await notification.PushNotifications({
                     //   receiverId: socket.user_data._id,
@@ -751,13 +758,6 @@ async function runServer() {
                     //   entityId: socket.user_data._id
                     // });
 
-                    // await notification.PushNotificationsDriver({
-                    //   receiverId: ride_details.basic.provider_id._id.toString(),
-                    //   type: "BONUS",
-                    //   title: "Ride cancelled by user",
-                    //   message: "Ride cancelled by user",
-                    //   entityId: ride_details.basic.provider_id._id.toString()
-                    // });
                   }
                 }
                 ack({
