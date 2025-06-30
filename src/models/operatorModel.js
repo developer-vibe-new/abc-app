@@ -54,10 +54,14 @@ const operatorSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        default: "operator"  
+        default: "operator"
     },
     token: {
         type: String
+    },
+    firebaseToken: {
+        type: String,
+        default: ""
     }
 }, { timestamps: true, versionKey: false });
 

@@ -35,7 +35,7 @@ exports.sendOtp = async (req) => {
 
 exports.verifyOtp = async (req) => {
     try {
-        const { mobile, otp } = req.body;
+        const { mobile, otp, firebaseToken } = req.body;
         const user = await User.findOne({ mobile, is_active: true });
         if (!user) {
             return {
@@ -61,6 +61,7 @@ exports.verifyOtp = async (req) => {
         );
         user.otp = null;
         user.login_token = token;
+        user.fcm_token = firebaseToken;
         await user.save();
         return {
             status: statusCode.OK,

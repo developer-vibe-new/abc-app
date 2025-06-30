@@ -13,7 +13,7 @@ exports.registerOperator = async (req) => {
             };
         }
         const data = await Operator.findOne({ phone });
-        if(data !== null) {
+        if (data !== null) {
             return {
                 status: statusCode.BAD_REQUEST,
                 success: false,
@@ -49,7 +49,7 @@ exports.loginOperator = async (req) => {
         }
 
         const operatorNo = await Operator.findOne({ phone });
-        if(!operatorNo) {
+        if (!operatorNo) {
             return {
                 status: statusCode.NOT_FOUND,
                 success: false,
@@ -57,11 +57,11 @@ exports.loginOperator = async (req) => {
             };
         }
 
-        const operatorData = await Operator.findOne({ phone, is_active: true, status: "unblock"});           
+        const operatorData = await Operator.findOne({ phone, is_active: true, status: "unblock" });
 
         if (operatorData) {
             operatorData.otp = 123456;
-            await operatorData.save(); 
+            await operatorData.save();
 
             return {
                 status: statusCode.OK,
@@ -75,7 +75,7 @@ exports.loginOperator = async (req) => {
             success: false,
             message: resMessage.Id_not_Active,
         };
-        
+
     } catch (error) {
         return {
             status: statusCode.INTERNAL_SERVER_ERROR,
@@ -88,7 +88,7 @@ exports.loginOperator = async (req) => {
 
 exports.verifyOtp = async (req) => {
     try {
-        const { phone, otp } = req.body;
+        const { phone, otp, firebaseToken } = req.body;
         if (!phone) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -116,6 +116,7 @@ exports.verifyOtp = async (req) => {
         if (operatorData.otp === otp) {
             operatorData.otp = null;
             operatorData.token = token;
+            operatorData.firebaseToken = firebaseToken;
             await operatorData.save();
             return {
                 status: statusCode.OK,
@@ -166,7 +167,7 @@ exports.uploadDocuments = async (req) => {
         const getStatus = (name, number, existingStatus) => {
             if (name && number) {
                 return 0; // Documents given
-            } 
+            }
             return existingStatus ?? -1; // Retain existing status or default to -1
         };
 

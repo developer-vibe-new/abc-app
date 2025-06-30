@@ -278,7 +278,7 @@ exports.providerlogin = async (req) => {
 
 exports.providerOtpVerification = async (req) => {
     try {
-        const { mobile, otp } = req.body;
+        const { mobile, otp, firebaseToken } = req.body;
 
         const driverData = await Provider.findOne({ mobile });
 
@@ -306,6 +306,7 @@ exports.providerOtpVerification = async (req) => {
 
         driverData.otp = null;
         driverData.login_token = token;
+        driverData.fcm_token = firebaseToken;
         console.log('driverData', driverData);
         await driverData.save();
 
