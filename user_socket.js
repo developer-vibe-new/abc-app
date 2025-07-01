@@ -463,7 +463,27 @@ async function runServer() {
                   await client.set(`request_data:${ride_id}`, JSON.stringify(request_data));
                   await client.set(`ride_attempt:${ride_id}`, settingData.ride_settings.ride_attempt);
 
-                  await FUNC.send_request(ride_id, io, settingData);
+                  let data = await FUNC.send_request(ride_id, io, settingData);
+                  if (data == 'ERROR') {
+                    const ride = await Ride.findOneAndUpdate(
+                      {
+                        _id: new mongoose.Types.ObjectId(ride_id),
+                        "basic.ride_status": "requested"
+                      },
+                      {
+                        $set: { "basic.ride_status": "declined" }
+                      },
+                      { new: true }
+                    ).lean();
+                    if (ride) {
+                      const userSocket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
+                      socket.to(userSocket).emit("ride_declined", {
+                        ride_id: ride_id, status: 200,
+                        success: true,
+                        message: "Ride declined Successfully"
+                      });
+                    }
+                  }
 
                 } catch (err) {
                   const rideDetails = await Ride.findOneAndUpdate(
