@@ -464,6 +464,7 @@ async function runServer() {
                   await client.set(`ride_attempt:${ride_id}`, settingData.ride_settings.ride_attempt);
 
                   let data = await FUNC.send_request(ride_id, io, settingData);
+                  console.log('data---', data);
                   if (data == 'ERROR') {
                     const ride = await Ride.findOneAndUpdate(
                       {
@@ -499,7 +500,6 @@ async function runServer() {
                       success: true,
                     });
                   }
-
                   console.error('Error in processProviders:', err);
                 }
               };

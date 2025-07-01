@@ -595,18 +595,21 @@ async function runServer() {
                 await FUNC.updateInRide(ride_details._id, ride_details.basic.user_id._id, providerId, false);
 
                 // Push notification
-                await PushNotifications({
-                  receiverId: ride_details.basic.user_id._id.toString(),
-                  type: "BONUS",
-                  title: "Ride cancelled Successfully",
-                  message: "Ride cancelled Successfully",
-                  deviceTokens: ride_details.basic.user_id._fcm_token
-                });
+
                 ack({
                   status: 200,
                   success: true,
                   message: "Ride cancelled Successfully"
                 });
+                let obj = {
+                  receiverId: ride_details.basic.user_id._id.toString(),
+                  type: "BONUS",
+                  title: "Ride cancelled Successfully",
+                  message: "Ride cancelled Successfully",
+                  deviceTokens: ride_details.basic.user_id._fcm_token
+                };
+                console.log('obj---', obj);
+                PushNotifications(obj);
 
               } catch (err) {
                 console.error("cancel_ride error:", err);
