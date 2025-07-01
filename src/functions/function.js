@@ -15,7 +15,6 @@ const { getClient } = require('../config/redis');
 const client = getClient();
 const pathModel = require('../models/pathModel');
 const Taxitype = require('../models/taxiTypeModel');
-const { PushNotifications } = require('../config/notification');
 exports.send_request = async function (ride_id, io, appSettings) {
     try {
         const request_data_str = await client.get("request_data:" + ride_id);
@@ -62,23 +61,10 @@ exports.send_request = async function (ride_id, io, appSettings) {
                     await client.set("ride_request:" + provider_id, JSON.stringify(request_data));
                     await client.expire("ride_request:" + provider_id, request_data.load_sec);
                 } else {
-                    let provider = await Provider.findOne({
-                        _id: new mongoose.Types.ObjectId(provider_id)
-                    }, {
-                        os: 1,
-                        fcm_token: 1,
-                        language: 1
-                    });
                     console.log("New Request Socket Emit");
                     request_data.timer = appSettings.ride_settings.load_sec;
                     io.to(provider_socket).emit('new_request', request_data);
-                    await PushNotifications({
-                        receiverId: provider._id.toString(),
-                        type: "BONUS",
-                        title: 'New Request',
-                        message: "New Request",
-                        deviceTokens: provider.fcm_token,
-                    });
+                    return true;
                 }
 
                 setTimeout(async () => {

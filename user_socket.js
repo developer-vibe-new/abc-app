@@ -452,7 +452,6 @@ async function runServer() {
 
               const processProviders = async () => {
                 try {
-                  console.log('allProviders--->>>>>>>', allProviders);
                   await Promise.all(allProviders.map(provider => {
                     return Promise.all([
                       client.rPush(`request_queue:${ride_id}`, provider.provider_id._id.toString()),
@@ -485,7 +484,7 @@ async function runServer() {
                       });
                     }
                   }
-
+                  return true;
                 } catch (err) {
                   const rideDetails = await Ride.findOneAndUpdate(
                     { _id: ride_id, "basic.ride_status": "requested" },
