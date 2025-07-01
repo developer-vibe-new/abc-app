@@ -636,7 +636,7 @@ async function runServer() {
                     }
                   },
                   { new: true }
-                );
+                ).populate("basic.user_id").lean();
 
                 if (!ride_details) {
                   return ack({
@@ -725,7 +725,7 @@ async function runServer() {
                     }
                   },
                   { new: true }
-                );
+                ).populate("basic.user_id").lean();
 
                 if (!ride_details) {
                   return ack({
@@ -819,7 +819,7 @@ async function runServer() {
                 },
                   { $set: update_ride_data },
                   { new: true }
-                );
+                ).populate("basic.user_id").lean();
                 if (!ride_details) {
                   return ack({
                     status: 203,
