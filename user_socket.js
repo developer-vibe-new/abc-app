@@ -765,7 +765,7 @@ async function runServer() {
                       message: "Ride cancelled Successfully"
                     });
 
-                    await PushNotifications({
+                    PushNotifications({
                       receiverId: ride_details.basic.provider_id._id.toString(),
                       type: "BONUS",
                       title: "Ride cancelled by user",

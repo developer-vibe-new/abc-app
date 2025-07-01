@@ -431,7 +431,7 @@ async function runServer() {
 
                 await FUNC.insertPath(ride_update._id, "accepted", data.longitude, data.latitude);
 
-                await PushNotifications({
+                PushNotifications({
                   receiverId: ride_update.basic.user_id._id.toString(),
                   type: "BONUS",
                   title: 'Ride accept Successfully',
@@ -676,7 +676,7 @@ async function runServer() {
 
                 FUNC.insertPath(ride_id, "arrived", longitude, latitude, () => { });
 
-                await PushNotifications({
+                PushNotifications({
                   receiverId: ride.basic.user_id._id.toString(),
                   type: "BONUS",
                   title: "Ride arrived Successfully",
@@ -754,7 +754,7 @@ async function runServer() {
                 });
 
                 FUNC.insertPath(ride_id, "start_ride", longitude, latitude, () => { });
-                await PushNotifications({
+                PushNotifications({
                   receiverId: ride.basic.user_id._id.toString(),
                   type: "BONUS",
                   title: "Ride started Successfully",
@@ -878,7 +878,7 @@ async function runServer() {
 
                   // const path_array = locations.map(location => [location.loc[0], location.loc[1]]);
                   // const poly_encode = Polyline.encode(path_array); // optional use
-                  await PushNotifications({
+                  PushNotifications({
                     receiverId: ride.basic.user_id._id.toString(),
                     type: "BONUS",
                     title: "Ride finished Successfully",
