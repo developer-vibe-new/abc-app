@@ -651,7 +651,7 @@ async function runServer() {
                 socket.ride_details.ride_status = "arrived";
                 socket.ride_details.arrived_time = now_date;
 
-                const ride = ride_details.toObject();
+                const ride = ride_details;
 
                 let user_socket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
                 if (!user_socket) {
@@ -738,7 +738,7 @@ async function runServer() {
                 }
 
                 socket.ride_details.ride_status = "running";
-                const ride = ride_details.toObject();
+                const ride = ride_details;
                 const user_socket = await client.get("socket_user:" + ride.basic.user_id.toString());
 
                 if (user_socket) {
