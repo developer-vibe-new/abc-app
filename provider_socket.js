@@ -846,7 +846,7 @@ async function runServer() {
 
                   // const track_room = 'trackprovider_' + socket.providerDetail._id.toString();
                   // await remoteLeaveUserFromRoom(user_socket, track_room);
-                  await FUNC.updateInRide(ride._id, ride.basic.user_id, socket.providerDetail._id, false);
+                  await FUNC.updateInRide(ride._id, ride.basic.user_id._id, socket.providerDetail._id, false);
 
                   await Provider.updateOne(
                     { _id: socket.providerDetail._id },
