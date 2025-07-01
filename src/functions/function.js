@@ -346,7 +346,6 @@ exports.ride_transaction_driver = async function (ride_id, fareObj) {
     let onlinepayment = 0;
     let offlinepayment = 0;
     let refund = 0;
-    console.log('fareObj', fareObj);
 
     try {
         const transaction_detail = await Transaction.findOne({ ride_id: ride_id });
@@ -374,7 +373,6 @@ exports.ride_transaction_driver = async function (ride_id, fareObj) {
             .lean();
 
         const { payment_type, chargeObj } = await FUNC.ride_payment(ride_details, fareObj);
-        console.log('payment_type', payment_type);
         if (payment_type === "wallet") {
             onlinepayment = ride_details.payment.onlinepayment;
 
@@ -405,7 +403,6 @@ exports.ride_transaction_driver = async function (ride_id, fareObj) {
         } else {
             offlinepayment = Number(fareObj.fare_charged);
         }
-        console.log('offlinepayment', offlinepayment);
 
         const lastTransaction = await Transaction.find({
             provider_id: ride_details.basic.provider_id
