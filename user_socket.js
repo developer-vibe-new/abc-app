@@ -473,7 +473,11 @@ async function runServer() {
                   );
 
                   if (rideDetails) {
-                    socket.emit('ride_declined', { ride_id });
+                    socket.emit('ride_declined', {
+                      ride_id,
+                      status: 200,
+                      success: true,
+                    });
                   }
 
                   console.error('Error in processProviders:', err);

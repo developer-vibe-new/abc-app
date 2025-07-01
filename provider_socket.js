@@ -581,7 +581,10 @@ async function runServer() {
 
                 if (userSocketId) {
                   // Notify user via socket
-                  socket.to(userSocketId).emit("request_cancelled", { ride_id });
+                  socket.to(userSocketId).emit("request_cancelled", {
+                    ride_id, status: 200,
+                    success: true,
+                  });
 
                   // Leave tracking room
                   const trackRoom = `trackprovider_${providerId}`;
