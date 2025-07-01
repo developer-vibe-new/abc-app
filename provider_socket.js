@@ -606,7 +606,7 @@ async function runServer() {
                   type: "BONUS",
                   title: "Ride cancelled Successfully",
                   message: "Ride cancelled Successfully",
-                  deviceTokens: ride_details.basic.user_id._fcm_token
+                  deviceTokens: ride_details.basic.user_id.fcm_token
                 };
                 console.log('obj---', obj);
                 PushNotifications(obj);
@@ -681,7 +681,7 @@ async function runServer() {
                   type: "BONUS",
                   title: "Ride arrived Successfully",
                   message: "Ride arrived Successfully",
-                  deviceTokens: ride.basic.user_id._fcm_token
+                  deviceTokens: ride.basic.user_id.fcm_token
                 });
               } catch (error) {
                 console.error("Error in ride arrival flow:", error);
@@ -759,7 +759,7 @@ async function runServer() {
                   type: "BONUS",
                   title: "Ride started Successfully",
                   message: "Ride started Successfully",
-                  deviceTokens: ride.basic.user_id._fcm_token
+                  deviceTokens: ride.basic.user_id.fcm_token
                 });
 
               } catch (error) {
@@ -883,7 +883,7 @@ async function runServer() {
                     type: "BONUS",
                     title: "Ride finished Successfully",
                     message: "Ride finished Successfully",
-                    deviceTokens: ride.basic.user_id._fcm_token
+                    deviceTokens: ride.basic.user_id.fcm_token
                   });
                 }
 
