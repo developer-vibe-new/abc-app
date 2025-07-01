@@ -831,7 +831,7 @@ async function runServer() {
                 }
 
                 delete socket.ride_details;
-                const ride = ride_details.toObject();
+                const ride = ride_details;
                 const user_socket = await client.get("socket_user:" + ride.basic.user_id.toString());
 
                 if (user_socket) {
