@@ -653,7 +653,7 @@ async function runServer() {
 
                 const ride = ride_details;
 
-                let user_socket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
+                let user_socket = await client.get(`socket_user:${ride.basic.user_id._id.toString()}`);
                 if (!user_socket) {
                   console.error("Socket not found for user:");
                   ack({
@@ -739,7 +739,7 @@ async function runServer() {
 
                 socket.ride_details.ride_status = "running";
                 const ride = ride_details;
-                const user_socket = await client.get("socket_user:" + ride.basic.user_id.toString());
+                const user_socket = await client.get("socket_user:" + ride.basic.user_id._id.toString());
 
                 if (user_socket) {
                   socket.to(user_socket).emit("ride_started", {
@@ -833,7 +833,7 @@ async function runServer() {
                 delete socket.ride_details;
                 const ride = ride_details;
 
-                const user_socket = await client.get("socket_user:" + ride.basic.user_id.toString());
+                const user_socket = await client.get("socket_user:" + ride.basic.user_id._id.toString());
 
                 if (user_socket) {
                   socket.to(user_socket).emit('ride_finished', {
