@@ -386,7 +386,7 @@ async function runServer() {
                 ack({
                   status: 200,
                   success: false,
-                  message: "Provider not found."
+                  message: "No vehicle available for this category."
                 });
               }
               console.log('location_data', location_data.length);
