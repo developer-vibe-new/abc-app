@@ -300,7 +300,7 @@ async function runServer() {
                       };
                       await client.rPush(redisKey, JSON.stringify(location));
                       const ride = await Ride.findOne({ _id: socket.ride_details.ride_id }, { "basic.user_id": 1 });
-                      console.log('ride---->.>>>', ride);
+
                       let user_socket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
                       if (!user_socket) {
                         console.error("Socket not found for user:");
@@ -310,6 +310,7 @@ async function runServer() {
                         });
 
                       } else {
+                        console.log('socket.ride_details.ride_id---->.>>>', socket.ride_details.ride_id);
                         socket.to(user_socket).emit("ongoing_ride", {
                           data: locationData,
                           ride_id: socket.ride_details.ride_id,
@@ -744,7 +745,6 @@ async function runServer() {
                       "basic.ride_status": "running",
                       "time.started": now_date,
                       "location.started": location_start,
-                      "location.destination": destination,
                       "location.googlePath": decodedPolyline
                     }
                   },
