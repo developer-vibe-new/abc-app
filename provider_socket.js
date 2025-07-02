@@ -297,6 +297,24 @@ async function runServer() {
                         lng: data.longitude
                       };
                       await client.rPush(redisKey, JSON.stringify(location));
+                      const ride = await Ride.findOne({ _id: socket.ride_details.ride_id }, { "basic.user_id": 1 });
+                      let user_socket = await client.get(`socket_user:${ride.user_id.toString()}`);
+                      if (!user_socket) {
+                        console.error("Socket not found for user:");
+                        ack({
+                          status: 500,
+                          message: "Something went wrong",
+                        });
+
+                      } else {
+                        socket.to(user_socket).emit("ongoing_ride", {
+                          data: locationData,
+                          ride_id: socket.ride_details.ride_id,
+                          status: 200,
+                          success: true,
+                          message: 'On going ride'
+                        });
+                      }
                     }
                     return ack({
                       status: 200,
