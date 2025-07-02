@@ -259,7 +259,9 @@ async function runServer() {
                   longitude: data.locations[0].coordinates[1],
                   latitude: data.locations[0].coordinates[0],
                   firstName: socket.providerDetail.first_name,
-                  lastName: socket.providerDetail.last_name
+                  lastName: socket.providerDetail.last_name,
+                  bearing: data.bearing,
+                  speed: data.speed
                 };
 
                 socket.emit('location_update', location_packet);
