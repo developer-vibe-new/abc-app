@@ -384,7 +384,7 @@ async function runServer() {
               const location_data = await Location.aggregate(locationQuery);
               if (!location_data) {
                 ack({
-                  status: 200,
+                  status: 203,
                   success: false,
                   message: "No vehicle available for this category."
                 });
