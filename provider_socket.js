@@ -261,7 +261,10 @@ async function runServer() {
                   firstName: socket.providerDetail.first_name,
                   lastName: socket.providerDetail.last_name,
                   bearing: data.bearing,
-                  speed: data.speed
+                  speed: data.speed,
+                  status: 200,
+                  success: true,
+                  message: 'On going ride'
                 };
                 console.log('location_packet', JSON.stringify(location_packet));
 
