@@ -745,6 +745,7 @@ async function runServer() {
                       "basic.ride_status": "running",
                       "time.started": now_date,
                       "location.started": location_start,
+                      "location.destination": destination,
                       "location.googlePath": decodedPolyline
                     }
                   },
