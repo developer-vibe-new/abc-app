@@ -241,7 +241,7 @@ async function runServer() {
                   ...loc,
                   coordinates: [loc.coordinates[1], loc.coordinates[0]]
                 }));
-                // console.log('locations', JSON.stringify(locations));
+
                 const locationData = {
                   bearing: data.bearing,
                   speed: data.speed,
@@ -263,11 +263,12 @@ async function runServer() {
                   bearing: data.bearing,
                   speed: data.speed
                 };
+                console.log('location_packet', JSON.stringify(location_packet));
 
                 socket.emit('location_update', location_packet);
 
                 const track_room = 'trackprovider_' + socket.providerDetail._id.toString();
-
+                console.log('socket.providerDetail.in_ride---->.>>>', socket.providerDetail.in_ride);
                 if (socket.providerDetail.in_ride && socket.ride_details) {
                   let estimated_time = 5;
                   let distanceObj = {};
