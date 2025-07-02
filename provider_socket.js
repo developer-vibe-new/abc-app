@@ -299,7 +299,7 @@ async function runServer() {
                       await client.rPush(redisKey, JSON.stringify(location));
                       const ride = await Ride.findOne({ _id: socket.ride_details.ride_id }, { "basic.user_id": 1 });
                       console.log('ride---->.>>>', ride);
-                      let user_socket = await client.get(`socket_user:${ride.user_id.toString()}`);
+                      let user_socket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
                       if (!user_socket) {
                         console.error("Socket not found for user:");
                         ack({
