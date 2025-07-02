@@ -384,7 +384,8 @@ async function runServer() {
               const location_data = await Location.aggregate(locationQuery);
               if (!location_data) {
                 ack({
-                  status: 404,
+                  status: 200,
+                  success: false,
                   message: "Provider not found."
                 });
               }
