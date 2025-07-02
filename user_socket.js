@@ -382,7 +382,7 @@ async function runServer() {
                 { $limit: 10 }
               ];
               const location_data = await Location.aggregate(locationQuery);
-              if (!location_data) {
+              if (!location_data || location_data.length == 0) {
                 ack({
                   status: 203,
                   success: false,
