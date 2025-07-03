@@ -234,7 +234,7 @@ async function runServer() {
           }
           switch (event) {
             case "updateLocation": {
-              console.log("=====Update Location =====");
+              console.log("=====Update Location =====", socket.providerDetail._id);
               try {
                 const now_date = moment().toDate();
                 const locations = data.locations.map(loc => ({
