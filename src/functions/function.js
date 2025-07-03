@@ -62,7 +62,8 @@ exports.send_request = async function (ride_id, io, appSettings) {
                     await client.expire("ride_request:" + provider_id, request_data.load_sec);
                 } else {
                     console.log("New Request Socket Emit");
-                    request_data.timer = appSettings.ride_settings.load_sec;
+                    // request_data.timer = appSettings.ride_settings.load_sec;
+                    request_data.timer = 15;
                     io.to(provider_socket).emit('new_request', request_data);
                     return true;
                 }
@@ -88,7 +89,7 @@ exports.send_request = async function (ride_id, io, appSettings) {
                         await client.set("request_data:" + ride_id, JSON.stringify(request_data));
                         await FUNC.send_request(ride_id, io, appSettings);
                     }
-                }, appSettings.ride_settings.load_sec * 1000);
+                }, 15 * 1000);
 
             } catch (err) {
                 console.log("Error1", err);
