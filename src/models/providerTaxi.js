@@ -85,7 +85,7 @@ const ProviderTaxiSchema = new mongoose.Schema({
 	operator_id: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Operator',
-		defaut: null
+		default: null
 	},
 	plateno: {
 		type: String,

@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const moment = require('moment');
 const FUNC = require('../../functions/function');
 const rentalModel = require('../../models/rentalModel');
+const providerTaxiModel = require('../../models/providerTaxi');
 exports.addDriver = async (req) => {
     try {
         const driver = req.body;
@@ -675,5 +676,40 @@ exports.timeFareEstimate = async function (req, res, next) {
 
     } catch (err) {
         return next(err);
+    }
+};
+exports.addProviderTaxi = async (req) => {
+    try {
+        const providerTaxi = req.body;
+
+        if (!providerTaxi.car_id || !providerTaxi.type_ids || !providerTaxi.plateno) {
+            return {
+                statusCode: statusCode.BAD_REQUEST,
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Required_Data,
+            };
+        }
+        const providerData = await providerTaxiModel.create(providerTaxi);
+        await Location.create({
+            provider_id: providerTaxi.provider_id,
+            type_ids: providerTaxi.type_ids
+        });
+        await Provider.findByIdAndUpdate(providerTaxi.provider_id,
+            { providerTaxi_id: providerData._id },
+            { new: true }
+        );
+        return {
+            statusCode: statusCode.OK,
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Created_Successfully,
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
     }
 };

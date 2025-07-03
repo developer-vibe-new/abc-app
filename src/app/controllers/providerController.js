@@ -193,3 +193,14 @@ exports.timeFareEstimate = async (req) => {
         };
     }
 };
+exports.addProviderTaxi = async (req) => {
+    try {
+        return await service.addProviderTaxi(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};

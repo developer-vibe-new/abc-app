@@ -21,4 +21,5 @@ router.post('/timeFareEstimate', verifyToken, responseHandler(controller.timeFar
 router.post('/register', responseHandler(controller.registerController));
 router.post('/login', responseHandler(controller.providerLoginController));
 router.post('/verifyOtp', responseHandler(controller.providerOtpVerification));
+router.post('/addProviderTaxi', verifyToken, responseHandler(controller.addProviderTaxi));
 module.exports = router;

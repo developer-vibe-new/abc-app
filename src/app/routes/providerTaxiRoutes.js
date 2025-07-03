@@ -1,7 +1,7 @@
 const express = require('express');
 const responseHandler = require('../../helpers/responseHandler');
 const controller = require('../controllers/provideTaxiController');
-const { upload } = require('../../helpers/multer');
+// const { upload } = require('../../helpers/multer');
 const { verifyToken } = require('../../middleware/auth');
 
 const router = express.Router();
