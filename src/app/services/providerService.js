@@ -691,7 +691,7 @@ exports.addProviderTaxi = async (req) => {
                 message: resMessage.Required_Data,
             };
         }
-        providerTaxi.provider_id = req.auth.id;
+        providerTaxi.provider_id = req.auth._id;
         const providerData = await providerTaxiModel.create(providerTaxi);
 
         await locationModel.create({
