@@ -708,6 +708,7 @@ exports.addProviderTaxi = async (req) => {
             status: statusCode.OK,
             success: true,
             message: resMessage.Data_Created_Successfully,
+            data: providerData
         };
     } catch (error) {
         return {
