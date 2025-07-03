@@ -693,7 +693,7 @@ exports.addProviderTaxi = async (req) => {
             };
         }
         providerTaxi.provider_id = req.auth._id;
-        const providerData = await providerTaxiModel.create(providerTaxi);
+        const providerData = await providerTaxiModel.findOneAndUpdate({ provider_id: req.auth._id }, providerTaxi, { new: true, upsert: true });
 
         await locationModel.create({
             provider_id: providerTaxi.provider_id,
