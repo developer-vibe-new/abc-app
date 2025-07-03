@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const moment = require('moment');
 const FUNC = require('../../functions/function');
 const rentalModel = require('../../models/rentalModel');
+const locationModel = require('../../models/locationModel');
 const providerTaxiModel = require('../../models/providerTaxi');
 exports.addDriver = async (req) => {
     try {
@@ -691,7 +692,7 @@ exports.addProviderTaxi = async (req) => {
             };
         }
         const providerData = await providerTaxiModel.create(providerTaxi);
-        await Location.create({
+        await locationModel.create({
             provider_id: providerTaxi.provider_id,
             type_ids: providerTaxi.type_ids
         });
