@@ -552,7 +552,8 @@ exports.getDocuments = async (req) => {
             message: resMessage.Documents_Retrieved_Successfully,
             data: {
                 documents: data.documents,
-                providerTaxiDocuments: data.providerTaxiDocuments
+                providerTaxiDocuments: data.providerTaxiDocuments,
+                providerTaxi_id: data.providerTaxi_id
             }
         };
     } catch (error) {
