@@ -185,7 +185,7 @@ exports.generateOrderId = async (req) => {
     const options = {
         amount: amount * 100, // amount in the smallest currency unit (e.g. 500 * 100 = 50000 paise = ₹500)
         currency: 'INR',
-        receipt: `ride_order_${req.auth._id}_${Date.now()}`,
+        receipt: `ride_order_${req.auth.id}_${Date.now()}`,
     };
 
     try {
