@@ -323,9 +323,7 @@ exports.driverView = async (req) => {
             { $count: "total" }
         ]); const totalRecords = totalCount.length > 0 ? totalCount[0].total : 0;
         const totalPages = Math.ceil(totalRecords / pagesize);
-
        
-
         const viewAllData = await driverModel.aggregate(conditions);
 
         return {
