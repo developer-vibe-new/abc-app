@@ -271,12 +271,53 @@ exports.updateInRide = async (ride_id, user_id, provider_id, in_ride) => {
     try {
         const inverse_in_ride = !in_ride;
         console.log('inverse_in_ride', inverse_in_ride);
-        const rides = await Ride.find({
-            "basic.user_id": new mongoose.Types.ObjectId(user_id),
-            "basic.ride_status": { $in: ["accepted", "arrived", "running"] }
-        })
-            .populate('basic.provider_id', 'first_name last_name full_name mobile callingmobile photo total_rating rated avg_rating image')
-            .populate("meta.category_id");
+        // const rides = await Ride.find({
+        //     "basic.user_id": new mongoose.Types.ObjectId(user_id),
+        //     "basic.ride_status": { $in: ["accepted", "arrived", "running"] }
+        // })
+        //     .populate('basic.provider_id', 'first_name last_name full_name mobile callingmobile photo total_rating rated avg_rating image')
+        //     .populate("meta.category_id");
+        const rides = await Ride.aggregate([
+            {
+                $match: {
+                    "basic.user_id": new mongoose.Types.ObjectId(user_id),
+                    "basic.ride_status": { $in: ["accepted", "arrived", "running"] }
+                }
+            },
+            {
+                $lookup: {
+                    from: "providers", // Assuming your `provider_id` references the `providers` collection
+                    localField: "basic.provider_id",
+                    foreignField: "_id",
+                    as: "provider"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$provider",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: "taxi_types", // Assuming `category_id` refers to `categories` collection
+                    localField: "meta.category_id",
+                    foreignField: "_id",
+                    as: "category"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$category",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    basic: 1,
+                }
+            }
+        ]);
 
         const hasActiveRide = rides && rides.length > 0;
         const finalInRideStatus = hasActiveRide;
