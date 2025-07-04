@@ -380,7 +380,7 @@ async function runServer() {
                 ack({
                   status: 200,
                   success: true,
-                  message: "Booking in progress",
+                  message: "Booking is scheduled",
                   data: { ride_id: NewRide._id }
                 });
 
