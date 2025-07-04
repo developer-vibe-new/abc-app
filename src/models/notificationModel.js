@@ -1,34 +1,40 @@
 const mongoose = require('mongoose');
-
-const notificationSchema = new mongoose.Schema({
-    type: {
-        type: String,
-        required: true
-    },
-    message: {
-        type: String,
-        required: true
-    },
-	is_active: {
-		type: Boolean,
-        default: true
-	}
-}, {
-	timestamps: {
-		createdAt: 'created',
-		updatedAt: 'updated'
+const Schema = mongoose.Schema;
+var NotificationSchema = new Schema({
+	activity: {
+		type: String,
 	},
-	id: false,
-	toJSON: {
-		getters: true,
-		virtuals: true
+	user_type: {
+		type: String
 	},
-	toObject: {
-		getters: true,
-		virtuals: true
+	user_id: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'User'
+	},
+	provider_id: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Provider'
+	},
+	ride_id: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Ride'
+	},
+	msg: {
+		type: String
+	},
+	live_on: {
+		type: Date,
+		default: Date.now
+	},
+	is_sent: {
+		type: Number,
+		default: 1
 	}
-});
-
-const notificationModel = mongoose.model("notification", notificationSchema);
-
-module.exports = notificationModel;
+},
+	{
+		timestamps: true,
+		versionKey: false
+	}
+);
+// we need to create a model to use it
+module.exports.Notification = mongoose.model('notification', NotificationSchema);

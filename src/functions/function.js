@@ -15,6 +15,8 @@ const { getClient } = require('../config/redis');
 const client = getClient();
 const pathModel = require('../models/pathModel');
 const Taxitype = require('../models/taxiTypeModel');
+const notificationModel = require('../models/notificationModel');
+const { PushNotifications } = require('../config/notification');
 exports.send_request = async function (ride_id, io, appSettings) {
     try {
         const request_data_str = await client.get("request_data:" + ride_id);
@@ -755,4 +757,51 @@ exports.calculateDistance = async (ride_id) => {
     }
 
     console.log(`Total Distance traveled: ${totalDistanceKm.toFixed(2)} km`);
+};
+
+exports.schedule_ride_notify = async function (ride_details, io) {
+    try {
+        const providers = await Provider.find({
+            city_id: ride_details.meta.city_id,
+            is_notify: 1,
+            fcm_token: {
+                $exists: true,
+                $ne: ''
+            }
+        }, {
+            os: 1,
+            fcm_token: 1,
+            language: 1
+        }).lean();
+        if (providers.length > 0) {
+            try {
+                for (let provider of providers) {
+                    await notificationModel.create({
+                        user_type: "customer",
+                        user_id: ride_details.basic.user_id,
+                        activity: "new_pending_ride",
+                        title: "New upcoming ride",
+                        message: "A future ride has been requested, please check upcoming rides",
+                        provider_id: provider._id,
+                        ride_id: ride_details._id,
+                    });
+                    PushNotifications({
+                        receiverId: provider._id.toString(),
+                        type: "new_pending_ride",
+                        title: "New upcoming ride",
+                        message: "A future ride has been requested, please check upcoming rides",
+                        deviceTokens: provider.fcm_token,
+                    });
+                }
+                return true;
+            } catch (notifyErr) {
+                console.error("Error sending push notification:", notifyErr);
+            }
+        }
+
+        await io.in('provider_room').emit('new_pending_ride', ride_details.toObject());
+
+    } catch (err) {
+        console.error("Error in schedule_ride_notify:", err);
+    }
 };
