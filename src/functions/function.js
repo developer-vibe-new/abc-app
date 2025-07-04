@@ -780,7 +780,6 @@ exports.schedule_ride_notify = async function (ride_details, io) {
                         user_type: "customer",
                         user_id: ride_details.basic.user_id,
                         activity: "new_pending_ride",
-                        title: "New upcoming ride",
                         message: "A future ride has been requested, please check upcoming rides",
                         provider_id: provider._id,
                         ride_id: ride_details._id,

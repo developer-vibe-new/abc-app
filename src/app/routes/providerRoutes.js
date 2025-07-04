@@ -22,4 +22,8 @@ router.post('/register', responseHandler(controller.registerController));
 router.post('/login', responseHandler(controller.providerLoginController));
 router.post('/verifyOtp', responseHandler(controller.providerOtpVerification));
 router.post('/addProviderTaxi', verifyToken, responseHandler(controller.addProviderTaxi));
+router.post('/pendingRides', verifyToken, responseHandler(controller.pendingRides));
+router.post('/bookedRides', verifyToken, responseHandler(controller.bookedRides));
+router.post('/bookRide', verifyToken, responseHandler(controller.bookRide));
+
 module.exports = router;

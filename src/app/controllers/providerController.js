@@ -204,3 +204,37 @@ exports.addProviderTaxi = async (req) => {
         };
     }
 };
+
+exports.pendingRides = async (req) => {
+    try {
+        return await service.pendingRides(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
+exports.bookedRides = async (req) => {
+    try {
+        return await service.bookedRides(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
+exports.bookRide = async (req) => {
+    try {
+        return await service.bookRide(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};

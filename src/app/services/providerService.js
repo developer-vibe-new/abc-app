@@ -8,6 +8,8 @@ const FUNC = require('../../functions/function');
 const rentalModel = require('../../models/rentalModel');
 const locationModel = require('../../models/locationModel');
 const providerTaxiModel = require('../../models/providerTaxi');
+const notificationModel = require('../../models/notificationModel');
+const { PushNotifications } = require('../../config/notification');
 exports.addDriver = async (req) => {
     try {
         const driver = req.body;
@@ -709,6 +711,230 @@ exports.addProviderTaxi = async (req) => {
             success: true,
             message: resMessage.Data_Created_Successfully,
             data: providerData
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+exports.pendingRides = async function (req) {
+    try {
+        const { skip, limit } = req.body;
+        const logindata = req.auth;
+        const max_waiting_time = moment().subtract(30, "minutes").toDate();
+
+        const matchStage = {
+            $match: {
+                "meta.city_id": new mongoose.Types.ObjectId(logindata.city_id),
+                "basic.schedule": true,
+                "basic.ride_status": "scheduled",
+                "basic.provider_id": { $exists: false },
+                "created": { $gte: max_waiting_time }
+            }
+        };
+
+        const aggregation = [
+            matchStage,
+            { $sort: { created: -1 } },
+            { $skip: skip },
+            { $limit: limit || 10 },
+
+            // Populate category
+            {
+                $lookup: {
+                    from: 'taxi_types',
+                    localField: 'meta.category_id',
+                    foreignField: '_id',
+                    as: 'category'
+                }
+            },
+            { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+
+            // Populate user
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'basic.user_id',
+                    foreignField: '_id',
+                    as: 'user'
+                }
+            },
+            { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } }
+        ];
+
+        const rides = await Ride.aggregate(aggregation);
+
+        const rideArr = rides.map(ride => {
+            const localObj = {
+                ride_id: ride._id.toString(),
+                ride_status: ride.basic?.ride_status,
+                ride_type: ride.basic?.ride_type,
+                source: ride.location?.source,
+                destination: ride.location?.destination,
+                start_on: ride.time?.ride_on,
+                payment_type: ride.basic?.payment_type,
+                fare_estimate: ride.payment?.fare_estimate,
+                category_image: ride.category?.thumb_3x,
+                category_name: ride.category?.title,
+                user_name: ride.user ? `${ride.user.first_name} ${ride.user.last_name}` : '',
+                user_mobile: ride.user?.mobile
+            };
+
+            if (ride.basic?.payment_type === 'Card') {
+                localObj.card = ride.payment?.card;
+            }
+
+            return localObj;
+        });
+        return {
+            statusCode: statusCode.OK,
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Ride_List,
+            data: rideArr
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+
+exports.bookedRides = async function (req) {
+    try {
+        const { skip, limit } = req.body;
+        const logindata = req.auth;
+
+        const remove_ride_time = moment().add(30, "minutes").toDate();
+        const aggregation = [
+            {
+                $match: {
+                    "basic.schedule": true,
+                    "basic.ride_status": "scheduled",
+                    "basic.provider_id": new mongoose.Types.ObjectId(logindata.id),
+                    "time.ride_on": { $gte: remove_ride_time }
+                }
+            },
+            { $sort: { created: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "meta.category_id",
+                    foreignField: "_id",
+                    as: "category"
+                }
+            },
+            { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "basic.user_id",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } }
+        ];
+
+        const rides = await Ride.aggregate(aggregation);
+
+        const rideArr = rides.map(ride => ({
+            ride_id: ride._id.toString(),
+            ride_status: ride.basic?.ride_status,
+            ride_type: ride.basic?.ride_type,
+            source: ride.location?.source,
+            destination: ride.location?.destination,
+            start_on: ride.time?.ride_on,
+            payment_type: ride.basic?.payment_type,
+            card: ride.basic?.payment_type === "Card" ? ride.payment?.card : undefined,
+            fare_estimate: ride.payment?.fare_estimate,
+            category_image: ride.category?.thumb_3x,
+            category_name: ride.category?.title,
+            user_name: `${ride.user?.first_name || ''} ${ride.user?.last_name || ''}`.trim(),
+            user_mobile: ride.user?.mobile
+        }));
+        return {
+            statusCode: statusCode.OK,
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Ride_List,
+            data: rideArr
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+
+exports.bookRide = async function (req) {
+    try {
+        const { ride_id } = req.body;
+        const logindata = req.auth;
+
+        const now_date = moment().toDate();
+
+        const ride_details = await Ride.findOneAndUpdate(
+            {
+                _id: ride_id,
+                "basic.schedule": true,
+                "basic.ride_status": "scheduled",
+                "basic.provider_id": { $exists: false }
+            },
+            {
+                $set: {
+                    "basic.provider_id": logindata.id,
+                    "time.booked": now_date
+                }
+            },
+            { new: true }
+        ).populate("basic.user_id");
+
+        if (!ride_details) {
+            return {
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.ride_not_found
+            };
+        }
+
+        // io.in('provider_room').emit('ride_booked', {
+        //     ride_id: ride_details._id.toString()
+        // });
+
+        const user = ride_details.basic.user_id;
+
+        const NotificationData = {
+            activity: "booking_confirmed",
+            ride_id: ride_details._id,
+            user_type: "customer",
+            user_id: user._id,
+            message: "Your ride has been confirmed by the driver",
+            provider_id: logindata.id
+        };
+        await notificationModel.create(NotificationData);
+        PushNotifications({
+            receiverId: logindata.id.toString(),
+            type: "booking_confirmed",
+            title: "Confirmed ride",
+            message: "Your ride has been confirmed by the driver",
+            deviceTokens: logindata.fcm_token,
+        });
+        return {
+            statusCode: statusCode.OK,
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.ride_booked_successfully,
+            data: {}
         };
     } catch (error) {
         return {

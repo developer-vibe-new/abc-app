@@ -19,7 +19,7 @@ var NotificationSchema = new Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Ride'
 	},
-	msg: {
+	message: {
 		type: String
 	},
 	live_on: {

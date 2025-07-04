@@ -162,7 +162,20 @@
     "Team_Not_Found_In_This_Group": "Team not found in this group.",
     "Admin_Not_Found": "Admin not found.",
     "Admin_Logout_Success": "Admin logged out successfully.",
-    "Admin_Login_Success": "Admin logged in successfully."
+    "Admin_Login_Success": "Admin logged in successfully.",
+    "ride_booked_successfully": "`Ride booked successfully`",
+    "ride_not_found": "`Ride not found`",
+    "ride_already_booked": "`Ride already booked`",
+    "ride_cancelled_successfully": "`Ride cancelled successfully`",
+    "ride_already_cancelled": "`Ride already cancelled`",
+    "ride_already_completed": "`Ride already completed`",
+    "ride_completed_successfully": "`Ride completed successfully`",
+    "ride_already_started": "`Ride already started`",
+    "ride_started_successfully": "`Ride started successfully`",
+    "ride_not_started": "`Ride not started`",
+    "ride_not_completed": "`Ride not completed`",
+    "ride_not_cancelled": "`Ride not cancelled`",
+    "ride_not_booked": "`Ride not booked`"
   },
   "userRoles": {
     "WALLET": "wallet",
