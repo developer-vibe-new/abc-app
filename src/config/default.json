@@ -16,6 +16,7 @@
   "resMessage": {
     "City_Status_Updated_Successfully": "City Status Updated Successfully",
     "Permission_Denied": "Only admins can create sub-admin",
+    "Ride_List": "Ride List",
     "Access_Denied": "Access Denied",
     "City_not_found": "City not found",
     "City_Deleted_Successfully": "City Deleted Successfully",

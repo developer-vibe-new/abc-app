@@ -12,3 +12,14 @@ exports.categoriesPrice = async (req) => {
         };
     }
 };
+exports.list = async (req) => {
+    try {
+        return await ride.list(req);
+    } catch (error) {
+        return {
+            status: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        };
+    }
+};
