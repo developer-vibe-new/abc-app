@@ -37,4 +37,4 @@ var NotificationSchema = new Schema({
 	}
 );
 // we need to create a model to use it
-module.exports.Notification = mongoose.model('notification', NotificationSchema);
+module.exports = mongoose.model('notification', NotificationSchema);

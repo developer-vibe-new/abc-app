@@ -358,7 +358,8 @@ async function runServer() {
                     ride_status: "scheduled",
                     user_id: socket.user_data._id,
                     instructions: "",
-                    bookdistance: distance
+                    bookdistance: distance,
+                    schedule: true
                   },
                   location: { source, destination },
                   meta: {
