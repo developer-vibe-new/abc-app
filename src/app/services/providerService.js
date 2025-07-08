@@ -734,7 +734,6 @@ exports.pendingRides = async function (req) {
                 message: resMessage.Provider_taxi_not_found
             };
         }
-        console.log('providerData', providerData.city_id);
         const matchStage = {
             $match: {
                 "meta.city_id": new mongoose.Types.ObjectId(providerData.city_id),
@@ -773,7 +772,6 @@ exports.pendingRides = async function (req) {
             },
             { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } }
         ];
-        console.log('aggregation---', JSON.stringify(aggregation));
         const rides = await Ride.aggregate(aggregation);
 
         const rideArr = rides.map(ride => {
@@ -889,7 +887,14 @@ exports.bookRide = async function (req) {
     try {
         const { ride_id } = req.body;
         const logindata = req.auth;
-
+        let providerData = await Provider.findOne({ _id: logindata._id }, { fcm_token: 1 });
+        if (!providerData) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Provider_taxi_not_found
+            };
+        }
         const now_date = moment().toDate();
 
         const ride_details = await Ride.findOneAndUpdate(
@@ -901,7 +906,7 @@ exports.bookRide = async function (req) {
             },
             {
                 $set: {
-                    "basic.provider_id": logindata.id,
+                    "basic.provider_id": logindata._id,
                     "time.booked": now_date
                 }
             },
@@ -928,15 +933,16 @@ exports.bookRide = async function (req) {
             user_type: "customer",
             user_id: user._id,
             message: "Your ride has been confirmed by the driver",
-            provider_id: logindata.id
+            provider_id: logindata._id
         };
         await notificationModel.create(NotificationData);
+        console.log('logindata', logindata);
         PushNotifications({
-            receiverId: logindata.id.toString(),
+            receiverId: logindata._id.toString(),
             type: "booking_confirmed",
             title: "Confirmed ride",
             message: "Your ride has been confirmed by the driver",
-            deviceTokens: logindata.fcm_token,
+            deviceTokens: providerData.fcm_token,
         });
         return {
             statusCode: statusCode.OK,
@@ -946,6 +952,7 @@ exports.bookRide = async function (req) {
             data: {}
         };
     } catch (error) {
+        console.log('err', error);
         return {
             success: false,
             message: resMessage.Internal_Server_Error,
