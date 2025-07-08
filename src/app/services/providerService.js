@@ -887,14 +887,7 @@ exports.bookRide = async function (req) {
     try {
         const { ride_id } = req.body;
         const logindata = req.auth;
-        let providerData = await Provider.findOne({ _id: logindata._id }, { fcm_token: 1 });
-        if (!providerData) {
-            return {
-                status: statusCode.BAD_REQUEST,
-                success: false,
-                message: resMessage.Provider_taxi_not_found
-            };
-        }
+
         const now_date = moment().toDate();
 
         const ride_details = await Ride.findOneAndUpdate(
@@ -926,7 +919,6 @@ exports.bookRide = async function (req) {
         // });
 
         const user = ride_details.basic.user_id;
-
         const NotificationData = {
             activity: "booking_confirmed",
             ride_id: ride_details._id,
@@ -942,7 +934,7 @@ exports.bookRide = async function (req) {
             type: "booking_confirmed",
             title: "Confirmed ride",
             message: "Your ride has been confirmed by the driver",
-            deviceTokens: providerData.fcm_token,
+            deviceTokens: user.fcm_token,
         });
         return {
             statusCode: statusCode.OK,
