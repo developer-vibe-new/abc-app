@@ -865,7 +865,8 @@ exports.bookedRides = async function (req) {
             category_image: ride.category?.thumb_3x,
             category_name: ride.category?.title,
             user_name: `${ride.user?.first_name || ''} ${ride.user?.last_name || ''} `.trim(),
-            user_mobile: ride.user?.mobile
+            user_mobile: ride.user?.mobile,
+            bookStatus: "booked_ride"
         }));
         return {
             statusCode: statusCode.OK,
