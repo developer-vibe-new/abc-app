@@ -723,12 +723,21 @@ exports.addProviderTaxi = async (req) => {
 exports.pendingRides = async function (req) {
     try {
         const { skip, limit } = req.body;
+        // console.log('req.auth', req.auth);
         const logindata = req.auth;
         const max_waiting_time = moment().subtract(30, "minutes").toDate();
-
+        let providerData = await Provider.findOne({ _id: logindata._id });
+        if (!providerData) {
+            return {
+                status: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Provider_taxi_not_found
+            };
+        }
+        console.log('providerData', providerData.city_id);
         const matchStage = {
             $match: {
-                "meta.city_id": new mongoose.Types.ObjectId(logindata.city_id),
+                "meta.city_id": new mongoose.Types.ObjectId(providerData.city_id),
                 "basic.schedule": true,
                 "basic.ride_status": "scheduled",
                 "basic.provider_id": { $exists: false },
@@ -764,7 +773,7 @@ exports.pendingRides = async function (req) {
             },
             { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } }
         ];
-
+        console.log('aggregation---', JSON.stringify(aggregation));
         const rides = await Ride.aggregate(aggregation);
 
         const rideArr = rides.map(ride => {
@@ -779,7 +788,7 @@ exports.pendingRides = async function (req) {
                 fare_estimate: ride.payment?.fare_estimate,
                 category_image: ride.category?.thumb_3x,
                 category_name: ride.category?.title,
-                user_name: ride.user ? `${ride.user.first_name} ${ride.user.last_name}` : '',
+                user_name: ride.user ? `${ride.user.first_name} ${ride.user.last_name} ` : '',
                 user_mobile: ride.user?.mobile
             };
 
@@ -857,7 +866,7 @@ exports.bookedRides = async function (req) {
             fare_estimate: ride.payment?.fare_estimate,
             category_image: ride.category?.thumb_3x,
             category_name: ride.category?.title,
-            user_name: `${ride.user?.first_name || ''} ${ride.user?.last_name || ''}`.trim(),
+            user_name: `${ride.user?.first_name || ''} ${ride.user?.last_name || ''} `.trim(),
             user_mobile: ride.user?.mobile
         }));
         return {

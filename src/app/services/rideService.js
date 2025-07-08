@@ -140,7 +140,7 @@ exports.CategoriesPrice = async (req) => {
 
             TaxiCateData.push({
                 id: taxiType._id,
-                cityiId: city._id,
+                city_id: city._id,
                 price: fareMultiplier,
                 airportCharge,
                 airportstatus,
