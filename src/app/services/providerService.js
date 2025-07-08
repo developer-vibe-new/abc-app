@@ -823,7 +823,7 @@ exports.bookedRides = async function (req) {
                 $match: {
                     "basic.schedule": true,
                     "basic.ride_status": "scheduled",
-                    "basic.provider_id": new mongoose.Types.ObjectId(logindata.id),
+                    "basic.provider_id": new mongoose.Types.ObjectId(logindata._id),
                     "time.ride_on": { $gte: remove_ride_time }
                 }
             },
