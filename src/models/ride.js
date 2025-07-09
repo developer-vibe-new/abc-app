@@ -369,6 +369,12 @@ const RideSchema = new mongoose.Schema({
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'provider'
 		}],
+		schedule_canclled_providers: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Provider",
+			},
+		],
 		is_reported: {
 			type: Boolean
 		}

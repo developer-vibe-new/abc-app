@@ -725,7 +725,8 @@ exports.pendingRides = async function (req) {
         const { skip, limit } = req.body;
         // console.log('req.auth', req.auth);
         const logindata = req.auth;
-        const max_waiting_time = moment().subtract(15, "minutes").toDate();
+        const remove_ride_time = moment().subtract(15, "minutes").toDate();
+
         let providerData = await Provider.findOne({ _id: logindata._id });
         if (!providerData) {
             return {
@@ -740,7 +741,8 @@ exports.pendingRides = async function (req) {
                 "basic.schedule": true,
                 "basic.ride_status": "scheduled",
                 "basic.provider_id": { $exists: false },
-                "created": { $gte: max_waiting_time }
+                "meta.schedule_canclled_providers": { $nin: [logindata.id] },
+                "time.ride_on": { $gte: remove_ride_time },
             }
         };
 
@@ -772,6 +774,7 @@ exports.pendingRides = async function (req) {
             },
             { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } }
         ];
+        // console.log('aggregation', JSON.stringify(aggregation));
         const rides = await Ride.aggregate(aggregation);
 
         const rideArr = rides.map(ride => {
