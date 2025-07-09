@@ -277,6 +277,7 @@ exports.list = async function (req) {
                 localObj.airportcharge = ride.payment?.airportcharge;
                 localObj.airportstatus = ride.payment?.airportstatus;
                 localObj.fare_charged = ride.payment?.fare_charged || 0;
+                localObj.coupon = ride.payment?.coupon || 0;
                 localObj.path_image = ride.basic?.path_image;
                 localObj.path_image2 = ride.basic?.path_image2;
             }
