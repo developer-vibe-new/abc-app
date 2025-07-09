@@ -725,7 +725,7 @@ exports.pendingRides = async function (req) {
         const { skip, limit } = req.body;
         // console.log('req.auth', req.auth);
         const logindata = req.auth;
-        const max_waiting_time = moment().subtract(30, "minutes").toDate();
+        const max_waiting_time = moment().subtract(15, "minutes").toDate();
         let providerData = await Provider.findOne({ _id: logindata._id });
         if (!providerData) {
             return {
