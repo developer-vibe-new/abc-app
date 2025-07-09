@@ -185,7 +185,7 @@ exports.list = async function (req) {
             matchStage = {
                 $match: {
                     $and: [
-                        { 'basic.booked_by': 'user' },
+                        { "basic.ride_status": "finished" },
                         { 'basic.user_id': new mongoose.Types.ObjectId(logindata.id) }
                     ]
                 }
