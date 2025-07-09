@@ -820,7 +820,7 @@ exports.bookedRides = async function (req) {
         const { skip, limit } = req.body;
         const logindata = req.auth;
 
-        const remove_ride_time = moment().add(30, "minutes").toDate();
+        const remove_ride_time = moment().add(15, "minutes").toDate();
         const aggregation = [
             {
                 $match: {
