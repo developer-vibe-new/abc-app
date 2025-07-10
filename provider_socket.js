@@ -931,7 +931,7 @@ async function runServer() {
                 const ride_details = await Ride.findOneAndUpdate(
                   {
                     _id: new mongoose.Types.ObjectId(ride_id),
-                    "basic.ride_status": "accepted",
+                    "basic.ride_status": "scheduled",
                     "basic.provider_id": socket.providerDetail._id
                   },
                   {
