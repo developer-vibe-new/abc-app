@@ -10,6 +10,7 @@ const locationModel = require('../../models/locationModel');
 const providerTaxiModel = require('../../models/providerTaxi');
 const notificationModel = require('../../models/notificationModel');
 const { PushNotifications } = require('../../config/notification');
+const appSettings = require('./src/models/settingModel');
 exports.addDriver = async (req) => {
     try {
         const driver = req.body;
@@ -864,7 +865,7 @@ exports.bookedRides = async function (req) {
         ];
 
         const rides = await Ride.aggregate(aggregation);
-
+        const settingData = await appSettings.findOne();
         const rideArr = rides.map(ride => ({
             ride_id: ride._id.toString(),
             ride_status: ride.basic?.ride_status,
@@ -887,7 +888,9 @@ exports.bookedRides = async function (req) {
             color: ride.basic?.vehicle.color || "",
             driver_name: ride.basic?.providername || "",
             driver_image: "https://customer.ktscab.com/drivers/" + ride.provider.image,
-            bookStatus: "booked_ride"
+            bookStatus: "booked_ride",
+            instruction: settingData[`${ride.basic.ridestationtype}_instruction`] || "",
+            stops: ride.location.stops,
         }));
         return {
             statusCode: statusCode.OK,
