@@ -862,6 +862,15 @@ exports.bookedRides = async function (req) {
                 }
             },
             { $unwind: { path: "$provider", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'taxi_types',
+                    localField: 'meta.category_id',
+                    foreignField: '_id',
+                    as: 'category'
+                }
+            },
+            { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } }
         ];
 
         const rides = await Ride.aggregate(aggregation);

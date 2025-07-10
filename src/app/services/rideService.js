@@ -228,7 +228,7 @@ exports.list = async function (req) {
             },
             { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } }
         ];
-        console.log('aggregation', JSON.stringify(aggregation));
+
         const rides = await rideModel.aggregate(aggregation);
 
         const rideArr = rides.map(ride => {
