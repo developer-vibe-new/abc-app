@@ -942,7 +942,7 @@ async function runServer() {
                   },
                   { new: true }
                 ).populate("basic.user_id").lean();
-
+                console.log('ride_details', ride_details);
                 if (!ride_details) {
                   return ack({
                     status: 204,
