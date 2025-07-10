@@ -966,7 +966,7 @@ async function runServer() {
                 const track_room = 'trackprovider_' + socket.providerDetail._id.toString();
                 await remoteJoinUserToRoom(user_socket, track_room);
                 const request_data = await FUNC.buildRideRequestData(ride_update, provider_detail, socket, data, distanceObj, now_date, estimated_time);
-                socket.to(user_socket).emit('ride_accepted', request_data);
+                socket.to(user_socket).emit('ride_scheduled_accepted', request_data);
 
                 await Location.updateOne({ provider_id: new mongoose.Types.ObjectId(socket.providerDetail._id) }, { $set: { 'time_estimate': estimated_time } });
 
