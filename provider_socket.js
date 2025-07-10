@@ -925,6 +925,7 @@ async function runServer() {
             }
             case "accept_schedule_ride": {
               try {
+                console.log('accept_schedule_ride');
                 const now_date = moment().toDate();
                 const { ride_id, longitude, latitude } = data;
 
