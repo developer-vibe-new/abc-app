@@ -988,6 +988,7 @@ exports.bookRide = async function (req) {
                 $set: {
                     "basic.provider_id": logindata._id,
                     "time.booked": now_date,
+                    "basic.ride_status": "accepted",
                     "basic.vehicle.title": `${taxi_detail.provider_taxis.make} ${taxi_detail.provider_taxis.title}`,
                     "basic.vehicle.plateno": taxi_detail.provider_taxis.plateno,
                     "basic.vehicle.color": taxi_detail.provider_taxis.color,
