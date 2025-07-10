@@ -923,6 +923,79 @@ async function runServer() {
               }
               break;
             }
+            case "accept_schedule_ride": {
+              try {
+                const now_date = moment().toDate();
+                const { ride_id, longitude, latitude } = data;
+
+                const ride_details = await Ride.findOne(
+                  {
+                    _id: new mongoose.Types.ObjectId(ride_id),
+                    "basic.ride_status": "accepted",
+                    "basic.provider_id": socket.providerDetail._id
+                  },
+                  {
+                    $set: {
+                      "basic.ride_status": "arrived",
+                      "time.arrived": now_date
+                    }
+                  },
+                  { new: true }
+                ).populate("basic.user_id").lean();
+
+                if (!ride_details) {
+                  return ack({
+                    status: 204,
+                    message: "Ride not found 1"
+                  });
+                }
+
+                socket.ride_details.ride_status = "arrived";
+                socket.ride_details.arrived_time = now_date;
+
+                const ride = ride_details;
+
+                let user_socket = await client.get(`socket_user:${ride.basic.user_id._id.toString()}`);
+                if (!user_socket) {
+                  console.error("Socket not found for user:");
+                  ack({
+                    status: 500,
+                    message: "Something went wrong",
+                  });
+
+                } else {
+                  socket.to(user_socket).emit("ride_arrived", {
+                    ride_id, status: 200,
+                    success: true,
+                    message: ride.basic.booked_by
+                  });
+                }
+                ack({
+                  status: 200,
+                  message: ride.basic.booked_by,
+                  data: { arrived: now_date },
+                });
+
+                FUNC.insertPath(ride_id, "arrived", longitude, latitude, () => { });
+
+                PushNotifications({
+                  receiverId: ride.basic.user_id._id.toString(),
+                  type: "BONUS",
+                  title: "Ride arrived Successfully",
+                  message: "Ride arrived Successfully",
+                  deviceTokens: ride.basic.user_id.fcm_token
+                });
+              } catch (error) {
+                console.error("Error in ride arrival flow:", error);
+                ack({
+                  status: 500,
+                  message: "Something went wrong",
+                });
+              }
+
+              break;
+
+            }
 
             default:
               socket.emit('unknown_event', {

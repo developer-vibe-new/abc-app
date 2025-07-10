@@ -827,7 +827,7 @@ exports.bookedRides = async function (req) {
             {
                 $match: {
                     "basic.schedule": true,
-                    "basic.ride_status": { $in: ["scheduled", 'accepted'] },
+                    "basic.ride_status": 'scheduled',
                     "basic.provider_id": new mongoose.Types.ObjectId(logindata._id),
                     "time.ride_on": { $gte: remove_ride_time }
                 }
@@ -988,7 +988,6 @@ exports.bookRide = async function (req) {
                 $set: {
                     "basic.provider_id": logindata._id,
                     "time.booked": now_date,
-                    "basic.ride_status": "accepted",
                     "basic.vehicle.title": `${taxi_detail.provider_taxis.make} ${taxi_detail.provider_taxis.title}`,
                     "basic.vehicle.plateno": taxi_detail.provider_taxis.plateno,
                     "basic.vehicle.color": taxi_detail.provider_taxis.color,
