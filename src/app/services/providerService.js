@@ -859,6 +859,7 @@ exports.bookedRides = async function (req) {
         const rideArr = rides.map(ride => ({
             ride_id: ride._id.toString(),
             ride_status: ride.basic?.ride_status,
+            pickup_distance: ride.basic?.pickup_distance,
             ride_type: ride.basic?.ride_type,
             source: ride.location?.source,
             destination: ride.location?.destination,
