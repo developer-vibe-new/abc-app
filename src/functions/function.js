@@ -124,6 +124,8 @@ exports.lockDriver = async (provider_id, ride_id, ringTime) => {
 };
 
 exports.time_estimate = async (origin, destination) => {
+    console.log("==========origin---------", origin);
+    console.log("==========destination---------", destination);
     const distanceData = await new Promise((resolve, reject) => {
         google_distance.get({
             index: 1,
