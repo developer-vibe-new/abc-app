@@ -404,7 +404,7 @@ async function runServer() {
                 // }
                 let obj = {
                   _id: new mongoose.Types.ObjectId(data.ride_id),
-                  "basic.ride_status": { $in: ['requested', 'scheduled'] },
+                  "basic.ride_status": 'requested',
                   "meta.search_providers": socket.providerDetail._id
                 };
                 const ride_update = await Ride.findOneAndUpdate(obj, {
@@ -925,69 +925,72 @@ async function runServer() {
             }
             case "accept_schedule_ride": {
               try {
+                console.log('----------accept_ride-------', socket.providerDetail.online_taxi._id);
                 const now_date = moment().toDate();
-                const { ride_id, longitude, latitude } = data;
-
-                const ride_details = await Ride.findOneAndUpdate(
-                  {
-                    _id: new mongoose.Types.ObjectId(ride_id),
-                    "basic.ride_status": "scheduled",
-                    "basic.provider_id": socket.providerDetail._id
-                  },
-                  {
-                    $set: {
-                      "basic.ride_status": "arrived",
-                      "time.arrived": now_date
-                    }
-                  },
-                  { new: true }
-                ).populate("basic.user_id").lean();
-                if (!ride_details) {
-                  return ack({
-                    status: 204,
-                    message: "Ride not found 1"
-                  });
-                }
-                socket.ride_details = ride_details;
-
-                const ride = ride_details;
-
-                let user_socket = await client.get(`socket_user:${ride.basic.user_id._id.toString()}`);
-                if (!user_socket) {
-                  console.error("Socket not found for user:");
-                  ack({
-                    status: 500,
-                    message: "Something went wrong",
-                  });
-
-                } else {
-                  socket.to(user_socket).emit("ride_arrived", {
-                    ride_id, status: 200,
-                    success: true,
-                    message: ride.basic.booked_by
-                  });
-                }
-                ack({
-                  status: 200,
-                  message: ride.basic.booked_by,
-                  data: { arrived: now_date },
+                const provider_detail = await Provider.findOne({
+                  _id: socket.providerDetail._id
                 });
 
-                FUNC.insertPath(ride_id, "arrived", longitude, latitude, () => { });
+                if (!provider_detail) return ack({ status: 203, message: "Your driver not found" });
+                let obj = {
+                  _id: new mongoose.Types.ObjectId(data.ride_id),
+                  "basic.ride_status": 'scheduled',
+                };
+                const ride_update = await Ride.findOneAndUpdate(obj, {
+                  $set: {
+                    "basic.ride_status": "accepted",
+                    "basic.pickup_distance": data.pickup_distance,
+                    // ...(stripe_id && { "basic.merchantStripe_id": stripe_id })  // only set if available
+                  }
+                }, { new: true })
+                  .populate("meta.category_id")
+                  .populate("basic.user_id");
+                if (!ride_update) return ack({ status: 203, message: "Something went wrong, please try again" });
+                socket.ride_details = {
+                  ride_id: ride_update._id.toString(),
+                  ride_status: "accepted",
+                  otp: ride_update.basic.otp,
+                  providername: `${provider_detail.first_name} ${provider_detail.last_name}`,
+                  driver_image: `https://driver.taxiride.com/drivers/${provider_detail.image}`,
+                  source: ride_update.location.source,
+                  destination: ride_update.location.destination,
+                  stops: ride_update.location.stops,
+                  outstation: ride_update.outstation
+                };
+
+                const driver_location = { latitude: data.latitude, longitude: data.longitude };
+                const customer_location = ride_update.location.source;
+                const distanceObj = await FUNC.time_estimate(driver_location, customer_location).catch(() => ({ estimated_time: 5, pickup_distance: null }));
+                const estimated_time = distanceObj.estimated_time;
+                const user_socket = await client.get("socket_user:" + ride_update.basic.user_id._id.toString());
+                const track_room = 'trackprovider_' + socket.providerDetail._id.toString();
+                await remoteJoinUserToRoom(user_socket, track_room);
+                const request_data = await FUNC.buildRideRequestData(ride_update, provider_detail, socket, data, distanceObj, now_date, estimated_time);
+                socket.to(user_socket).emit('ride_accepted', request_data);
+
+                await Location.updateOne({ provider_id: new mongoose.Types.ObjectId(socket.providerDetail._id) }, { $set: { 'time_estimate': estimated_time } });
+
+                await FUNC.updateInRide(ride_update._id, ride_update.basic.user_id._id, socket.providerDetail._id, true);
+
+                await FUNC.insertPath(ride_update._id, "accepted", data.longitude, data.latitude);
 
                 PushNotifications({
-                  receiverId: ride.basic.user_id._id.toString(),
+                  receiverId: ride_update.basic.user_id._id.toString(),
                   type: "BONUS",
-                  title: "Ride arrived Successfully",
-                  message: "Ride arrived Successfully",
-                  deviceTokens: ride.basic.user_id.fcm_token
+                  title: 'Ride accept Successfully',
+                  message: "Ride accept Successfully",
+                  deviceTokens: ride_update.basic.user_id.fcm_token,
                 });
+
+                const driver_object = JSON.parse(JSON.stringify(request_data));
+                driver_object.user_name = ride_update.basic.user_id.full_name;
+                driver_object.user_mobile = ride_update.basic.user_id.mobile;
+                console.log('driver_object', driver_object);
+                ack({ status: 200, message: "Ride Accepted Successfully", data: driver_object });
+
               } catch (error) {
-                console.error("Error in ride arrival flow:", error);
-                ack({
-                  status: 500,
-                  message: "Something went wrong",
-                });
+                console.error("accept_ride error:", error);
+                ack({ status: 500, message: "Internal server error" });
               }
               break;
             }
