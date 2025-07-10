@@ -10,7 +10,7 @@ const locationModel = require('../../models/locationModel');
 const providerTaxiModel = require('../../models/providerTaxi');
 const notificationModel = require('../../models/notificationModel');
 const { PushNotifications } = require('../../config/notification');
-const appSettings = require('./src/models/settingModel');
+const appSettings = require('../../models/settingModel');
 exports.addDriver = async (req) => {
     try {
         const driver = req.body;
