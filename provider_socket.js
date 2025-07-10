@@ -948,9 +948,7 @@ async function runServer() {
                     message: "Ride not found 1"
                   });
                 }
-
-                socket.ride_details.ride_status = "arrived";
-                socket.ride_details.arrived_time = now_date;
+                socket.ride_details = ride_details;
 
                 const ride = ride_details;
 
