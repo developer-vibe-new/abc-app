@@ -823,6 +823,12 @@ exports.bookedRides = async function (req) {
 
         // const remove_ride_time = moment().add(15, "minutes").toDate();
         const remove_ride_time = moment().subtract(15, "minutes").toDate();
+        console.log({
+            "basic.schedule": true,
+            "basic.ride_status": 'scheduled',
+            "basic.provider_id": new mongoose.Types.ObjectId(logindata._id),
+            "time.ride_on": { $gte: remove_ride_time }
+        });
         const aggregation = [
             {
                 $match: {
