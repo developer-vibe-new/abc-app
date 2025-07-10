@@ -918,31 +918,33 @@ exports.bookRide = async function (req) {
                 }
             },
             {
-                from: "provider_taxis",
-                localField: "providerTaxi_id",
-                foreignField: "_id",
-                pipeline: [
-                    {
-                        $lookup: {
-                            from: "cars",
-                            localField: "car_id",
-                            foreignField: "_id",
-                            as: "car_id"
+                $lookup: {
+                    from: "provider_taxis",
+                    localField: "providerTaxi_id",
+                    foreignField: "_id",
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "cars",
+                                localField: "car_id",
+                                foreignField: "_id",
+                                as: "car_id"
+                            }
+                        },
+                        {
+                            $unwind: "$car_id"
+                        },
+                        {
+                            $project: {
+                                make: "$car_id.make",
+                                title: "$car_id.title",
+                                plateno: 1,
+                                color: 1
+                            }
                         }
-                    },
-                    {
-                        $unwind: "$car_id"
-                    },
-                    {
-                        $project: {
-                            make: "$car_id.make",
-                            title: "$car_id.title",
-                            plateno: 1,
-                            color: 1
-                        }
-                    }
-                ],
-                as: "provider_taxis"
+                    ],
+                    as: "provider_taxis"
+                }
             },
             {
                 $unwind: "$provider_taxis"
