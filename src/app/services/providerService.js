@@ -851,7 +851,16 @@ exports.bookedRides = async function (req) {
                     as: "user"
                 }
             },
-            { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } }
+            { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: "providers",
+                    localField: "basic.provider_id",
+                    foreignField: "_id",
+                    as: "provider"
+                }
+            },
+            { $unwind: { path: "$provider", preserveNullAndEmptyArrays: true } },
         ];
 
         const rides = await Ride.aggregate(aggregation);
@@ -859,7 +868,9 @@ exports.bookedRides = async function (req) {
         const rideArr = rides.map(ride => ({
             ride_id: ride._id.toString(),
             ride_status: ride.basic?.ride_status,
+            otp: ride.basic?.otp,
             pickup_distance: ride.basic?.pickup_distance,
+            ridestationtype: ride.basic?.ridestationtype,
             ride_type: ride.basic?.ride_type,
             source: ride.location?.source,
             destination: ride.location?.destination,
@@ -871,6 +882,11 @@ exports.bookedRides = async function (req) {
             category_name: ride.category?.title,
             user_name: `${ride.user?.first_name || ''} ${ride.user?.last_name || ''} `.trim(),
             user_mobile: ride.user?.mobile,
+            car_title: ride.basic?.vehicle.title || "",
+            plateno: ride.basic?.vehicle.plateno || "",
+            color: ride.basic?.vehicle.color || "",
+            driver_name: ride.basic?.providername || "",
+            driver_image: "https://customer.ktscab.com/drivers/" + ride.provider.image,
             bookStatus: "booked_ride"
         }));
         return {
@@ -895,18 +911,74 @@ exports.bookRide = async function (req) {
         const logindata = req.auth;
 
         const now_date = moment().toDate();
+        let taxi_detail = await Provider.aggregate([
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(logindata._id)
+                }
+            },
+            {
+                from: "provider_taxis",
+                localField: "providerTaxi_id",
+                foreignField: "_id",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "cars",
+                            localField: "car_id",
+                            foreignField: "_id",
+                            as: "car_id"
+                        }
+                    },
+                    {
+                        $unwind: "$car_id"
+                    },
+                    {
+                        $project: {
+                            make: "$car_id.make",
+                            title: "$car_id.title",
+                            plateno: 1,
+                            color: 1
+                        }
+                    }
+                ],
+                as: "provider_taxis"
+            },
+            {
+                $unwind: "$provider_taxis"
+            }, {
+                $project: {
+                    provider_taxis: 1,
+                    first_name: 1,
+                    last_name: 1
+                }
+            }
+        ]);
+        if (taxi_detail.length <= 0) {
+            return {
+                statusCode: statusCode.BAD_REQUEST,
+                success: false,
+                message: resMessage.Provider_taxi_not_found
+            };
+        }
+        taxi_detail = taxi_detail[0];
 
         const ride_details = await Ride.findOneAndUpdate(
             {
                 _id: ride_id,
                 "basic.schedule": true,
                 "basic.ride_status": "scheduled",
-                "basic.provider_id": { $exists: false }
+                "basic.provider_id": { $exists: false },
             },
             {
                 $set: {
                     "basic.provider_id": logindata._id,
-                    "time.booked": now_date
+                    "time.booked": now_date,
+                    "basic.vehicle.title": `${taxi_detail.provider_taxis.make} ${taxi_detail.provider_taxis.title}`,
+                    "basic.vehicle.plateno": taxi_detail.provider_taxis.plateno,
+                    "basic.vehicle.color": taxi_detail.provider_taxis.color,
+                    "basic.providername": `${taxi_detail.first_name} ${taxi_detail.last_name}`,
+                    "meta.taxi_id": taxi_detail._id,
                 }
             },
             { new: true }

@@ -20,6 +20,7 @@ const chatModel = require('./src/models/chatModel');
 const cityModel = require('./src/models/city');
 const { getClient } = require('./src/config/redis');
 const { PushNotifications } = require('./src/config/notification');
+
 const client = getClient();
 connectDB();
 const app = express();
@@ -355,17 +356,19 @@ async function runServer() {
                     ridestationtype,
                     planId,
                     way,
+                    otp: Math.floor(1000 + Math.random() * 9000),
                     ride_status: "scheduled",
                     user_id: socket.user_data._id,
                     instructions: "",
                     bookdistance: distance,
-                    schedule: true
+                    schedule: true,
+
                   },
                   location: { source, destination },
                   meta: {
                     category_id,
                     city_id,
-                    zone_id: city_id
+                    zone_id: city_id,
                   },
                   payment: {
                     fare_estimate,
