@@ -925,14 +925,13 @@ async function runServer() {
             }
             case "accept_schedule_ride": {
               try {
-                console.log('accept_schedule_ride');
                 const now_date = moment().toDate();
                 const { ride_id, longitude, latitude } = data;
 
-                const ride_details = await Ride.findOne(
+                const ride_details = await Ride.findOneAndUpdate(
                   {
                     _id: new mongoose.Types.ObjectId(ride_id),
-                    "basic.ride_status": "scheduled",
+                    "basic.ride_status": "accepted",
                     "basic.provider_id": socket.providerDetail._id
                   },
                   {
@@ -943,7 +942,6 @@ async function runServer() {
                   },
                   { new: true }
                 ).populate("basic.user_id").lean();
-                console.log('ride_details', ride_details);
                 if (!ride_details) {
                   return ack({
                     status: 204,
