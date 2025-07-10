@@ -52,7 +52,7 @@ const RideSchema = new mongoose.Schema({
 			default: false
 		},
 
-		// requested, declined, accepted, cancelled, arrived, running, finished, scheduled
+		// requested, declined, accepted, cancelled, arrived, running, finished, scheduled, failed
 		//failed in case of schedule ride failure
 		ride_status: {
 			type: String,

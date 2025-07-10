@@ -804,3 +804,81 @@ exports.schedule_ride_notify = async function (ride_details, io) {
         console.error("Error in schedule_ride_notify:", err);
     }
 };
+// Assuming this is in a module (e.g., rideUtils.js or FUNC.js)
+
+// Export the function
+exports.driver_not_responding = async (ride_details) => {
+    try {
+        const update_results = await Ride.update(
+            {
+                _id: ride_details._id,
+                "basic.schedule": true,
+                "basic.ride_status": "scheduled",
+                "basic.provider_id": { $exists: true },
+            },
+            {
+                $set: {
+                    "basic.ride_status": "failed",
+                },
+            }
+        );
+
+        if (update_results.nModified === 1) {
+
+            const NotificationData = {
+                activity: "ride_failed",
+                ride_id: ride_details._id,
+                user_type: "customer",
+                user_id: ride_details.basic.user_id._id.toString(),
+                message: "Ride failed successfully",
+                provider_id: ride_details.basic.provider_id
+            };
+
+            await notificationModel.create(NotificationData);
+            PushNotifications({
+                receiverId: ride_details.basic.user_id._id.toString(),
+                type: "ride_failed",
+                title: "Failed ride",
+                message: "Ride failed successfully",
+                deviceTokens: ride_details.basic.user_id.fcm_token,
+            });
+        }
+    } catch (err) {
+        console.error('Error in driver_not_responding:', err);
+    }
+};
+exports.schedule_ride_reminder = async (ride_details) => {
+    try {
+        let obj = {
+            _id: ride_details.basic.provider_id,
+            is_notify: true,
+            $or: [{ os: 'ios' }, { os: 'android' }],
+        };
+        // Find provider details using await
+        const provider_detail = await Provider.findOne(obj).lean().exec();
+        if (provider_detail) {
+            const NotificationData = {
+                activity: "ride_reminder",
+                ride_id: ride_details._id,
+                user_type: "customer",
+                user_id: provider_detail._id.toString(),
+                message: "Requesting a ride from a User",
+                provider_id: provider_detail._id
+            };
+            console.log('NotificationData', NotificationData);
+            await notificationModel.create(NotificationData);
+            PushNotifications({
+                receiverId: provider_detail._id.toString(),
+                type: "ride_failed",
+                title: "Requesting a Ride",
+                message: "Requesting a ride from a User",
+                deviceTokens: provider_detail.fcm_token,
+            });
+
+        } else {
+            console.log("No provider detail found for the provider_id");
+        }
+    } catch (err) {
+        console.error("Error in schedule_ride_reminder:", err);
+    }
+};

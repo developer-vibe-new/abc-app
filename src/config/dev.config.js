@@ -14,7 +14,6 @@ module.exports = {
     HOST: process.env.HOST || 'http://play2plus.prometteur.in',
     PORT: process.env.PORT || 5000,
     ADMINPORT: process.env.ADMINPORT || 7272,
-    CRONPORT: process.env.CRONPORT || 6363,
     DB_URL: process.env.DB_URL,
     FCM_SERVER_KEY: process.env.FCM_SERVER_KEY,
     apk: '----',
@@ -24,5 +23,6 @@ module.exports = {
     REDIS_HOST: process.env.REDIS_HOST,
     REDIS_PORT: process.env.REDIS_PORT,
     SOCKET_USER_PORT: process.env.SOCKET_USER_PORT,
-    SOCKET_DELIVERY_PORT: process.env.SOCKET_DELIVERY_PORT
+    SOCKET_DELIVERY_PORT: process.env.SOCKET_DELIVERY_PORT,
+    CRON_PORT: process.env.CRON_PORT || 5011
 };
