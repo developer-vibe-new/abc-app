@@ -404,7 +404,7 @@ async function runServer() {
                 // }
                 let obj = {
                   _id: new mongoose.Types.ObjectId(data.ride_id),
-                  "basic.ride_status": "requested",
+                  "basic.ride_status": { $in: ['requested', 'scheduled'] },
                   "meta.search_providers": socket.providerDetail._id
                 };
                 const ride_update = await Ride.findOneAndUpdate(obj, {
@@ -989,9 +989,7 @@ async function runServer() {
                   message: "Something went wrong",
                 });
               }
-
               break;
-
             }
 
             default:
