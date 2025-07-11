@@ -206,31 +206,31 @@ exports.updateDriver = async (req) => {
                 message: resMessage.Data_Not_Found
             };
         }
-        const operatorId = new mongoose.Types.ObjectId(req.auth.id);
-        if (driverData.operator_id && driverData.operator_id.equals(operatorId)) {
-            await Provider.updateOne(
-                { _id: id },
-                {
-                    $set: {
-                        first_name,
-                        last_name,
-                        email,
-                        mobile,
-                        profile_image: imagePath
-                    }
+        // const operatorId = new mongoose.Types.ObjectId(req.auth.id);
+        // if (driverData.operator_id && driverData.operator_id.equals(operatorId)) {
+        await Provider.updateOne(
+            { _id: id },
+            {
+                $set: {
+                    first_name,
+                    last_name,
+                    email,
+                    mobile,
+                    profile_image: imagePath
                 }
-            );
-            return {
-                status: statusCode.OK,
-                success: true,
-                message: resMessage.Data_Updated_Successfully
-            };
-        }
+            }
+        );
         return {
-            status: statusCode.UNAUTHORIZED,
-            success: false,
-            message: resMessage.Unauthorized_Access
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.Data_Updated_Successfully
         };
+        // }
+        // return {
+        //     status: statusCode.UNAUTHORIZED,
+        //     success: false,
+        //     message: resMessage.Unauthorized_Access
+        // };
     } catch (error) {
         return {
             status: statusCode.INTERNAL_SERVER_ERROR,
