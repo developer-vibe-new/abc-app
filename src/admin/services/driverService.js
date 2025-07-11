@@ -3,7 +3,7 @@ const Admin = require('../../models/adminModel');
 const driverModel = require('../../models/providerModel');
 const taxiTypeModel = require('../../models/taxiTypeModel');
 const { statusCode, resMessage } = require('../../config/default.json');
-
+const { url } = require('../../config/dev.config');
 
 exports.driverDetailsService = async (req) => {
     try {
@@ -45,9 +45,9 @@ exports.driverDetailsService = async (req) => {
                     $addFields: {
                         "car_details": { $arrayElemAt: ["$car_details", 0] },
                         "taxi_type_details": { $arrayElemAt: ["$taxi_type_details", 0] },
-                        "taxis":{
+                        "taxis": {
                             $arrayElemAt: ["$taxis", 0],
-                          
+
                         }
                     }
                 },
@@ -67,18 +67,18 @@ exports.driverDetailsService = async (req) => {
                         "taxis.documents.pollution_certificate": 1,
                         "taxis.documents.vehicle_permit": 1,
                         "taxis.documents.insurance": 1,
-                        car_details :{
-                           name: "$car_details.title",
-                            make:"$car_details.make",
+                        car_details: {
+                            name: "$car_details.title",
+                            make: "$car_details.make",
                             model: "$car_details.model",
-                           plateno: "$taxis.plateno",
-                        } ,
+                            plateno: "$taxis.plateno",
+                        },
                         "taxi_type_details.title": 1,
                         providerTaxiDocuments: 1
                     }
                 }
             ]
-              
+
         ];
 
         console.log(JSON.stringify(aggregationPipeline));
@@ -116,9 +116,8 @@ exports.driverCreate = async (req) => {
     try {
         const { first_name, last_name, mobile, email, city_id } = req.body;
         let profile_image;
-        if(req.file) {
-            const baseUrl = proess.env.BASE_URL;
-            profile_image = `${baseUrl}/${req.body.typeName}/${req.file.filename}`;
+        if (req.file) {
+            profile_image = `${req.body.typeName}/${req.file.filename}`;
         }
         if (!first_name || !last_name || !mobile || !email) {
             return {
@@ -150,7 +149,6 @@ exports.driverCreate = async (req) => {
 exports.driverView = async (req) => {
     try {
         const adminData = await Admin.findById(req.auth._id);
-        console.log("========", adminData)
         var page = req.query.page || 1;
         let pagesize = parseInt(req.query.pagesize) || 10;
 
@@ -228,12 +226,12 @@ exports.driverView = async (req) => {
         conditions.push({
             $addFields:
             {
-                // profile_image: {
-                //     $concat: [
-                //         "http://192.168.0.18:6161/driver/",
-                //         "$profile_image"
-                //     ]
-                // },
+                profile_image: {
+                    $concat: [
+                        url,
+                        "$profile_image"
+                    ]
+                },
                 taxitype: "$taxi_types.title",
                 status: "Block",
             }
@@ -282,28 +280,28 @@ exports.driverView = async (req) => {
             sortConditions.mobile = sortByNo;
         }
 
-        if(req.query.sortByBalance) {
-            let sortByBalance = req.query.sortByBalance === 'desc'? -1 : 1;
+        if (req.query.sortByBalance) {
+            let sortByBalance = req.query.sortByBalance === 'desc' ? -1 : 1;
             sortConditions.balance = sortByBalance;
         }
 
-        if(req.query.sortByPendingAmount) {
-            let sortByPendingAmount = req.query.sortByPendingAmount === 'desc'? -1 : 1;
+        if (req.query.sortByPendingAmount) {
+            let sortByPendingAmount = req.query.sortByPendingAmount === 'desc' ? -1 : 1;
             sortConditions.pending_balance = sortByPendingAmount;
         }
 
-        if(req.query.sortBycurrentStatus) {
-            let sortBycurrentStatus = req.query.sortBycurrentStatus === 'desc'? -1 : 1;
+        if (req.query.sortBycurrentStatus) {
+            let sortBycurrentStatus = req.query.sortBycurrentStatus === 'desc' ? -1 : 1;
             sortConditions.is_active = sortBycurrentStatus;
         }
 
-        if(req.query.sortByKycStatus) {
-            let sortByKycStatus = req.query.sortByKycStatus === 'desc'? -1 : 1;
+        if (req.query.sortByKycStatus) {
+            let sortByKycStatus = req.query.sortByKycStatus === 'desc' ? -1 : 1;
             sortConditions.kycStatus = sortByKycStatus;
         }
 
-        if(req.query.sortByVehicleStatus) {
-            let sortByVehicleStatus = req.query.sortByVehicleStatus === 'desc'? -1 : 1;
+        if (req.query.sortByVehicleStatus) {
+            let sortByVehicleStatus = req.query.sortByVehicleStatus === 'desc' ? -1 : 1;
             sortConditions.vehicleStatus = sortByVehicleStatus;
         }
 
@@ -324,7 +322,7 @@ exports.driverView = async (req) => {
         ]); const totalRecords = totalCount.length > 0 ? totalCount[0].total : 0;
         const totalPages = Math.ceil(totalRecords / pagesize);
 
-       
+
 
         const viewAllData = await driverModel.aggregate(conditions);
 
@@ -379,23 +377,23 @@ exports.driverEdit = async (req) => {
     try {
         const getData = await driverModel.aggregate([
             {
-              $match: {
-                _id: new mongoose.Types.ObjectId(req.params.id)
-              }
+                $match: {
+                    _id: new mongoose.Types.ObjectId(req.params.id)
+                }
             },
             {
-              $addFields: {
-              }
+                $addFields: {
+                }
             },
             {
-              $project: {
-                first_name: 1,
-                last_name: 1,
-                email: 1,
-                mobile: 1,
-                profile_image: 1,
-                status: 1
-              }
+                $project: {
+                    first_name: 1,
+                    last_name: 1,
+                    email: 1,
+                    mobile: 1,
+                    profile_image: 1,
+                    status: 1
+                }
             }
         ]);
         return {
@@ -418,9 +416,9 @@ exports.driverUpdate = async ({ body, file, params }) => {
     try {
         if (file) {
             const baseUrl = process.env.BASE_URL;
-            body.profile_image =  `${baseUrl}/driver/${file.filename}`;
+            body.profile_image = `${baseUrl}/driver/${file.filename}`;
         }
-        if(body.first_name && body.last_name) {
+        if (body.first_name && body.last_name) {
             body.full_name = body.first_name + " " + body.last_name;
         }
         const updateData = await driverModel.findByIdAndUpdate(params.id, body, { new: true });
@@ -506,7 +504,7 @@ exports.blockedDriverList = async (req) => {
         let pipeline = [];
         let search_value = req.query.search || "";
 
-        let page = parseInt(req.query.page) || 1; 
+        let page = parseInt(req.query.page) || 1;
         let perPage = parseInt(req.query.perPage) || 10;
         let skip = (page - 1) * perPage;
 
@@ -729,18 +727,18 @@ exports.unblockDriver = async (req) => {
 exports.onlineDriverList = async (req) => {
     try {
         const adminData = await Admin.findById(req.auth._id);
-         var conditions = [];
+        var conditions = [];
         const totalCount = await driverModel.aggregate([
             ...conditions.slice(0, -2),
             { $count: "total" }
         ]);
         var page = req.query.page || 1;
         let pagesize = req.query.pagesize || 10;
-     
+
         const totalRecords = totalCount.length > 0 ? totalCount[0].total : 0;
         const totalPages = Math.ceil(totalRecords / pagesize);
         let search_value = req.query.search || "";
-        
+
         if (search_value) {
             conditions.push({
                 $match: {
@@ -861,14 +859,14 @@ exports.onlineDriverList = async (req) => {
             { $limit: pagesize }
         );
         const viewAllData = await driverModel.aggregate(conditions);
-    
+
 
         return {
             statusCode: statusCode.OK,
             success: true,
             message: resMessage.Data_Fetch_Successfully,
             data: viewAllData,
-              pagination: {
+            pagination: {
                 currentPage: parseInt(page),
                 totalPages: totalPages,
                 totalRecords: totalRecords,
@@ -891,7 +889,7 @@ exports.updateDocumentStatus = async (req) => {
         const { document_type, status } = req.body;
 
         const data = await driverModel.findById(id);
-        
+
         if (!data) {
             return {
                 statusCode: statusCode.NOT_FOUND,

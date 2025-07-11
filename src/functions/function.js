@@ -17,6 +17,7 @@ const pathModel = require('../models/pathModel');
 const Taxitype = require('../models/taxiTypeModel');
 const notificationModel = require('../models/notificationModel');
 const { PushNotifications } = require('../config/notification');
+const { url } = require('../../config/dev.config');
 exports.send_request = async function (ride_id, io, appSettings) {
     try {
         const request_data_str = await client.get("request_data:" + ride_id);
@@ -240,7 +241,7 @@ exports.buildRideRequestData = async (ride, provider, socket, data, distanceObj,
         plateno: ride.basic.vehicle.plateno,
         color: ride.basic.vehicle.color,
         driver_name: `${provider.first_name} ${provider.last_name}`,
-        driver_image: `https://driver.taxiride.com/drivers/${provider.image}`,
+        driver_image: `${url}${provider.image}`,
         category_image: ride.meta.category_id.thumb_3x,
         driver_mobile: socket.providerDetail.mobile,
         avg_rating: socket.providerDetail.avg_rating,

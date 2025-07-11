@@ -82,7 +82,8 @@ exports.updateUser = async (req) => {
     try {
         const { first_name, last_name, email, mobile } = req.body;
         const data = await User.findOne({ _id: req.auth.id });
-        const imagePath = req.file ? req.file.filename : "";
+        // const imagePath = req.file ? req.file.filename : "";
+        const imagePath = req.file ? `${req.body.typeName}/${req.file.filename}` : "";
         if (!data) {
             return {
                 status: statusCode.BAD_REQUEST,

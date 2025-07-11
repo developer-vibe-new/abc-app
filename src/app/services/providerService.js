@@ -11,6 +11,7 @@ const providerTaxiModel = require('../../models/providerTaxi');
 const notificationModel = require('../../models/notificationModel');
 const { PushNotifications } = require('../../config/notification');
 const appSettings = require('../../models/settingModel');
+const { url } = require('../../config/dev.config');
 exports.addDriver = async (req) => {
     try {
         const driver = req.body;
@@ -197,7 +198,7 @@ exports.updateDriver = async (req) => {
     try {
         const { id } = req.params;
         const { first_name, last_name, email, mobile } = req.body;
-        const imagePath = req.file ? req.file.filename : "";
+        const imagePath = req.file ? `${req.body.typeName}/${req.file.filename}` : "";
         const driverData = await Provider.findOne({ _id: id });
         if (!driverData) {
             return {
@@ -902,7 +903,7 @@ exports.bookedRides = async function (req) {
             plateno: ride.basic?.vehicle.plateno || "",
             color: ride.basic?.vehicle.color || "",
             driver_name: ride.basic?.providername || "",
-            driver_image: "https://customer.ktscab.com/drivers/" + ride.provider.image,
+            driver_image: `${url}${ride.provider.image}`,
             bookStatus: "booked_ride",
             instruction: settingData[`${ride.basic.ridestationtype}_instruction`] || "",
             stops: ride.location.stops,

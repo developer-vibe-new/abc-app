@@ -5,7 +5,7 @@ const moment = require('moment');
 const Polyline = require('polyline');
 const axios = require('axios');
 const { initializeSocket, getIO, remoteJoinUserToRoom, remoteLeaveUserFromRoom } = require('./socket');
-const { SOCKET_DELIVERY_PORT } = require('./src/config/dev.config');
+const { SOCKET_DELIVERY_PORT, url } = require('./src/config/dev.config');
 const { getClient } = require('./src/config/redis');
 const client = getClient();
 // const Delieverypartnerlocation = require('./src/models/delieverypartnerlocation');
@@ -434,7 +434,7 @@ async function runServer() {
                   ride_status: "accepted",
                   otp: ride_update.basic.otp,
                   providername: `${provider_detail.first_name} ${provider_detail.last_name}`,
-                  driver_image: `https://driver.taxiride.com/drivers/${provider_detail.image}`,
+                  driver_image: `${url}${provider_detail.image}`,
                   source: ride_update.location.source,
                   destination: ride_update.location.destination,
                   stops: ride_update.location.stops,

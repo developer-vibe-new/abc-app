@@ -4,7 +4,7 @@ require('dotenv').config();
 const appSettings = require('./src/models/settingModel');
 const RequestRide = require('./src/models/RequestRide');
 const FUNC = require('./src/functions/function');
-const { SOCKET_USER_PORT } = require('./src/config/dev.config');
+const { SOCKET_USER_PORT, url } = require('./src/config/dev.config');
 const moment = require('moment');
 const http = require('http');
 const { initializeSocket, getIO } = require('./socket');
@@ -177,7 +177,7 @@ async function runServer() {
                     plateno: ride.basic.vehicle.plateno,
                     color: ride.basic.vehicle.color,
                     driver_name: ride.provider.first_name + ' ' + ride.provider.last_name,
-                    driver_image: "https://customer.ktscab.com/drivers/" + ride.provider.image,
+                    driver_image: `${url}${ride.provider.image}`,
                     avg_rating: ride.basic.provider_id.avg_rating,
                     driver_mobile: ride.basic.provider_id.callingmobile,
                     category_image: ride.meta?.category_id?.thumb_3x || "",

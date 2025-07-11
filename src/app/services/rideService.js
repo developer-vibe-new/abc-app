@@ -7,6 +7,7 @@ const settingModel = require('../../models/settingModel');
 const mongoose = require('mongoose');
 const google_distance = require('google-distance');
 google_distance.apiKey = process.env.GOOGLE_APP_KEY;
+const { url } = require('../../config/dev.config');
 const NodeGeocoder = require('node-geocoder');
 
 var options = {
@@ -254,8 +255,7 @@ exports.list = async function (req) {
 
             if (ride.provider) {
                 localObj.driver_name = `${ride.provider.first_name} ${ride.provider.last_name}`;
-                localObj.driver_image = `https://customer.ktscab.com/drivers/${ride.provider.image}`;
-                localObj.avg_rating = ride.provider.rated;
+                localObj.driver_image = `${url}${ride.provider.image}`;
                 localObj.driver_mobile = ride.provider.mobile;
             }
 
