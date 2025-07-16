@@ -17,7 +17,7 @@ const pathModel = require('../models/pathModel');
 const Taxitype = require('../models/taxiTypeModel');
 const notificationModel = require('../models/notificationModel');
 const { PushNotifications } = require('../config/notification');
-const { url } = require('../../config/dev.config');
+const { url } = require('../config/dev.config');
 exports.send_request = async function (ride_id, io, appSettings) {
     try {
         const request_data_str = await client.get("request_data:" + ride_id);
