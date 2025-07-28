@@ -15,9 +15,15 @@ router.post('/updateDrive/:id', verifyToken, upload.single('image'), responseHan
 router.post('/deleteDriver', verifyToken, responseHandler(controller.deleteDriverController));
 router.post('/uploadDocuments', verifyToken, responseHandler(controller.updateDocumentsController));
 router.get('/getDocuments', verifyToken, responseHandler(controller.getDocumentsController));
+router.post('/timeFareEstimate', verifyToken, responseHandler(controller.timeFareEstimate));
 
 //otp routes api for  providers
 router.post('/register', responseHandler(controller.registerController));
 router.post('/login', responseHandler(controller.providerLoginController));
 router.post('/verifyOtp', responseHandler(controller.providerOtpVerification));
+router.post('/addProviderTaxi', verifyToken, responseHandler(controller.addProviderTaxi));
+router.post('/pendingRides', verifyToken, responseHandler(controller.pendingRides));
+router.post('/bookedRides', verifyToken, responseHandler(controller.bookedRides));
+router.post('/bookRide', verifyToken, responseHandler(controller.bookRide));
+
 module.exports = router;

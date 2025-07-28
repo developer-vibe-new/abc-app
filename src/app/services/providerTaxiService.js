@@ -25,7 +25,7 @@ exports.addProviderTaxi = async (req) => {
             type_ids: providerTaxi.type_ids
         });
         await Provider.findByIdAndUpdate(providerTaxi.provider_id,
-            { online_taxi: providerData._id },
+            { providerTaxi_id: providerData._id },
             { new: true }
         );
         return {
@@ -275,7 +275,7 @@ exports.deassignProvider = async (req) => {
         };
     }
 };
- 
+
 exports.updateDocuments = async (req) => {
     try {
         const { taxiProviderId, documentType, documentData } = req.body;

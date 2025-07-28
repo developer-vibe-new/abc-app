@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const { statusCode, resMessage } = require('../../config/default.json');
+const razorpay = require('../../config/razorpay');
 const User = require('../../models/users');
-
 exports.sendOtp = async (req) => {
     try {
         const { mobile } = req.body;
@@ -35,7 +35,7 @@ exports.sendOtp = async (req) => {
 
 exports.verifyOtp = async (req) => {
     try {
-        const { mobile, otp } = req.body;
+        const { mobile, otp, firebaseToken } = req.body;
         const user = await User.findOne({ mobile, is_active: true });
         if (!user) {
             return {
@@ -61,6 +61,7 @@ exports.verifyOtp = async (req) => {
         );
         user.otp = null;
         user.login_token = token;
+        user.fcm_token = firebaseToken;
         await user.save();
         return {
             status: statusCode.OK,
@@ -81,7 +82,8 @@ exports.updateUser = async (req) => {
     try {
         const { first_name, last_name, email, mobile } = req.body;
         const data = await User.findOne({ _id: req.auth.id });
-        const imagePath = req.file ? req.file.filename : "";
+        // const imagePath = req.file ? req.file.filename : "";
+        const imagePath = req.file ? `${req.body.typeName}/${req.file.filename}` : "";
         if (!data) {
             return {
                 status: statusCode.BAD_REQUEST,
@@ -166,6 +168,37 @@ exports.deleteUser = async (req) => {
             message: resMessage.User_Deleted_Successfully
         };
     } catch (error) {
+        return {
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error"
+        };
+    }
+};
+exports.generateOrderId = async (req) => {
+    const { amount } = req.body;
+    if (amount <= 0 || amount == undefined) {
+        return {
+            success: false,
+            message: "Amount should be greater than 0",
+        };
+    }
+    const options = {
+        amount: amount * 100, // amount in the smallest currency unit (e.g. 500 * 100 = 50000 paise = ₹500)
+        currency: 'INR',
+        receipt: `ride_order_${Date.now()}`,
+    };
+
+    try {
+        const order = await razorpay.orders.create(options);
+        return {
+            status: statusCode.OK,
+            success: true,
+            message: resMessage.User_Deleted_Successfully,
+            data: order
+        };
+    } catch (error) {
+        console.error('Razorpay Order Error:', error);
         return {
             success: false,
             message: resMessage.Internal_Server_Error,

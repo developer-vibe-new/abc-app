@@ -3,7 +3,7 @@ const Location = require('../models/locationModel');
 const Provider = require('../models/providerModel');
 const rentalModel = require('../models/rentalModel');
 const appSettingsModel = require('../models/settingModel');
-const Transaction = require('../models/transactionsModel');
+const Transaction = require('../models/transactionsModel').Transaction;
 const Ride = require('../models/ride');
 const FUNC = require('./function');
 const User = require('../models/users');
@@ -14,24 +14,28 @@ const moment = require('moment');
 const { getClient } = require('../config/redis');
 const client = getClient();
 const pathModel = require('../models/pathModel');
+const Taxitype = require('../models/taxiTypeModel');
+const notificationModel = require('../models/notificationModel');
+const { PushNotifications } = require('../config/notification');
+const { url } = require('../config/dev.config');
 exports.send_request = async function (ride_id, io, appSettings) {
     try {
         const request_data_str = await client.get("request_data:" + ride_id);
         const request_data = JSON.parse(request_data_str);
 
-        const remaining_attempt = await client.decrBy("ride_attempt:" + ride_id, 1);
+        const remaining_attempt = await client.decrBy(`ride_attempt:${ride_id}`, 1);
         if (remaining_attempt < 0) {
             console.error("Max attempts reachd for ride ID: ", ride_id);
             return "ERROR";
         }
 
-        const provider_id = await client.lIndex("request_queue:" + ride_id, 0);
+        const provider_id = await client.lIndex(`request_queue:${ride_id}`, 0);
         if (!provider_id) {
             console.error("No provider found for ride ID:", ride_id);
             return 'ERROR';
         }
 
-        // await client.lRem("request_queue:" + ride_id, 1, provider_id);
+        await client.lRem(`request_queue:${ride_id}`, 1, provider_id);
         const location_data = await Location.findOne({
             provider_id: provider_id,
             available: true,
@@ -40,8 +44,8 @@ exports.send_request = async function (ride_id, io, appSettings) {
 
         if (location_data) {
             try {
+                //i have to uncomment this line
                 // await FUNC.lockDriver(provider_id, ride_id, request_data.load_sec);
-
                 const provider_loc = {
                     longitude: location_data.locations[0].coordinates[0],
                     latitude: location_data.locations[0].coordinates[1]
@@ -59,30 +63,22 @@ exports.send_request = async function (ride_id, io, appSettings) {
                     console.error("Provider socket not found for provider ID");
                     await client.set("ride_request:" + provider_id, JSON.stringify(request_data));
                     await client.expire("ride_request:" + provider_id, request_data.load_sec);
-
-                    await Provider.findOne({
-                        _id: new mongoose.Types.ObjectId(provider_id)
-                    }, {
-                        os: 1,
-                        badge: 1,
-                        arn_token: 1,
-                        language: 1
-                    });
-
                 } else {
                     console.log("New Request Socket Emit");
-                    request_data.timer = appSettings.ride_settings.load_sec;
-                    console.log('moment().unix();--->>>', moment().unix());
+                    // request_data.timer = appSettings.ride_settings.load_sec;
+                    request_data.timer = 15;
                     io.to(provider_socket).emit('new_request', request_data);
+                    return true;
                 }
 
                 setTimeout(async () => {
                     console.log("Coming in Set Timeout");
-                    const results = await Ride.updateOne({
+                    let obj = {
                         _id: ride_id,
                         "basic.ride_status": "requested",
                         "meta.search_providers": provider_id
-                    }, {
+                    };
+                    const results = await Ride.updateOne(obj, {
                         $pull: {
                             "meta.search_providers": provider_id
                         },
@@ -92,14 +88,11 @@ exports.send_request = async function (ride_id, io, appSettings) {
                     });
 
                     if (results.nModified === 1) {
-                        console.log("Modified Data");
                         request_data.start_on = moment().unix();
                         await client.set("request_data:" + ride_id, JSON.stringify(request_data));
                         await FUNC.send_request(ride_id, io, appSettings);
                     }
-                    console.log("No Modified Data");
-                }, appSettings.ride_settings.load_sec * 1000);
-                console.log("Data has been loaded");
+                }, 15 * 1000);
 
             } catch (err) {
                 console.log("Error1", err);
@@ -118,7 +111,7 @@ exports.send_request = async function (ride_id, io, appSettings) {
 exports.lockDriver = async (provider_id, ride_id, ringTime) => {
     try {
         const result = await client.setNX("provider_available:" + provider_id.toString(), ride_id);
-        console.log("==========result---------", result);
+        console.log("==========lockDriver---------");
         if (result === false) {
             await client.expire("provider_available:" + provider_id.toString(), ringTime);
             throw new Error("Driver is not available");
@@ -132,7 +125,8 @@ exports.lockDriver = async (provider_id, ride_id, ringTime) => {
 };
 
 exports.time_estimate = async (origin, destination) => {
-
+    console.log("==========origin---------", origin);
+    console.log("==========destination---------", destination);
     const distanceData = await new Promise((resolve, reject) => {
         google_distance.get({
             index: 1,
@@ -146,7 +140,6 @@ exports.time_estimate = async (origin, destination) => {
             resolve(data);
         });
     });
-
     // Extracting the relevant data
     let estimated_time = Math.round(distanceData.durationValue / 60);
     const pickup_distance = distanceData.distance;
@@ -226,6 +219,8 @@ exports.insertPath = async (ride_id, ride_status, longitude, latitude) => {
 exports.buildRideRequestData = async (ride, provider, socket, data, distanceObj, now_date, estimated_time) => {
     const settingData = await appSettingsModel.findOne();
     const request_data = {
+        status: 200,
+        message: "Ride Accepted Successfully",
         ride_id: ride._id.toString(),
         ride_status: ride.basic.ride_status,
         otp: ride.basic.otp,
@@ -246,9 +241,9 @@ exports.buildRideRequestData = async (ride, provider, socket, data, distanceObj,
         plateno: ride.basic.vehicle.plateno,
         color: ride.basic.vehicle.color,
         driver_name: `${provider.first_name} ${provider.last_name}`,
-        driver_image: `https://driver.taxiride.com/drivers/${provider.image}`,
+        driver_image: `${url}${provider.image}`,
         category_image: ride.meta.category_id.thumb_3x,
-        driver_mobile: socket.providerDetail.callingmobile,
+        driver_mobile: socket.providerDetail.mobile,
         avg_rating: socket.providerDetail.avg_rating,
         created: ride.created,
         provider_location: {
@@ -280,13 +275,54 @@ exports.buildRideRequestData = async (ride, provider, socket, data, distanceObj,
 exports.updateInRide = async (ride_id, user_id, provider_id, in_ride) => {
     try {
         const inverse_in_ride = !in_ride;
-
-        const rides = await Ride.find({
-            "basic.user_id": new mongoose.Types.ObjectId(user_id),
-            "basic.ride_status": { $in: ["accepted", "arrived", "running"] }
-        })
-            .populate('basic.provider_id', 'first_name last_name full_name mobile callingmobile photo total_rating rated avg_rating image')
-            .populate("meta.category_id");
+        console.log('inverse_in_ride', inverse_in_ride);
+        // const rides = await Ride.find({
+        //     "basic.user_id": new mongoose.Types.ObjectId(user_id),
+        //     "basic.ride_status": { $in: ["accepted", "arrived", "running"] }
+        // })
+        //     .populate('basic.provider_id', 'first_name last_name full_name mobile callingmobile photo total_rating rated avg_rating image')
+        //     .populate("meta.category_id");
+        const rides = await Ride.aggregate([
+            {
+                $match: {
+                    "basic.user_id": new mongoose.Types.ObjectId(user_id),
+                    "basic.ride_status": { $in: ["accepted", "arrived", "running"] }
+                }
+            },
+            {
+                $lookup: {
+                    from: "providers", // Assuming your `provider_id` references the `providers` collection
+                    localField: "basic.provider_id",
+                    foreignField: "_id",
+                    as: "provider"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$provider",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: "taxi_types", // Assuming `category_id` refers to `categories` collection
+                    localField: "meta.category_id",
+                    foreignField: "_id",
+                    as: "category"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$category",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    basic: 1,
+                }
+            }
+        ]);
 
         const hasActiveRide = rides && rides.length > 0;
         const finalInRideStatus = hasActiveRide;
@@ -320,9 +356,10 @@ exports.updateInRide = async (ride_id, user_id, provider_id, in_ride) => {
         );
 
         if (inverse_in_ride) {
-            await new Promise((resolve) => {
-                FUNC.unlockDriver(provider_id.toString(), () => resolve());
-            });
+            await FUNC.unlockDriver(provider_id.toString());
+            // await new Promise((resolve) => {
+            //     FUNC.unlockDriver(provider_id.toString(), () => resolve());
+            // });
         }
 
         return true; // final callback after all updates
@@ -331,7 +368,8 @@ exports.updateInRide = async (ride_id, user_id, provider_id, in_ride) => {
         return true;
     }
 };
-exports.splitFare = function (fare, airportCharge) {
+exports.splitFare = function (fare, airportCharge = 0) {
+    console.log('fare', fare);
     fare = parseFloat(parseFloat(fare - airportCharge).toFixed(2));
 
     const gst_value = parseFloat(fare - (fare / (1 + 5 / 100))).toFixed(2);
@@ -340,14 +378,15 @@ exports.splitFare = function (fare, airportCharge) {
     const base_fare_before_tax = parseFloat(fare_after_tax_but_before_gst / 1.13).toFixed(2);
     const earnratiodata = parseFloat((fare_after_tax_but_before_gst - base_fare_before_tax)).toFixed(2);
     const base_fare = parseFloat((fare - gst_value - earnratiodata).toFixed(2));
-
-    return {
+    let obj = {
         base_fare: base_fare,
         gst_per: 5,
         gst_value: gst_value,
         earnratiodata: earnratiodata,
         fare_charged: fare + airportCharge
     };
+    console.log('obj', obj);
+    return obj;
 };
 
 exports.ride_transaction_driver = async function (ride_id, fareObj) {
@@ -381,7 +420,6 @@ exports.ride_transaction_driver = async function (ride_id, fareObj) {
             .lean();
 
         const { payment_type, chargeObj } = await FUNC.ride_payment(ride_details, fareObj);
-
         if (payment_type === "wallet") {
             onlinepayment = ride_details.payment.onlinepayment;
 
@@ -401,7 +439,7 @@ exports.ride_transaction_driver = async function (ride_id, fareObj) {
                     { _id: ride_id },
                     {
                         $set: {
-                            'basic.razorpay_refundId': "KTSREFUND" + Date.now() + FUNC.randomString(4, "123456789"),
+                            'basic.razorpay_refundId': "TAXIREFUND" + Date.now() + FUNC.randomString(4, "123456789"),
                             'payment.refund': refund,
                         }
                     }
@@ -410,7 +448,7 @@ exports.ride_transaction_driver = async function (ride_id, fareObj) {
                 offlinepayment = fareObj.fare_charged - onlinepayment;
             }
         } else {
-            offlinepayment = fareObj.fare_charged;
+            offlinepayment = Number(fareObj.fare_charged);
         }
 
         const lastTransaction = await Transaction.find({
@@ -469,3 +507,381 @@ exports.ride_transaction_driver = async function (ride_id, fareObj) {
     }
 };
 
+
+exports.ride_payment = async function (ride_details) {
+    let chargeObj = {
+        id: ride_details.basic.user_id?.stripe_id || ''
+    };
+
+    if (ride_details.basic.payment_type === "cash") {
+        return { type: "cash", chargeObj };
+    } else if (ride_details.basic.payment_type === "wallet") {
+        return { type: "wallet", chargeObj };
+    }
+
+    // optional: handle unknown payment type
+    throw new Error("Unsupported payment type");
+};
+exports.ride_fare_estimate_rental = async function (category_id,
+    origin,
+    duration,
+    distance,
+    planId,
+    hour,
+    onlinepayment,
+    ride_id,
+    rentalKm,
+    rentalHour,
+    rentalPrice
+) {
+    try {
+        // const rentalPlans = await rentalModel.find({ _id: planId });
+        const categoryData = await Taxitype.findOne({ _id: category_id });
+        if (!categoryData) throw new Error("Price Not Found");;
+        let totalDistance = parseFloat(distance) / 1000; // convert meters to km
+        let extraDistance = 0;
+        let extraDistanceAmount = 0;
+        let total_fare = 0;
+
+        if (parseFloat(rentalKm) >= totalDistance) {
+            total_fare = parseFloat(rentalPrice);
+        } else {
+            extraDistance = totalDistance - parseFloat(rentalKm);
+            extraDistanceAmount = extraDistance * parseFloat(categoryData.rental_distance_fare);
+            total_fare = parseFloat(rentalPrice) + extraDistanceAmount;
+        }
+
+        // Extra time calculation (duration is in seconds)
+        let allowedMinutes = parseFloat(rentalHour) * 60;
+        let rideMinutes = parseFloat(duration) / 60;
+        let extraTime = Math.max(0, rideMinutes - allowedMinutes);
+        let extraTimeAmount = extraTime * parseFloat(categoryData.time_fare);
+
+        total_fare += extraTimeAmount;
+
+        // Make note for extra charges
+        let note = 'No extra charges';
+        if (extraDistance > 0 && extraTime > 0) {
+            note = `Extra distance: ${extraDistance.toFixed(2)} km, Extra time: ${extraTime.toFixed(2)} min. Extra for distance: ${extraDistanceAmount.toFixed(2)}, Extra for time: ${extraTimeAmount.toFixed(2)}`;
+        } else if (extraDistance > 0) {
+            note = `Extra distance: ${extraDistance.toFixed(2)} km. Extra amount: ${extraDistanceAmount.toFixed(2)}`;
+        } else if (extraTime > 0) {
+            note = `Extra time: ${extraTime.toFixed(2)} min. Extra amount: ${extraTimeAmount.toFixed(2)}`;
+        }
+
+        // Update ride fare in DB
+        await Ride.updateOne(
+            { _id: ride_id },
+            {
+                $set: {
+                    'payment.fare_charged': Math.round(total_fare),
+                    'payment.extrapaynote': note
+                }
+            }
+        );
+
+        return {
+            currency: categoryData.currency,
+            bookdistance: totalDistance,
+            type: "rentals",
+            total_fare: Math.round(total_fare),
+            onlinepayment: Math.round(onlinepayment),
+            offlinepayment: Math.round(total_fare) - Math.round(onlinepayment)
+        };
+
+    } catch (error) {
+        console.log('errror', error);
+        throw error;
+    }
+};
+
+exports.ride_fare_estimate = async function (
+    category_id,
+    origin,
+    destination,
+    duration,
+    distance,
+    discount,
+    bookdistance,
+    start_fare,
+    airportCharge,
+    onlinepayment,
+    ride_id
+) {
+    try {
+        // 1. Get distance and duration from Google
+        // const distanceData = await google_distance.get({
+        //     index: 1,
+        //     origin: `${origin.latitude},${origin.longitude}`,
+        //     destination: `${destination.latitude},${destination.longitude}`,
+        // });
+
+        // 2. Fetch vehicle category details
+        const categoryData = await Taxitype.findOne({ _id: category_id });
+        if (!categoryData) return { status: 404, message: "category is not available" };
+
+        let totalDistance = parseFloat(bookdistance);
+        let total_fare = 0;
+
+        // 3. Base fare calculation
+        if (totalDistance <= 3) {
+            total_fare = Math.round((categoryData.base_fare * 1.13) * 1.05);
+        } else {
+            const extraDistanceFare = (totalDistance - 3) * categoryData.distance_fare;
+            total_fare = Math.round((categoryData.base_fare + extraDistanceFare) * 1.13 * 1.05);
+        }
+
+        // (Optional: add time fare or other logic using distanceData.durationValue if needed)
+
+        // 4. Apply discount logic (if fare after discount < 0, set to 0)
+        const finalFare = total_fare - discount < 0 ? 0 : start_fare;
+
+        // 5. Update fare in DB
+        await Ride.updateOne(
+            { _id: ride_id },
+            {
+                $set: {
+                    'payment.fare_charged': Math.round(finalFare),
+                },
+            }
+        );
+
+        // 6. Return estimated fare details
+        return {
+            currency: categoryData.currency,
+            bookdistance: totalDistance,
+            type: "daily",
+            total_fare: Math.round(finalFare),
+            onlinepayment: Math.round(onlinepayment),
+            offlinepayment: Math.round(finalFare) - Math.round(onlinepayment),
+            airportCharge: airportCharge
+        };
+
+    } catch (err) {
+        console.log('err', err);
+        throw err;
+    }
+};
+
+exports.ride_fare_estimate_outstation = async function (
+    category_id,
+    origin,
+    destination,
+    duration,
+    distance,
+    way,
+    fare_estimate,
+    TravelDistance,
+    onlinepayment,
+    ride_id,
+    per_km
+) {
+    try {
+        // 1. Get distance from Google (optional use)
+        // const distanceData = await google_distance.get({
+        //     index: 1,
+        //     origin: `${origin.latitude},${origin.longitude}`,
+        //     destination: `${destination.latitude},${destination.longitude}`
+        // });
+
+        // 2. Get vehicle category info
+        const categoryData = await Taxitype.findOne({ _id: category_id });
+        if (!categoryData) throw new Error("Price Not Found");
+
+        // 3. Fare calculation
+        let totalDistance = parseFloat(TravelDistance);
+        let baseFare = totalDistance * parseFloat(per_km);
+        let total_fare = Math.round((baseFare * 1.13) * 1.05); // tax + service fee
+
+        // 4. Update fare in DB
+        await Ride.updateOne(
+            { _id: ride_id },
+            {
+                $set: {
+                    'payment.fare_charged': total_fare,
+                }
+            }
+        );
+
+        // 5. Calculate offline payment
+        const roundedOnline = Math.round(onlinepayment);
+        let offlinepayment = total_fare - roundedOnline;
+        if (offlinepayment < 0) offlinepayment = 0;
+
+        // 6. Return final result
+        return {
+            currency: categoryData.currency,
+            bookdistance: totalDistance,
+            type: "outstation",
+            total_fare: total_fare,
+            onlinepayment: roundedOnline,
+            offlinepayment: offlinepayment
+        };
+
+    } catch (err) {
+        console.log('err', err);
+        throw err;
+    }
+};
+function haversineDistance(coord1, coord2) {
+    const R = 6371; // Earth's radius in km
+    const toRad = (deg) => deg * (Math.PI / 180);
+
+    const dLat = toRad(coord2.lat - coord1.lat);
+    const dLon = toRad(coord2.lng - coord1.lng);
+    const lat1 = toRad(coord1.lat);
+    const lat2 = toRad(coord2.lat);
+
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1) * Math.cos(lat2) *
+        Math.sin(dLon / 2) ** 2;
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+
+exports.calculateDistance = async (ride_id) => {
+    let redisKey = `ride:${ride_id}:path`;
+    let allData = await client.lRange(redisKey, 0, -1); // all points
+    if (!allData) return 0;
+    let coordsArray = allData.map(loc => JSON.parse(loc));
+    // const coordsArray = [
+    //     { lat: 28.7041, lng: 77.1025 },
+    //     { lat: 28.7048, lng: 77.1050 },
+    //     { lat: 28.7072, lng: 77.1100 },
+    //     { lat: 28.7101, lng: 77.1200 }
+    // ];
+
+    let totalDistanceKm = 0;
+
+    for (let i = 0; i < coordsArray.length - 1; i++) {
+        totalDistanceKm += haversineDistance(coordsArray[i], coordsArray[i + 1]);
+    }
+
+    console.log(`Total Distance traveled: ${totalDistanceKm.toFixed(2)} km`);
+};
+
+exports.schedule_ride_notify = async function (ride_details, io) {
+    try {
+        const providers = await Provider.find({
+            city_id: ride_details.meta.city_id,
+            is_notify: 1,
+            fcm_token: {
+                $exists: true,
+                $ne: ''
+            }
+        }, {
+            os: 1,
+            fcm_token: 1,
+            language: 1
+        }).lean();
+        if (providers.length > 0) {
+            try {
+                for (let provider of providers) {
+                    await notificationModel.create({
+                        user_type: "customer",
+                        user_id: ride_details.basic.user_id,
+                        activity: "new_pending_ride",
+                        message: "A future ride has been requested, please check upcoming rides",
+                        provider_id: provider._id,
+                        ride_id: ride_details._id,
+                    });
+                    PushNotifications({
+                        receiverId: provider._id.toString(),
+                        type: "new_pending_ride",
+                        title: "New upcoming ride",
+                        message: "A future ride has been requested, please check upcoming rides",
+                        deviceTokens: provider.fcm_token,
+                    });
+                }
+                return true;
+            } catch (notifyErr) {
+                console.error("Error sending push notification:", notifyErr);
+            }
+        }
+
+        await io.in('provider_room').emit('new_pending_ride', ride_details.toObject());
+
+    } catch (err) {
+        console.error("Error in schedule_ride_notify:", err);
+    }
+};
+// Assuming this is in a module (e.g., rideUtils.js or FUNC.js)
+
+// Export the function
+exports.driver_not_responding = async (ride_details) => {
+    try {
+        const update_results = await Ride.update(
+            {
+                _id: ride_details._id,
+                "basic.schedule": true,
+                "basic.ride_status": "scheduled",
+                "basic.provider_id": { $exists: true },
+            },
+            {
+                $set: {
+                    "basic.ride_status": "failed",
+                },
+            }
+        );
+
+        if (update_results.nModified === 1) {
+
+            const NotificationData = {
+                activity: "ride_failed",
+                ride_id: ride_details._id,
+                user_type: "customer",
+                user_id: ride_details.basic.user_id._id.toString(),
+                message: "Ride failed successfully",
+                provider_id: ride_details.basic.provider_id
+            };
+
+            await notificationModel.create(NotificationData);
+            PushNotifications({
+                receiverId: ride_details.basic.user_id._id.toString(),
+                type: "ride_failed",
+                title: "Failed ride",
+                message: "Ride failed successfully",
+                deviceTokens: ride_details.basic.user_id.fcm_token,
+            });
+        }
+    } catch (err) {
+        console.error('Error in driver_not_responding:', err);
+    }
+};
+exports.schedule_ride_reminder = async (ride_details) => {
+    try {
+        let obj = {
+            _id: ride_details.basic.provider_id,
+            is_notify: true,
+            $or: [{ os: 'ios' }, { os: 'android' }],
+        };
+        // Find provider details using await
+        const provider_detail = await Provider.findOne(obj).lean().exec();
+        if (provider_detail) {
+            const NotificationData = {
+                activity: "ride_reminder",
+                ride_id: ride_details._id,
+                user_type: "customer",
+                user_id: provider_detail._id.toString(),
+                message: "Requesting a ride from a User",
+                provider_id: provider_detail._id
+            };
+            console.log('NotificationData', NotificationData);
+            await notificationModel.create(NotificationData);
+            PushNotifications({
+                receiverId: provider_detail._id.toString(),
+                type: "ride_failed",
+                title: "Requesting a Ride",
+                message: "Requesting a ride from a User",
+                deviceTokens: provider_detail.fcm_token,
+            });
+
+        } else {
+            console.log("No provider detail found for the provider_id");
+        }
+    } catch (err) {
+        console.error("Error in schedule_ride_reminder:", err);
+    }
+};

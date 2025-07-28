@@ -46,7 +46,7 @@ exports.userDetailsController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.deleteUserController = async (req) => {
     try {
@@ -58,4 +58,15 @@ exports.deleteUserController = async (req) => {
             message: error.message
         };
     }
-}
+};
+exports.generateOrderId = async (req) => {
+    try {
+        return await service.generateOrderId(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};

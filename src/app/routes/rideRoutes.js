@@ -7,5 +7,6 @@ const { verifyToken } = require('../../middleware/auth');
 const router = express.Router();
 
 router.post('/categoriesPrice', verifyToken, responseHandler(controller.categoriesPrice));
+router.post('/list', verifyToken, responseHandler(controller.list));
 
 module.exports = router;

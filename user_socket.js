@@ -4,7 +4,7 @@ require('dotenv').config();
 const appSettings = require('./src/models/settingModel');
 const RequestRide = require('./src/models/RequestRide');
 const FUNC = require('./src/functions/function');
-const { SOCKET_USER_PORT } = require('./src/config/dev.config');
+const { SOCKET_USER_PORT, url } = require('./src/config/dev.config');
 const moment = require('moment');
 const http = require('http');
 const { initializeSocket, getIO } = require('./socket');
@@ -13,11 +13,14 @@ const User = require('./src/models/users');
 const Ride = require('./src/models/ride');
 // const redisKeyPrefix = 'UserSocket:';
 const connectDB = require('./src/config/db.config');
+const mongoose = require('mongoose');
 const { ObjectId } = require('mongoose').Types;
 const Location = require('./src/models/locationModel');
 const chatModel = require('./src/models/chatModel');
 const cityModel = require('./src/models/city');
 const { getClient } = require('./src/config/redis');
+const { PushNotifications } = require('./src/config/notification');
+
 const client = getClient();
 connectDB();
 const app = express();
@@ -87,11 +90,11 @@ async function runServer() {
 
               socket.user_data = user;
               if (user.in_ride) {
-                const rides = await Ride.aggregate([
-                  { $match: { "basic.user_id": user._id, "basic.ride_status": { $in: ["accepted", "arrived", "running"] } } },
+                let obj = [
+                  { $match: { "basic.user_id": new mongoose.Types.ObjectId(user._id), "basic.ride_status": { $in: ["accepted", "arrived", "running"] } } },
                   {
                     $lookup: {
-                      from: 'users',
+                      from: 'providers',
                       localField: 'basic.provider_id',
                       foreignField: '_id',
                       as: 'provider'
@@ -100,7 +103,7 @@ async function runServer() {
                   { $unwind: "$provider" },
                   {
                     $lookup: {
-                      from: 'categories',
+                      from: 'taxi_types',
                       localField: 'meta.category_id',
                       foreignField: '_id',
                       as: 'category'
@@ -127,7 +130,8 @@ async function runServer() {
                       'category.thumb_3x': 1
                     }
                   }
-                ]);
+                ];
+                const rides = await Ride.aggregate(obj);
                 if (!rides || rides.length === 0) {
                   ack({
                     status: 200,
@@ -143,7 +147,6 @@ async function runServer() {
                 const locations = await Location.find({
                   provider_id: { $in: providerIds }
                 }).lean();
-
                 const locationMap = new Map();
                 locations.forEach(loc => {
                   locationMap.set(loc.provider_id.toString(), loc);
@@ -173,24 +176,23 @@ async function runServer() {
                     car_title: ride.basic.vehicle.title,
                     plateno: ride.basic.vehicle.plateno,
                     color: ride.basic.vehicle.color,
-                    driver_name: ride.basic.provider_id.first_name + ' ' + ride.basic.provider_id.last_name,
-                    driver_image: "https://customer.ktscab.com/drivers/" + ride.basic.provider_id.image,
+                    driver_name: ride.provider.first_name + ' ' + ride.provider.last_name,
+                    driver_image: `${url}${ride.provider.image}`,
                     avg_rating: ride.basic.provider_id.avg_rating,
                     driver_mobile: ride.basic.provider_id.callingmobile,
-                    category_image: ride.meta.category_id.thumb_3x,
+                    category_image: ride.meta?.category_id?.thumb_3x || "",
                     created: ride.created
                   };
 
                   if (ride_data.payment_type === "Card") {
                     ride_data.card = ride.payment.card;
                   }
-
                   const location_packet = locationMap.get(ride.basic.provider_id._id.toString());
                   if (location_packet) {
                     ride_data.provider_location = {
                       _id: location_packet.provider_id.toString(),
-                      longitude: location_packet.location[0],
-                      latitude: location_packet.location[1],
+                      longitude: location_packet.locations[0].coordinates[0],
+                      latitude: location_packet.locations[0].coordinates[1],
                       bearing: location_packet.bearing,
                       time_estimate: location_packet.time_estimate,
                       speed: 0
@@ -343,150 +345,218 @@ async function runServer() {
                 ride_on = moment().unix(),
                 offercode,
                 offer_id,
+                schedule,
                 taxi_data: { id: category_id, per_km, price: fare_estimate, base_fixed_fare, city_id, name, distance,
                   duration }
               } = data;
-              const locationQuery = [
-                {
-                  $geoNear: {
-                    near: {
-                      type: "Point",
-                      coordinates: [Number(source.longitude), Number(source.latitude)]
-                    },
-                    distanceField: "distance",
-                    maxDistance: 4000,
-                    spherical: true,
-                    query: {
-                      ...(Array.isArray(category_id) && category_id.length > 0 ? { type_ids: category_id } : {}),
-                      available: true,
-                      blocked: false
-                    },
-                    key: 'locations.coordinates'
-                  }
-                },
-                {
-                  $lookup: {
-                    from: "providers",
-                    localField: "provider_id",
-                    foreignField: "_id",
-                    as: "provider_id"
-                  }
-                },
-                {
-                  $unwind: {
-                    path: "$provider_id",
-                    preserveNullAndEmptyArrays: true
-                  }
-                },
-                { $limit: 10 }
-              ];
-              const location_data = await Location.aggregate(locationQuery);
-              if (!location_data) {
+              if (schedule) {
+                const new_ride = {
+                  basic: {
+                    ride_type: name,
+                    ridestationtype,
+                    planId,
+                    way,
+                    otp: Math.floor(1000 + Math.random() * 9000),
+                    ride_status: "scheduled",
+                    user_id: socket.user_data._id,
+                    instructions: "",
+                    bookdistance: distance,
+                    schedule: true,
+
+                  },
+                  location: { source, destination },
+                  meta: {
+                    category_id,
+                    city_id,
+                    zone_id: city_id,
+                  },
+                  payment: {
+                    fare_estimate,
+                    base_fixed_fare,
+                    per_km
+                  },
+                  time: { ride_on },
+                  offer: { offercode, offer_id }
+                };
+
+                const NewRide = new Ride(new_ride);
+                await NewRide.save();
                 ack({
-                  status: 404,
-                  message: "Provider not found."
+                  status: 200,
+                  success: true,
+                  message: "Booking is scheduled",
+                  data: { ride_id: NewRide._id }
                 });
-              }
-              console.log('location_data', location_data.length);
-              const allProviders = location_data.map(p => p.toObject ? p.toObject() : p);
 
-              if (allProviders.length === 0) break;
+              } else {
+                const locationQuery = [
+                  {
+                    $geoNear: {
+                      near: {
+                        type: "Point",
+                        coordinates: [Number(source.longitude), Number(source.latitude)]
+                      },
+                      distanceField: "distance",
+                      maxDistance: 4000,
+                      spherical: true,
+                      query: {
+                        ...(Array.isArray(category_id) && category_id.length > 0 ? { type_ids: category_id } : {}),
+                        available: true,
+                        blocked: false
+                      },
+                      key: 'locations.coordinates'
+                    }
+                  },
+                  {
+                    $lookup: {
+                      from: "providers",
+                      localField: "provider_id",
+                      foreignField: "_id",
+                      as: "provider_id"
+                    }
+                  },
+                  {
+                    $unwind: {
+                      path: "$provider_id",
+                      preserveNullAndEmptyArrays: true
+                    }
+                  },
+                  { $limit: 10 }
+                ];
+                const location_data = await Location.aggregate(locationQuery);
+                if (!location_data || location_data.length == 0) {
+                  ack({
+                    status: 203,
+                    success: false,
+                    message: "No vehicle available for this category."
+                  });
+                }
+                console.log('location_data', location_data.length);
+                const allProviders = location_data.map(p => p.toObject ? p.toObject() : p);
 
-              const provider_ids = allProviders.map(p => p.provider_id._id);
+                if (allProviders.length === 0) break;
 
-              const new_ride = {
-                basic: {
-                  ride_type: name,
-                  ridestationtype,
-                  planId,
-                  way,
-                  ride_status: "requested",
-                  user_id: socket.user_data._id,
-                  instructions: "",
-                  bookdistance: distance
-                },
-                location: { source, destination },
-                meta: {
-                  category_id,
-                  city_id,
-                  zone_id: city_id,
-                  search_providers: provider_ids
-                },
-                payment: {
+                const provider_ids = allProviders.map(p => p.provider_id._id);
+
+                const new_ride = {
+                  basic: {
+                    ride_type: name,
+                    ridestationtype,
+                    planId,
+                    way,
+                    ride_status: "requested",
+                    user_id: socket.user_data._id,
+                    instructions: "",
+                    bookdistance: distance
+                  },
+                  location: { source, destination },
+                  meta: {
+                    category_id,
+                    city_id,
+                    zone_id: city_id,
+                    search_providers: provider_ids
+                  },
+                  payment: {
+                    fare_estimate,
+                    base_fixed_fare,
+                    per_km
+                  },
+                  time: { ride_on },
+                  offer: { offercode, offer_id }
+                };
+
+                const NewRide = new Ride(new_ride);
+                await NewRide.save();
+
+                const ride_id = NewRide._id.toString();
+                const request_data = {
+                  ride_id,
+                  ride_status: NewRide.basic.ride_status,
+                  ride_edit_status: NewRide.basic.ride_edit_status,
+                  ride_type: NewRide.basic.ride_type,
+                  ridestationtype: NewRide.basic.ridestationtype,
+                  planId: NewRide.basic.planId,
+                  way: NewRide.basic.way,
+                  start_on: moment().unix(),
+                  user_name: socket.user_data.full_name,
+                  user_mobile: socket.user_data.mobile,
+                  source,
+                  distance,
+                  duration,
+                  destination,
+                  payment_type,
+                  razorpay_orderId,
+                  razorpay_paymentId,
                   fare_estimate,
                   base_fixed_fare,
-                  per_km
-                },
-                time: { ride_on },
-                offer: { offercode, offer_id }
-              };
+                  per_km,
+                  instructions: ""
+                };
 
-              const NewRide = new Ride(new_ride);
-              await NewRide.save();
+                const processProviders = async () => {
+                  try {
+                    await Promise.all(allProviders.map(provider => {
+                      return Promise.all([
+                        client.rPush(`request_queue:${ride_id}`, provider.provider_id._id.toString()),
+                        RequestRide.create({ ride_id, provider_id: provider.provider_id._id })
+                      ]);
+                    }));
+                    const settingData = await appSettings.findOne();
+                    await client.set(`request_data:${ride_id}`, JSON.stringify(request_data));
+                    await client.set(`ride_attempt:${ride_id}`, settingData.ride_settings.ride_attempt);
 
-              const ride_id = NewRide._id.toString();
-              const request_data = {
-                ride_id,
-                ride_status: NewRide.basic.ride_status,
-                ride_edit_status: NewRide.basic.ride_edit_status,
-                ride_type: NewRide.basic.ride_type,
-                ridestationtype: NewRide.basic.ridestationtype,
-                planId: NewRide.basic.planId,
-                way: NewRide.basic.way,
-                start_on: moment().unix(),
-                user_name: socket.user_data.full_name,
-                user_mobile: socket.user_data.mobile,
-                source,
-                distance,
-                duration,
-                destination,
-                payment_type,
-                razorpay_orderId,
-                razorpay_paymentId,
-                fare_estimate,
-                base_fixed_fare,
-                per_km,
-                instructions: ""
-              };
+                    let data = await FUNC.send_request(ride_id, io, settingData);
+                    console.log('data---', data);
+                    if (data == 'ERROR') {
+                      const ride = await Ride.findOneAndUpdate(
+                        {
+                          _id: new mongoose.Types.ObjectId(ride_id),
+                          "basic.ride_status": "requested"
+                        },
+                        {
+                          $set: { "basic.ride_status": "declined" }
+                        },
+                        { new: true }
+                      ).lean();
+                      if (ride) {
+                        const userSocket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
+                        socket.to(userSocket).emit("ride_declined", {
+                          ride_id: ride_id, status: 200,
+                          success: true,
+                          message: "Ride declined Successfully"
+                        });
+                      }
+                    }
+                    return true;
+                  } catch (err) {
+                    const rideDetails = await Ride.findOneAndUpdate(
+                      { _id: ride_id, "basic.ride_status": "requested" },
+                      { $set: { "basic.ride_status": "declined" } },
+                      { new: true }
+                    );
 
-              const processProviders = async () => {
-                try {
-                  await Promise.all(allProviders.map(provider => {
-                    return Promise.all([
-                      client.rPush(`request_queue:${ride_id}`, provider.provider_id._id.toString()),
-                      RequestRide.create({ ride_id, provider_id: provider.provider_id._id })
-                    ]);
-                  }));
-                  const settingData = await appSettings.findOne();
-                  await client.set(`request_data:${ride_id}`, JSON.stringify(request_data));
-                  await client.set(`ride_attempt:${ride_id}`, settingData.ride_settings.ride_attempt);
-
-                  await FUNC.send_request(ride_id, io, settingData);
-
-                } catch (err) {
-                  const rideDetails = await Ride.findOneAndUpdate(
-                    { _id: ride_id, "basic.ride_status": "requested" },
-                    { $set: { "basic.ride_status": "declined" } },
-                    { new: true }
-                  );
-
-                  if (rideDetails) {
-                    socket.emit('ride_declined', { ride_id });
+                    if (rideDetails) {
+                      socket.emit('ride_declined', {
+                        ride_id,
+                        status: 200,
+                        success: true,
+                      });
+                    }
+                    console.error('Error in processProviders:', err);
                   }
+                };
 
-                  console.error('Error in processProviders:', err);
-                }
-              };
-
-              await processProviders();
-              ack({
-                status: 200,
-                success: true,
-                message: "Booking in progress",
-                data: { ride_id: NewRide._id }
-              });
+                await processProviders();
+                ack({
+                  status: 200,
+                  success: true,
+                  message: "Booking in progress",
+                  data: { ride_id: NewRide._id }
+                });
+              }
               break;
             }
+
 
             // Assuming this is inside an async function or a Socket.IO event handler
             case "User_msg_sent": {
@@ -722,50 +792,46 @@ async function runServer() {
 
                 // Notify driver via socket if connected
                 if (ride_details.basic?.provider_id?._id) {
-                  client.get("socket_provider:" + ride_details.basic.provider_id._id.toString(), async (err, provider_socket) => {
-                    if (provider_socket) {
-                      socket.to(provider_socket).emit("request_cancelled", { ride_id });
+                  const provider_socket = await client.get(`socket_provider:${ride_details.basic.provider_id._id.toString()}`);
 
-                      const track_room = "trackprovider_" + ride_details.basic.provider_id._id.toString();
-                      socket.leave(track_room);
+                  if (provider_socket) {
+                    socket.to(provider_socket).emit("request_cancelled", {
+                      ride_id, status: 200,
+                      message: "Ride cancelled Successfully"
+                    });
 
-                      await FUNC.updateInRide(ride_details._id, socket.user_data._id, ride_details.basic.provider_id._id, false);
+                    const track_room = "trackprovider_" + ride_details.basic.provider_id._id.toString();
+                    socket.leave(track_room);
+                    await FUNC.updateInRide(ride_details._id, socket.user_data._id, ride_details.basic.provider_id._id, false);
 
-                      ack({
-                        status: 200,
-                        message: "Ride cancelled Successfully"
-                      });
+                    ack({
+                      status: 200,
+                      message: "Ride cancelled Successfully"
+                    });
 
-                      // Send notifications to user and driver
-                      // await notification.PushNotifications({
-                      //   receiverId: socket.user_data._id,
-                      //   deviceTokens: socket.user_data.fcm_token,
-                      //   type: "BONUS",
-                      //   title: "Ride cancelled Successfully",
-                      //   message: "Ride cancelled Successfully",
-                      //   entityId: socket.user_data._id
-                      // });
+                    PushNotifications({
+                      receiverId: ride_details.basic.provider_id._id.toString(),
+                      type: "BONUS",
+                      title: "Ride cancelled by user",
+                      message: "Ride cancelled by user",
+                      deviceTokens: ride_details.basic.provider_id.fcm_token,
+                    });
+                    // Send notifications to user and driver
+                    // await notification.PushNotifications({
+                    //   receiverId: socket.user_data._id,
+                    //   deviceTokens: socket.user_data.fcm_token,
+                    //   type: "BONUS",
+                    //   title: "Ride cancelled Successfully",
+                    //   message: "Ride cancelled Successfully",
+                    //   entityId: socket.user_data._id
+                    // });
 
-                      // await notification.PushNotificationsDriver({
-                      //   receiverId: ride_details.basic.provider_id._id.toString(),
-                      //   type: "BONUS",
-                      //   title: "Ride cancelled by user",
-                      //   message: "Ride cancelled by user",
-                      //   entityId: ride_details.basic.provider_id._id.toString()
-                      // });
-                    } else {
-                      ack({
-                        status: 200,
-                        message: "Ride cancelled Successfully"
-                      });
-                    }
-                  });
-                } else {
-                  ack({
-                    status: 200,
-                    message: "Ride cancelled Successfully"
-                  });
+                  }
                 }
+                ack({
+                  status: 200,
+                  message: "Ride cancelled Successfully"
+                });
 
               } catch (err) {
                 console.error("Error during ride cancel:", err);

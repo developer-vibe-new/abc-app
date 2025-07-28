@@ -12,11 +12,13 @@
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "cron": "^4.3.1",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "express-session": "^1.18.1",
     "express-validation": "^4.1.1",
     "express-validator": "^7.2.0",
+    "firebase-admin": "^13.4.0",
     "fs": "^0.0.1-security",
     "google-distance": "^1.0.1",
     "http": "^0.0.1-security",
@@ -30,6 +32,7 @@
     "nodemon": "^3.1.7",
     "path": "^0.12.7",
     "polyline": "^0.2.0",
+    "razorpay": "^2.9.6",
     "redis-adapter": "^0.2.0",
     "socket.io": "^4.8.1",
     "swagger-ui-express": "^5.0.1"
@@ -41,6 +44,7 @@
     "prod-admin": "nodemon admin.js",
     "user_socket": "nodemon user_socket.js",
     "provider_socket": "nodemon provider_socket.js",
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "cron": "nodemon cron.js"
   }
 }

@@ -156,7 +156,7 @@ exports.updateDocumentsController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.registerController = async (req) => {
     try {
@@ -168,7 +168,7 @@ exports.registerController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.getDocumentsController = async (req) => {
     try {
@@ -180,4 +180,61 @@ exports.getDocumentsController = async (req) => {
             message: error.message
         };
     }
-}
+};
+
+exports.timeFareEstimate = async (req) => {
+    try {
+        return await service.timeFareEstimate(req);
+    } catch (error) {
+        return {
+            status: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
+exports.addProviderTaxi = async (req) => {
+    try {
+        return await service.addProviderTaxi(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
+
+exports.pendingRides = async (req) => {
+    try {
+        return await service.pendingRides(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
+exports.bookedRides = async (req) => {
+    try {
+        return await service.bookedRides(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};
+exports.bookRide = async (req) => {
+    try {
+        return await service.bookRide(req);
+    } catch (error) {
+        return {
+            statusCode: statusCode.INTERNAL_SERVER_ERROR,
+            success: false,
+            message: error.message
+        };
+    }
+};

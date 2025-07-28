@@ -14,4 +14,5 @@ router.post('/deleteUser', verifyToken, responseHandler(controller.deleteUserCon
 router.get('/', (req, res) => {
     return res.status(200).json({ message: 'User registration successful.' });
 });
+router.post('/generateOrderId', verifyToken, responseHandler(controller.generateOrderId));
 module.exports = router;

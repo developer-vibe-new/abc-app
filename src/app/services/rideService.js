@@ -1,12 +1,13 @@
 const { statusCode, resMessage } = require('../../config/default.json');
 const taxiType = require('../../models/taxiTypeModel');
 const cityModel = require('../../models/city');
-// const rideModel = require('../../models/ride');
+const rideModel = require('../../models/ride');
 const userModel = require('../../models/users');
 const settingModel = require('../../models/settingModel');
-// const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const google_distance = require('google-distance');
 google_distance.apiKey = process.env.GOOGLE_APP_KEY;
+const { url } = require('../../config/dev.config');
 const NodeGeocoder = require('node-geocoder');
 
 var options = {
@@ -140,7 +141,7 @@ exports.CategoriesPrice = async (req) => {
 
             TaxiCateData.push({
                 id: taxiType._id,
-                cityiId: city._id,
+                city_id: city._id,
                 price: fareMultiplier,
                 airportCharge,
                 airportstatus,
@@ -165,6 +166,136 @@ exports.CategoriesPrice = async (req) => {
         };
     } catch (error) {
         console.error("CategoriesPrice Error:", error);
+        return {
+            status: statusCode.BAD_REQUEST,
+            success: false,
+            message: resMessage.Internal_Server_Error,
+            error: error.message || "Internal Server Error",
+        };
+    }
+};
+
+
+exports.list = async function (req) {
+    try {
+        const { limit, skip, list_type } = req.body;
+        const logindata = req.auth;
+        // Set up match stage based on list_type
+        let matchStage = {};
+        if (list_type === 'past') {
+            matchStage = {
+                $match: {
+                    $and: [
+                        { "basic.ride_status": "finished" },
+                        { 'basic.user_id': new mongoose.Types.ObjectId(logindata.id) }
+                    ]
+                }
+            };
+        } else if (list_type === 'upcoming') {
+            matchStage = {
+                $match: {
+                    'basic.user_id': new mongoose.Types.ObjectId(logindata.id),
+                    'basic.schedule': true,
+                    'basic.ride_status': 'scheduled'
+                }
+            };
+        }
+
+        const aggregation = [
+            matchStage,
+            { $sort: { created: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+
+            // Populate provider
+            {
+                $lookup: {
+                    from: 'providers',
+                    localField: 'basic.provider_id',
+                    foreignField: '_id',
+                    as: 'provider'
+                }
+            },
+            { $unwind: { path: '$provider', preserveNullAndEmptyArrays: true } },
+
+            // Populate category
+            {
+                $lookup: {
+                    from: 'taxi_types',
+                    localField: 'meta.category_id',
+                    foreignField: '_id',
+                    as: 'category'
+                }
+            },
+            { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } }
+        ];
+
+        const rides = await rideModel.aggregate(aggregation);
+
+        const rideArr = rides.map(ride => {
+            const localObj = {
+                ride_id: ride._id.toString(),
+                ride_status: ride.basic.ride_status,
+                ride_type: ride.basic.ride_type,
+                source: ride.location?.source,
+                destination: ride.location?.destination,
+                start_on: ride.time?.ride_on,
+                started: ride.time?.started,
+                finished: ride.time?.finished,
+                payment_type: ride.basic.payment_type,
+                fare_estimate: ride.payment?.fare_estimate,
+                category_image: ride.category?.thumb_3x,
+                category_name: ride.category?.title,
+                provider_assigned: !!ride.provider,
+            };
+
+            if (ride.basic.payment_type === 'Card') {
+                localObj.card = ride.payment?.card;
+            }
+
+            if (ride.provider) {
+                localObj.driver_name = `${ride.provider.first_name} ${ride.provider.last_name}`;
+                localObj.driver_image = `${url}${ride.provider.image}`;
+                localObj.driver_mobile = ride.provider.mobile;
+            }
+
+            if (list_type === 'past') {
+                localObj.start_on = ride.created;
+                localObj.car_title = ride.basic?.vehicle?.title || '';
+                localObj.plateno = ride.basic?.vehicle?.plateno || '';
+                localObj.is_rated = ride.basic?.is_rated || false;
+
+                if (localObj.is_rated) {
+                    localObj.rating = ride.basic.rating;
+                    localObj.comment = ride.basic.comment;
+                }
+
+                localObj.base_fare = ride.payment?.base_fare;
+                localObj.gst_per = ride.payment?.gst_per;
+                localObj.gst_value = ride.payment?.gst_value;
+                localObj.pst_per = ride.payment?.pst_per;
+                localObj.pst_value = ride.payment?.pst_value;
+                localObj.airportcharge = ride.payment?.airportcharge;
+                localObj.airportstatus = ride.payment?.airportstatus;
+                localObj.fare_charged = ride.payment?.fare_charged || 0;
+                localObj.coupon = ride.payment?.coupon || 0;
+                localObj.path_image = ride.basic?.path_image;
+                localObj.path_image2 = ride.basic?.path_image2;
+            }
+
+            return localObj;
+        });
+
+        return {
+            status: statusCode.OK,
+            success: true,
+            data: rideArr,
+            max_limit: limit,
+            displayed_record: rideArr.length,
+            message: resMessage.Ride_List,
+            meta: req.phoneMeta
+        };
+    } catch (error) {
         return {
             status: statusCode.BAD_REQUEST,
             success: false,

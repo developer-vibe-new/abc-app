@@ -1,45 +1,55 @@
-const FCM = require('fcm-node');
-const { FCM_SERVER_KEY } = require('../config/dev.config');
+const admin = require('firebase-admin');
+const serviceAccount1 = require('./firebase-adminsdk.json');
 
-const fcm = new FCM(FCM_SERVER_KEY); // put your server key here
+// Initialize the second app with a different unique name
+const app2 = admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount1),
+}, 'app2');
+
+
 let fcm_fun = {
     sendPush: async (message) => {
         return new Promise((resolve, reject) => {
             try {
-                fcm.send(message, function (error, response) {
-                    if (error) {
-                        console.log(error);
-                        resolve(error);
-                    } else {
-                        console.log('---push---notificatrion--success--', response);
+                app2.messaging().send(message)
+                    .then((response) => {
+                        console.log('response---->>>', response);
+                        console.log('Successfully sent message');
                         resolve(response);
-                    }
-                });
+                    })
+                    .catch((error) => {
+                        console.log('Error sending message:', error);
+                        reject(error);
+                    });
             } catch (error) {
                 reject(error);
             }
         });
     },
-    subscribeToTopic: async (deviceIds) => {
+    subscribeToTopic: async (deviceIds, topic) => {
         return new Promise((resolve, reject) => {
-            try {
-                fcm.subscribeToTopic(deviceIds, 'some_topic_name', (err, res) => {
-                    console.log(err, res);
+            app2.messaging().subscribeToTopic(deviceIds, topic)
+                .then((response) => {
+                    // console.log("Subscribed to topic");
+                    resolve(response);
+                })
+                .catch((error) => {
+                    console.error("Error subscribing to topic:", error);
+                    reject(error);
                 });
-            } catch (error) {
-                reject(error);
-            }
         });
     },
-    unsubscribeToTopic: async (deviceIds) => {
+    unsubscribeToTopic: async (deviceIds, topic) => {
         return new Promise((resolve, reject) => {
-            try {
-                fcm.unsubscribeToTopic(deviceIds, 'some_topic_name', (err, res) => {
-                    console.log(err, res);
+            app2.messaging().unsubscribeFromTopic(deviceIds, topic)
+                .then((response) => {
+                    console.log("Unsubscribed from topic:", response);
+                    resolve(response);
+                })
+                .catch((error) => {
+                    console.error("Error unsubscribing from topic:", error);
+                    reject(error);
                 });
-            } catch (error) {
-                reject(error);
-            }
         });
     }
 };

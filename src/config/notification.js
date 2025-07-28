@@ -1,39 +1,65 @@
-
 const appUtils = require('./appUtils');
 const fcm = require('./fcm');
-// const { userModel } = require('../../src/model');
-// const { messaging } = require('../../src/libs/firestoreConnections')
-// const { NOTIFICATION } = require('../config/constant');
-exports.PushAllNotifications = async (params) => {
-    return new Promise((resolve, reject) => {
-        try {
-            const pushLoad = {
-                title: params.title || '',
-                body: params.message,
-                type: params.type,
-                notification: {
-                    title: params.message,
-                    displayPicture: '',
-                    type: params.type
-                },
-                data: {
-                    title: params.message,
-                    displayPicture: '',
-                    type: params.type
-                }
-            };
-            console.log(params.deviceTokens, '----->>>>>>>');
-            const tokenChunks = appUtils.splitArrayInToChunks(params.deviceTokens);
-
-            const promiseResult = [];
-            for (let i = 0; i < tokenChunks.length; i++) {
-                const message = appUtils.formatDataForPush(pushLoad, tokenChunks[i]);
-                promiseResult.push(fcm.sendPush(message));
+const Notifications = {
+    PushNotifications: async (message) => {
+        const payload = {
+            notification: {
+                title: message.title,
+                body: message.message,
+                // sound: message?.sound || 'default', // Specify the sound here
+            },
+            token: message.deviceTokens,
+            data: {
+                sound: message?.sound || 'default',
             }
-            resolve(Promise.all(promiseResult));
-        } catch (error) {
-            console.log('error', error);
-            reject(error);
-        }
-    });
+        };
+        await fcm.sendPush(payload);
+    },
+
+    PushAllNotifications: async (params) => {
+        return new Promise((resolve, reject) => {
+            try {
+                //console.log("push")
+                const pushLoad = {
+                    title: params.title || '',
+                    body: params.message,
+                    type: params.type,
+                    notification: {
+                        title: params.message,
+                        // entityId: params.entityId,
+                        displayPicture: '',
+                        type: params.type,
+                        // userId: params.receiverId,
+                    },
+                    data: {
+                        title: params.message,
+                        // entityId: params.entityId,
+                        displayPicture: '',
+                        type: params.type,
+                        // userId: params.receiverId,
+                    },
+                };
+                // console.log("-----pushLoad------", params.deviceTokens);
+
+                const tokenChunks = appUtils.splitArrayInToChunks(params.deviceTokens);
+                // console.log("outside", params);
+                if (global.constant.PUSH_SENDING_TYPE.FCM === 2) {
+                    const promiseResult = [];
+                    for (let i = 0; i < tokenChunks.length; i++) {
+                        // console.log("inside");
+                        const message = appUtils.formatDataForPush(pushLoad, tokenChunks[i]);
+                        promiseResult.push(fcm.sendPush(message));
+                    }
+                    resolve(Promise.all(promiseResult));
+                } else {
+                    return;
+                }
+            } catch (error) {
+                console.log('error', error);
+                reject(error);
+            }
+        });
+    }
 };
+
+module.exports = Notifications;
