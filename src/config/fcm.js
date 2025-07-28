@@ -11,7 +11,7 @@ let fcm_fun = {
                         console.log(error);
                         resolve(error);
                     } else {
-                        console.log('---push---notificatrion--sucess--', response);
+                        console.log('---push---notificatrion--success--', response);
                         resolve(response);
                     }
                 });

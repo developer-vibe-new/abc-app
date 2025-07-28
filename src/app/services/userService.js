@@ -56,7 +56,7 @@ exports.verifyOtp = async (req) => {
         },
             process.env.SECRET_KEY,
             {
-                expiresIn: '1h'
+                expiresIn: '30d'
             }
         );
         user.otp = null;
@@ -114,20 +114,20 @@ exports.userDetails = async (req) => {
     try {
         const user = await User.aggregate([
             {
-              $match: {
-                _id: new mongoose.Types.ObjectId(req.auth.id)
-              }
+                $match: {
+                    _id: new mongoose.Types.ObjectId(req.auth.id)
+                }
             },
             {
-              $project: {
-                first_name: 1,
-                last_name: 1,
-                profile_image: 1, 
-                email: 1
-              }
+                $project: {
+                    first_name: 1,
+                    last_name: 1,
+                    profile_image: 1,
+                    email: 1
+                }
             }
         ]);
-        if(!user) {
+        if (!user) {
             return {
                 status: statusCode.BAD_REQUEST,
                 success: false,
@@ -147,7 +147,7 @@ exports.userDetails = async (req) => {
             error: error.message || "Internal Server Error"
         };
     }
-}
+};
 
 exports.deleteUser = async (req) => {
     try {
@@ -157,14 +157,14 @@ exports.deleteUser = async (req) => {
                 status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.User_Not_Found
-            }
+            };
         }
         await User.findByIdAndUpdate(req.auth.id, { is_active: false });
         return {
             status: statusCode.OK,
             success: true,
             message: resMessage.User_Deleted_Successfully
-        }
+        };
     } catch (error) {
         return {
             success: false,
@@ -172,4 +172,4 @@ exports.deleteUser = async (req) => {
             error: error.message || "Internal Server Error"
         };
     }
-}
+};

@@ -1,7 +1,5 @@
 const service = require('../services/reportService');
 const { statusCode } = require('../../config/default.json');
-
-
 exports.viewRideReport = async (req) => {
     try {
         return await service.allData(req);
@@ -15,3 +13,16 @@ exports.viewRideReport = async (req) => {
         };
     }
 };
+exports.viewAllRideDetails = async( req) =>{
+    try{
+  return await service.ViewAllData(req);
+    }
+    catch(error){
+        console.error("Error in ViewAllRideDetails:",error);
+        return{
+            statusCode: statusCode.BAD_REQUEST,
+            success: false,
+            message: error.message
+        }
+    }
+}

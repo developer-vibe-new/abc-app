@@ -27,11 +27,11 @@ exports.rentalEditData = async (req) => {
 exports.createRental = async (req) => {
     try {
         return await services.addRental(req);
-        // if(data.success == true){
-        //     return res.status(200).json(Object.assign({status:data.success},data))
-        // } else {
-        //     return res.status(400).json(Object.assign({status:data.success,message:data.message}))
-        // }
+        if(data.success == true){
+            return res.status(200).json(Object.assign({status:data.success},data))
+        } else {
+            return res.status(400).json(Object.assign({status:data.success,message:data.message}))
+        }
     } catch (error) {
         console.log(error);
         return {

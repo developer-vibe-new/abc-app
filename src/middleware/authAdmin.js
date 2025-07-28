@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const Admin = require('../models/adminModel')
-const SECRET_Key = process.env.SECRET_Key;
+const Admin = require('../models/adminModel');
+const SECRET_KEY = process.env.SECRET_KEY;
 const { statusCode, resMessage } = require('../config/default.json');
 
 exports.auth = async (req, res, next) => {
@@ -15,7 +15,7 @@ exports.auth = async (req, res, next) => {
         }
 
         const token = authHeader.split(" ")[1];
-        const decoded = jwt.verify(token, SECRET_Key);
+        const decoded = jwt.verify(token, SECRET_KEY);
         const adminData = await Admin.findById(decoded._id);
         if (!decoded) {
             return res.json({
@@ -25,12 +25,13 @@ exports.auth = async (req, res, next) => {
 
             });
         }
+        console.log('adminData', adminData);
         req.auth = adminData;
         next();
 
     } catch (error) {
 
-      
+
         if (error instanceof jwt.TokenExpiredError) {
             return res.json({
                 statusCode: statusCode.UNAUTHORIZED,
@@ -50,7 +51,7 @@ exports.auth = async (req, res, next) => {
 };
 
 exports.authorize = (category, action) => (req, res, next) => {
-    if(req.auth.role_type === 'admin') return next();
+    if (req.auth.role_type === 'admin') return next();
     const hasPermission = req.auth.permissions?.[category]?.includes(action);
     if (!hasPermission) {
         return res.json({
@@ -60,4 +61,4 @@ exports.authorize = (category, action) => (req, res, next) => {
         });
     }
     next();
-}
+};

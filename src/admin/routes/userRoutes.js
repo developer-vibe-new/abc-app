@@ -19,6 +19,7 @@ const offerCodeController = require('../controllers/offerCodeController');
 const subAdminController = require('../controllers/subAdminController');
 const notificationController = require('../controllers/notificationController');
 const settingController = require('../controllers/settingController');
+const transactionController = require('../controllers/transactionController');
 // const validation = require('../../validators/admin/userVal');
 
 router.get('/index', async (req, res) => {
@@ -116,17 +117,17 @@ router.get('/editBlockDriver/:id', auth, responseHandler(driverController.editBl
 router.post('/blockedDriverUpdate/:id', auth, upload.single('image'), responseHandler(driverController.blockedDriverUpdate));
 router.get('/taxiTypeDropDown', auth, responseHandler(driverController.taxiTypeDropDown));
 
-
-
-
-
-
+//rider route
 router.get('/viewRideReport', auth, responseHandler(reportController.viewRideReport));
+router.get('/rideReport', auth, responseHandler(reportController.viewAllRideDetails));
 
-// Notification manager
+// Notification route
 router.post('/addNotification', auth, responseHandler(notificationController.addNotificationController));
 router.get("/viewNotification", auth, responseHandler(notificationController.viewNotificationController));
 router.post('/deleteNotification', auth, responseHandler(notificationController.deleteNotificationController));
+
+// Transaction route
+router.get('/transactionReport',auth,responseHandler(transactionController.viewTransactionController));
 
 // Setting manager
 router.post('/addSetting', auth, responseHandler(settingController.addSettingController));

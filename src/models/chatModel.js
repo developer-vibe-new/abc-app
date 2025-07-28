@@ -1,15 +1,17 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-
-var RequestRideSchema = new Schema({
+var ChatSchema = new Schema({
     ride_id: {
         type: mongoose.Schema.Types.ObjectId,
-        default: null
+        ref: 'Ride'
     },
-    provider_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        default: null
+    type: {
+        type: String,
+        default: "user"
     },
+    msg: {
+        type: String
+    }
 }, {
     timestamps: {
         createdAt: 'created',
@@ -26,7 +28,5 @@ var RequestRideSchema = new Schema({
     }
 });
 
-const requestRideModel = mongoose.model('RequestRide', RequestRideSchema);
-
 //make this available to our users in Node applications
-module.exports = requestRideModel;
+module.exports.Chat = mongoose.model('chat', ChatSchema);

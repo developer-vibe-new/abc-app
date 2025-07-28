@@ -15,20 +15,25 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '/public')));
 app.use((req, res, next) => {
     console.log(req.method, req.protocol + '://' + req.get('host') + req.originalUrl);
-    console.log('body :', req.body, 'query :', req.query);
+    // console.log('body :', req.body, 'query :', req.query);
     req.date = new Date();
     next();
 });
 /* version V1 Routes */
 require('./src/app/routes')(app);
-// require('./src/admin/routes')(app);
+require('./src/admin/routes/index')(app);
 
 // set port, listen for request s
-const PORT = 5050;
+const PORT = process.env.PORT;
 console.log('port: ' + PORT);
 
 
-console.log('sdf');
+
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
 });
+
+// api=6262
+// operator socket= 5050
+// driver socket= 4040
+// user socket=4040

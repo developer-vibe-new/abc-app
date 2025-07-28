@@ -21,6 +21,21 @@ const CitySchema = new mongoose.Schema({
         requried: true
     },
     coordinates: { type: [Number], index: "2dsphere", default: [0, 0] },// [longitude, latitude]
+    // Pagination
+    locations: [
+        {
+            type: {
+                type: String,
+                enum: ['Point'],
+                default: 'Point'
+            },
+            coordinates: {
+                type: [Number],
+                index: '2dsphere',
+                default: [0, 0]
+            }
+        }
+    ],
     // per kilometer
     icon: {
         type: String
@@ -37,9 +52,17 @@ const CitySchema = new mongoose.Schema({
         type: String
 
     },
-    is_active: {
+    is_delete: {
+		type: Boolean,
+		default:false
+	},
+    is_active: { // change to status
         type: Boolean,
         default: true
+    },
+    radius: {
+        type: Number,
+        default: 50000
     }
 
 }, {

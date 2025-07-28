@@ -8,6 +8,7 @@
   "dependencies": {
     "@redis/client": "^1.6.0",
     "@socket.io/redis-adapter": "^8.3.0",
+    "axios": "^1.10.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -25,8 +26,10 @@
     "mongoose": "^8.8.1",
     "mongoose-geojson-schema": "^2.2.5",
     "multer": "^1.4.5-lts.1",
+    "node-geocoder": "^4.4.1",
     "nodemon": "^3.1.7",
     "path": "^0.12.7",
+    "polyline": "^0.2.0",
     "redis-adapter": "^0.2.0",
     "socket.io": "^4.8.1",
     "swagger-ui-express": "^5.0.1"
@@ -35,6 +38,7 @@
     "lint": "eslint .",
     "preadmin": "eslint .",
     "admin": "nodemon admin.js",
+    "prod-admin": "nodemon admin.js",
     "user_socket": "nodemon user_socket.js",
     "provider_socket": "nodemon provider_socket.js",
     "start": "nodemon index.js"

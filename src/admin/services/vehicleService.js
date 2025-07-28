@@ -31,7 +31,7 @@ exports.vehicleList = async (req) => {
         pipeline.push(
             {
                 $match: {
-                    city_id: adminData.city_id
+                    city_id:new mongoose.Types.ObjectId(adminData.city_id)
                 }
             },
             {
@@ -83,7 +83,7 @@ exports.vehicleList = async (req) => {
             { $skip: skip },
             { $limit: limit }
         );
-
+           console.log('pipeline',JSON.stringify(pipeline))
         const vehicleView = await vehicleModel.aggregate(pipeline);
 
         let totalVehicles;

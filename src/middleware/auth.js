@@ -19,7 +19,6 @@ exports.verifyToken = async (req, res, next) => {
                     message: resMessage.Invalid_Token
                 });
             }
-            console.log("Decoded data: ", decoded);
             req.auth = decoded;
             next();
         });

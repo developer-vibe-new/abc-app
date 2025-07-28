@@ -99,6 +99,7 @@ exports.deleteCity = async (req, res) => {
 
 exports.viewCity = async (req, res) => {
     try {
+        console.log('rest');
         return await services.cityView(req);
 
     } catch (error) {

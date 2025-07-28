@@ -11,17 +11,13 @@ const connectDB = require('./src/config/db.config');
 connectDB();
 global.c = console.log.bind(console);
 
-
-
-
-
 app.use(cors({ origin: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '/public')));
 app.use((req, res, next) => {
     console.log(req.method, req.protocol + '://' + req.get('host') + req.originalUrl);
-    console.log('body :', req.body, 'query :', req.query);
+    // console.log('body :', req.body, 'query :', req.query);
     req.date = new Date();
     next();
 });
@@ -37,7 +33,7 @@ app.use(session({
     cookie: { secure: false }
 }));
 // set port, listen for requests
-const PORT = devConfig.ADMINPORT || 6161;
+const PORT = devConfig.ADMINPORT || 6262;
 
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);

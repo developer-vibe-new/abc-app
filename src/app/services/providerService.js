@@ -158,6 +158,14 @@ exports.driverOninerStatus = async (req) => {
     try {
         const { _id } = req.auth;
         const { is_online } = req.body;
+         var page = req.query.page || 1;
+        let pagesize = parseInt(req.query.pagesize) || 10;
+        const totalCount = await driverData.aggregate([
+                    ...conditions.slice(0, -2),
+                    { $count: "total" }
+                ]);
+         const totalRecords = totalCount.length > 0 ? totalCount[0].total : 0;
+        const totalPages = Math.ceil(totalRecords / pagesize);
         const driverData = await Provider.findByIdAndUpdate({ _id }, { is_online }, { new: true });
         if (!driverData) {
             return {
@@ -172,6 +180,11 @@ exports.driverOninerStatus = async (req) => {
             message: resMessage.Status_Updated_Successfully,
             data: {
                 is_online: driverData.is_online
+            },
+            pagination: {
+                currentPage: parseInt(page),
+                totalPages: totalPages,
+                totalRecords: totalRecords,
             }
         };
     } catch (error) {
@@ -244,7 +257,7 @@ exports.providerlogin = async (req) => {
                 status: statusCode.DATA_NOT_FOUND,
                 success: false,
                 message: resMessage.Not_Registered,
-            }
+            };
         }
 
         if (driverData.status === "block") {
@@ -286,29 +299,30 @@ exports.providerOtpVerification = async (req) => {
             };
         }
 
-        if(otp !== driverData.otp) {
+        if (otp !== driverData.otp) {
             return {
                 status: statusCode.OK,
                 success: false,
                 message: resMessage.Otp_Verify_Failed
-            }
+            };
         }
 
         const token = jwt.sign(
             { _id: driverData._id, mobile: driverData.mobile },
             process.env.SECRET_KEY,
-            { expiresIn: "1h" }
+            { expiresIn: "30d" }
         );
 
         driverData.otp = null;
         driverData.login_token = token;
+        console.log('driverData', driverData);
         await driverData.save();
-        
+
         return {
             status: statusCode.OK,
             success: true,
             message: resMessage.Otp_Verify_Successfully,
-            data: { 
+            data: {
                 _id: driverData._id,
                 token,
                 operator_id: driverData.operator_id,
@@ -368,8 +382,8 @@ exports.updateDocuments = async (req) => {
                 message: resMessage.Invalid_document_type
             };
         }
-
         const provider = await Provider.findById(_id);
+
         if (!provider) {
             return {
                 status: statusCode.NOT_FOUND,
@@ -379,51 +393,51 @@ exports.updateDocuments = async (req) => {
         }
 
         // Check if the provider has an operator_id and deny access if set
-        if (provider.operator_id !== null) {
-            return {
-                status: statusCode.UNAUTHORIZED,
-                success: false,
-                message: resMessage.Unauthorized_Access,
-            };
-        }
+        // if (provider.operator_id !== null) {
+        //     return {
+        //         status: statusCode.UNAUTHORIZED,
+        //         success: false,
+        //         message: resMessage.Unauthorized_Access,
+        //     };
+        // }
 
         // Handling other documents
         switch (documentType) {
             case 'rc':
-                    provider.providerTaxiDocuments.rc = {
-                        ...provider.providerTaxiDocuments.rc,
-                        ...documentData,
-                        status: 0
-                    };
-                    break;
+                provider.providerTaxiDocuments.rc = {
+                    ...provider.providerTaxiDocuments.rc,
+                    ...documentData,
+                    status: 0
+                };
+                break;
             case 'pollution_certificate':
-                    provider.providerTaxiDocuments.pollution_certificate = {
-                        ...provider.providerTaxiDocuments.pollution_certificate,
-                        ...documentData,
-                        status: 0
-                    };
-                    break;        
+                provider.providerTaxiDocuments.pollution_certificate = {
+                    ...provider.providerTaxiDocuments.pollution_certificate,
+                    ...documentData,
+                    status: 0
+                };
+                break;
             case 'vehicle_image':
-                    provider.providerTaxiDocuments.vehicle_image = {
-                        ...provider.providerTaxiDocuments.vehicle_image,
-                        ...documentData,
-                        status: 0
-                    };
-                    break;
+                provider.providerTaxiDocuments.vehicle_image = {
+                    ...provider.providerTaxiDocuments.vehicle_image,
+                    ...documentData,
+                    status: 0
+                };
+                break;
             case 'vehicle_permit':
-                    provider.providerTaxiDocuments.vehicle_permit = {
-                        ...provider.providerTaxiDocuments.vehicle_permit,
-                        ...documentData,
-                        status: 0
-                    };
-                    break;
+                provider.providerTaxiDocuments.vehicle_permit = {
+                    ...provider.providerTaxiDocuments.vehicle_permit,
+                    ...documentData,
+                    status: 0
+                };
+                break;
             case 'insurance':
-                    provider.providerTaxiDocuments.insurance = {
-                        ...provider.providerTaxiDocuments.insurance,
-                        ...documentData,
-                        status: 0
-                    };
-                    break;
+                provider.providerTaxiDocuments.insurance = {
+                    ...provider.providerTaxiDocuments.insurance,
+                    ...documentData,
+                    status: 0
+                };
+                break;
             case 'driving_license':
                 provider.documents.driving_license = {
                     ...provider.documents.driving_license,
@@ -492,7 +506,7 @@ exports.register = async (req) => {
             };
         }
         const data = await Provider.findOne({ mobile });
-        if(data !== null) {
+        if (data !== null) {
             return {
                 status: statusCode.BAD_REQUEST,
                 success: false,
@@ -519,7 +533,7 @@ exports.getDocuments = async (req) => {
     try {
         const { _id } = req.auth;
         const data = await Provider.findById(_id);
-        if(!data) {
+        if (!data) {
             return {
                 statusCode: statusCode.UNAUTHORIZED,
                 status: statusCode.UNAUTHORIZED,
@@ -527,7 +541,7 @@ exports.getDocuments = async (req) => {
                 message: resMessage.Unauthorized_Access
             };
         }
-        if(data.providerTaxi_id === null) {
+        if (data.providerTaxi_id === null) {
             return {
                 status: statusCode.OK,
                 success: true,
@@ -536,14 +550,17 @@ exports.getDocuments = async (req) => {
                     documents: data.documents,
                     providerTaxiDocuments: data.providerTaxiDocuments
                 }
-            }
+            };
         }
         return {
             status: statusCode.OK,
             success: true,
             message: resMessage.Documents_Retrieved_Successfully,
-            data: data.documents
-        }
+            data: {
+                documents: data.documents,
+                providerTaxiDocuments: data.providerTaxiDocuments
+            }
+        };
     } catch (error) {
         return {
             status: statusCode.INTERNAL_SERVER_ERROR,
@@ -552,4 +569,4 @@ exports.getDocuments = async (req) => {
             error: error.message || "Internal Server Error",
         };
     }
-}
+};

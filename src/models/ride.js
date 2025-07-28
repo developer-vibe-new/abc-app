@@ -102,12 +102,12 @@ const RideSchema = new mongoose.Schema({
 
 		user_id: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'User'
+			ref: 'user'
 		},
 
 		provider_id: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Provider'
+			ref: 'provider'
 		},
 		// Customer Stripe Id 
 		stripe_id: {
@@ -337,7 +337,7 @@ const RideSchema = new mongoose.Schema({
 	meta: {
 		category_id: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'TaxiType'
+			ref: 'taxi_type'
 		},
 
 		city_id: {
@@ -352,22 +352,22 @@ const RideSchema = new mongoose.Schema({
 
 		taxi_id: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'ProviderTaxi'
+			ref: 'provider_taxi'
 		},
 
 		search_providers: [{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Provider'
+			ref: 'provider'
 		}],
 
 		declined_providers: [{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Provider'
+			ref: 'provider'
 		}],
 
 		skip_providers: [{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Provider'
+			ref: 'provider'
 		}],
 		is_reported: {
 			type: Boolean
