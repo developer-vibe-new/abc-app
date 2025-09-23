@@ -415,8 +415,7 @@ exports.driverEdit = async (req) => {
 exports.driverUpdate = async ({ body, file, params }) => {
     try {
         if (file) {
-            const baseUrl = process.env.BASE_URL;
-            body.profile_image = `${baseUrl}/driver/${file.filename}`;
+            body.profile_image = `driver/${file.filename}`;
         }
         if (body.first_name && body.last_name) {
             body.full_name = body.first_name + " " + body.last_name;

@@ -2,7 +2,7 @@ const services = require('../services/driverService');
 const { statusCode } = require('../../config/default.json');
 
 
-exports.getDriverDetails = async (req) =>{
+exports.getDriverDetails = async (req) => {
     try {
         return await services.driverDetailsService(req);
     } catch (error) {
@@ -190,4 +190,4 @@ exports.updateDocumentStatusController = async (req) => {
             message: error.message
         };
     }
-}
+};
