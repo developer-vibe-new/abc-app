@@ -21,6 +21,7 @@ app.use((req, res, next) => {
     req.date = new Date();
     next();
 });
+
 /* version V1 Routes */
 // require('./src/app/routes')(app);
 require('./src/admin/routes')(app);
