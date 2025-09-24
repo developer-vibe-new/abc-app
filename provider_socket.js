@@ -307,6 +307,17 @@ async function runServer() {
                       const ride = await Ride.findOne({ _id: socket.ride_details.ride_id }, { "basic.user_id": 1 });
 
                       let user_socket = await client.get(`socket_user:${ride.basic.user_id.toString()}`);
+                      distanceObj = await FUNC.time_estimate(location_packet, targetPoint);
+                      estimated_time = distanceObj?.estimated_time || 5;
+
+                      location_packet.time_estimate = estimated_time;
+                      location_packet.pickup_distance = distanceObj?.pickup_distance || 0;
+                      await Location.updateOne(
+                        { provider_id: socket.providerDetail._id },
+                        { $set: { time_estimate: estimated_time } }
+                      );
+                      // console.log('track_provider-----', location_packet, track_room);
+                      socket.broadcast.to(track_room).emit("track_provider", location_packet);
                       if (!user_socket) {
                         console.error("Socket not found for user:");
                         ack({
