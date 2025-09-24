@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const taxiTypeModel = require('../../models/taxiTypeModel');
 const Admin = require('../../models/adminModel');
 const { statusCode, resMessage } = require('../../config/default.json');
-
+const { url } = require('../../config/dev.config');
 exports.taxiTypeList = async (req) => {
     try {
         const adminData = await Admin.findById(req.auth._id);
@@ -47,6 +47,17 @@ exports.taxiTypeList = async (req) => {
             { $skip: (page - 1) * pagesize },
             { $limit: pagesize }
         ];
+        conditions.push({
+            $addFields:
+            {
+                icon: {
+                    $concat: [
+                        url,
+                        "$icon"
+                    ]
+                },
+            }
+        });
         const findTaxi = await taxiTypeModel.aggregate(conditions);
 
         const totalRecords = await taxiTypeModel.countDocuments(matchConditions);
@@ -81,7 +92,7 @@ exports.updateTaxiTypeList = async (req) => {
         if (req.file) {
             body.icon = `taxitype/${req.file.filename}`;
         }
-        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true })
+        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true });
         if (editData) {
             return {
                 success: true,
@@ -103,7 +114,7 @@ exports.updateTaxiTypeList = async (req) => {
     }
 };
 
-exports.addTaxiType = async (req, res) => {
+exports.addTaxiType = async (req) => {
     try {
         const body = req.body;
         if (req.file) {
