@@ -1,0 +1,135 @@
+< !DOCTYPE html >
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>AI Image Generator</title>
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <style>
+                        body {
+                            font - family: 'Inter', sans-serif;
+                        background-color: #f0f4f8;
+        }
+                        .loading-spinner {
+                            border: 4px solid rgba(0, 0, 0, 0.1);
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 50%;
+                        border-left-color: #3b82f6;
+                        animation: spin 1s ease infinite;
+        }
+                        @keyframes spin {
+                            0 % { transform: rotate(0deg); }
+            100% {transform: rotate(360deg); }
+        }
+                    </style>
+                </head>
+                <body class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
+                    <div class="bg-white p-6 sm:p-10 rounded-3xl shadow-2xl max-w-2xl w-full text-center">
+                        <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-6">AI Image Generator</h1>
+                        <p class="text-gray-600 mb-8">
+                            Apni kalpana ko ek tasveer mein badaliye! Description likhein aur generate karein.
+                        </p>
+
+                        <div class="w-full flex flex-col items-center">
+                            <input type="text" id="promptInput" placeholder="Ek udte hue dragon ki tasveer, jo pahadon ke upar se guzar raha hai..." class="w-full p-3 sm:p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                                <button id="generateBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 sm:py-4 px-8 rounded-xl shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                    Generate Image
+                                </button>
+                        </div>
+
+                        <div id="statusMessage" class="mt-8 text-gray-500 font-medium"></div>
+
+                        <div id="imageContainer" class="mt-8 flex justify-center items-center p-2 rounded-xl border border-dashed border-gray-300 min-h-[300px] bg-gray-50">
+                            <p id="placeholderText" class="text-gray-400">Yahan aapki image dikhai degi.</p>
+                            <img id="generatedImage" class="hidden max-w-full max-h-full rounded-lg shadow-md" alt="Generated Image">
+                        </div>
+                    </div>
+
+                    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const promptInput = document.getElementById('promptInput');
+                        const generateBtn = document.getElementById('generateBtn');
+                        const statusMessage = document.getElementById('statusMessage');
+                        const imageContainer = document.getElementById('imageContainer');
+                        const placeholderText = document.getElementById('placeholderText');
+                        const generatedImage = document.getElementById('generatedImage');
+
+                        // --- API Key and URL Configuration ---
+                        const apiKey = ""; // Canvas will provide this automatically.
+                        const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict";
+
+                        // --- API Call Logic with Exponential Backoff ---
+                        async function generateImage(prompt) {
+                            let retries = 0;
+                        const maxRetries = 5;
+                        const baseDelay = 1000;
+
+                        while (retries < maxRetries) {
+                    try {
+                        const payload = {
+                            instances: [{prompt: prompt }],
+                        parameters: {"sampleCount": 1 }
+                        };
+
+                        const response = await fetch(`${apiUrl}?key=${apiKey}`, {
+                            method: 'POST',
+                        headers: {'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            if (response.status === 429) {
+                                throw new Error('Too many requests, retrying...');
+                            } else {
+                                throw new Error(`API Error: ${response.statusText}`);
+                            }
+                        }
+
+                        const result = await response.json();
+                        return result.predictions && result.predictions.length > 0 ? result.predictions[0].bytesBase64Encoded : null;
+
+                    } catch (error) {
+                            retries++;
+                        const delay = baseDelay * Math.pow(2, retries);
+                        console.error(`Attempt ${retries} failed: ${error.message}. Retrying in ${delay / 1000}s...`);
+                        await new Promise(res => setTimeout(res, delay));
+                    }
+                }
+                        throw new Error("Failed to generate image after multiple retries.");
+            }
+
+            // --- Event Listener for Button Click ---
+            generateBtn.addEventListener('click', async () => {
+                const prompt = promptInput.value.trim();
+                        if (!prompt) {
+                            statusMessage.textContent = 'Kripya kuch likhein jo aap generate karna chahte hain.';
+                        return;
+                }
+
+                        // Clear previous state and show loading
+                        generatedImage.src = '';
+                        generatedImage.classList.add('hidden');
+                        placeholderText.classList.add('hidden');
+                        statusMessage.innerHTML = '<div class="loading-spinner mx-auto"></div><div class="mt-2 text-blue-600">Image generate ho rahi hai...</div>';
+
+                        try {
+                    const base64Data = await generateImage(prompt);
+                        if (base64Data) {
+                        const imageUrl = `data:image/png;base64,${base64Data}`;
+                        generatedImage.src = imageUrl;
+                        generatedImage.classList.remove('hidden');
+                        statusMessage.textContent = '';
+                    } else {
+                            statusMessage.textContent = 'Image generate karne mein koi dikkat aayi. Kripya dobara try karein.';
+                        placeholderText.classList.remove('hidden');
+                    }
+                } catch (error) {
+                            statusMessage.textContent = 'Maaf kijiye, image generate nahi ho payi: ' + error.message;
+                        placeholderText.classList.remove('hidden');
+                }
+            });
+        });
+                    </script>
+                </body>
+            </html>
