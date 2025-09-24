@@ -66,6 +66,7 @@ exports.taxiTypeList = async (req) => {
             }
         };
     } catch (error) {
+        console.log('err', error);
         return {
             success: false,
             message: resMessage.Internal_Server_Error,
@@ -81,7 +82,7 @@ exports.updateTaxiTypeList = async (req) => {
         if (req.file) {
             body.icon = `taxitype/${req.file.filename}`;
         }
-        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true });
+        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true })
         if (editData) {
             return {
                 success: true,
@@ -103,7 +104,7 @@ exports.updateTaxiTypeList = async (req) => {
     }
 };
 
-exports.addTaxiType = async (req) => {
+exports.addTaxiType = async (req, res) => {
     try {
         const body = req.body;
         if (req.file) {
@@ -207,7 +208,7 @@ exports.editTaxiType = async (req) => {
                 status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Data_Not_Found
-            }
+            };
         }
         return {
             status: statusCode.OK,
@@ -222,4 +223,4 @@ exports.editTaxiType = async (req) => {
             error: error.message || "Internal Server Error",
         };
     }
-}
+};
