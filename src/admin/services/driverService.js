@@ -809,6 +809,12 @@ exports.onlineDriverList = async (req) => {
         conditions.push({
             $addFields:
             {
+                profile_image: {
+                    $concat: [
+                        url,
+                        "$profile_image"
+                    ]
+                },
                 taxitype: "$taxi_types.title"
 
             }
