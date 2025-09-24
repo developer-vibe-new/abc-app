@@ -571,7 +571,17 @@ exports.blockedDriverList = async (req) => {
                 }
             });
         }
-
+        pipeline.push({
+            $addFields:
+            {
+                profile_image: {
+                    $concat: [
+                        url,
+                        "$profile_image"
+                    ]
+                }
+            }
+        });
         let sortConditions = {};
 
         if (req.query.sortByName) {
