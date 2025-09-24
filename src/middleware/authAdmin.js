@@ -25,8 +25,8 @@ exports.auth = async (req, res, next) => {
 
             });
         }
-        console.log('adminData', adminData);
         req.auth = adminData;
+
         next();
 
     } catch (error) {
@@ -51,7 +51,9 @@ exports.auth = async (req, res, next) => {
 };
 
 exports.authorize = (category, action) => (req, res, next) => {
+
     if (req.auth.role_type === 'admin') return next();
+
     const hasPermission = req.auth.permissions?.[category]?.includes(action);
     if (!hasPermission) {
         return res.json({

@@ -47,12 +47,11 @@ exports.taxiTypeList = async (req) => {
             { $skip: (page - 1) * pagesize },
             { $limit: pagesize }
         ];
-
         const findTaxi = await taxiTypeModel.aggregate(conditions);
 
         const totalRecords = await taxiTypeModel.countDocuments(matchConditions);
         const totalPages = Math.ceil(totalRecords / pagesize);
-
+        console.log('totalPages', totalPages);
         return {
             statusCode: statusCode.OK,
             success: true,

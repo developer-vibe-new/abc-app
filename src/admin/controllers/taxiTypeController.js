@@ -1,11 +1,11 @@
 const services = require('../services/taxiTypeService');
-
+const { statusCode } = require('../../config/default.json');
 exports.viewTaxiType = async (req) => {
     try {
-     const result = await services.taxiTypeList(req);
-     console.log(result,"dihfskh");
-     return result;
+        const result = await services.taxiTypeList(req);
+        return result;
     } catch (error) {
+        console.log('error----->>>', error);
         return {
             statusCode: statusCode.INTERNAL_SERVER_ERROR,
             success: false,
@@ -37,7 +37,7 @@ exports.addTaxiTypeController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.updateTaxiStatus = async (req) => {
     try {
@@ -54,7 +54,7 @@ exports.updateTaxiStatus = async (req) => {
 
 exports.updateTaxiTypeOutstationStatusController = async (req) => {
     try {
-        return await services.updateTaxiOutstationStatus(req)
+        return await services.updateTaxiOutstationStatus(req);
     } catch (error) {
         return {
             statusCode: statusCode.INTERNAL_SERVER_ERROR,
@@ -62,11 +62,11 @@ exports.updateTaxiTypeOutstationStatusController = async (req) => {
             message: error.message
         };
     }
-}
+};
 
 exports.editTaxiTypeController = async (req) => {
     try {
-        return await services.editTaxiType(req)
+        return await services.editTaxiType(req);
     } catch (error) {
         return {
             statusCode: statusCode.INTERNAL_SERVER_ERROR,
@@ -74,4 +74,4 @@ exports.editTaxiTypeController = async (req) => {
             message: error.message
         };
     }
-}
+};
