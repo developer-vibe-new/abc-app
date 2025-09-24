@@ -87,6 +87,8 @@ async function runServer() {
                 });
               }
               let provider = providers[0];
+              console.log('provider--->>', provider);
+              console.log('provider._id--->>', provider._id);
               socket.providerDetail = provider;
               socket.join("provider_room");
 
