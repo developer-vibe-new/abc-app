@@ -87,8 +87,6 @@ async function runServer() {
                 });
               }
               let provider = providers[0];
-              console.log('provider--->>', provider);
-              console.log('provider._id--->>', provider._id);
               socket.providerDetail = provider;
               socket.join("provider_room");
 
@@ -286,7 +284,6 @@ async function runServer() {
                     const targetPoint = isAccepted
                       ? socket.ride_details.source
                       : socket.ride_details.destination;
-                    console.log('isAccepted-----', isAccepted);
                     if (isAccepted) {
                       distanceObj = await FUNC.time_estimate(location_packet, targetPoint);
                       estimated_time = distanceObj?.estimated_time || 5;
@@ -297,7 +294,7 @@ async function runServer() {
                         { provider_id: socket.providerDetail._id },
                         { $set: { time_estimate: estimated_time } }
                       );
-                      console.log('track_provider-----', location_packet, track_room);
+                      // console.log('track_provider-----', location_packet, track_room);
                       socket.broadcast.to(track_room).emit("track_provider", location_packet);
                     }
                     if (isRunning) {
