@@ -43,6 +43,12 @@ exports.driverDetailsService = async (req) => {
                 },
                 {
                     $addFields: {
+                        profile_image: {
+                            $concat: [
+                                url,
+                                "$profile_image"
+                            ]
+                        },
                         "car_details": { $arrayElemAt: ["$car_details", 0] },
                         "taxi_type_details": { $arrayElemAt: ["$taxi_type_details", 0] },
                         "taxis": {
