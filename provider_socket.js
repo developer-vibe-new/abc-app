@@ -56,6 +56,7 @@ async function runServer() {
         if (typeof (ack) == "function") {
 
           if (event === "authenticate") {
+
             try {
               let pipeline = [
                 {
@@ -79,6 +80,7 @@ async function runServer() {
                 }
               ];
               const providers = await Provider.aggregate(pipeline);
+              console.log('providers---', providers);
               if (providers.length <= 0) {
                 return ack({
                   status: 440,
@@ -294,7 +296,7 @@ async function runServer() {
                         { provider_id: socket.providerDetail._id },
                         { $set: { time_estimate: estimated_time } }
                       );
-                      // console.log('track_provider-----', location_packet, track_room);
+                      console.log('track_provider-----', location_packet, track_room);
                       socket.broadcast.to(track_room).emit("track_provider", location_packet);
                     }
                     if (isRunning) {
@@ -316,7 +318,7 @@ async function runServer() {
                         { provider_id: socket.providerDetail._id },
                         { $set: { time_estimate: estimated_time } }
                       );
-                      // console.log('track_provider-----', location_packet, track_room);
+                      console.log('track_provider-----', location_packet, track_room);
                       socket.broadcast.to(track_room).emit("track_provider", location_packet);
                       if (!user_socket) {
                         console.error("Socket not found for user:");
