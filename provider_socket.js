@@ -79,7 +79,7 @@ async function runServer() {
                   }
                 }
               ];
-              let providers = await Provider.aggregate(pipeline);
+              const providers = await Provider.aggregate(pipeline);
 
               if (providers.length <= 0) {
                 return ack({
@@ -237,41 +237,7 @@ async function runServer() {
           switch (event) {
             case "updateLocation": {
               console.log("=====Update Location =====", socket.providerDetail._id);
-              console.log("=====data.login_token Location =====", data.login_token);
               try {
-                let pipeline2 = [
-                  {
-                    $match: {
-                      login_token: data.login_token,
-                      is_active: true
-                    },
-                  },
-                  {
-                    $lookup: {
-                      from: "provider_taxis",
-                      localField: "providerTaxi_id",
-                      foreignField: "_id",
-                      as: "online_taxi"
-                    }
-                  }, {
-                    $unwind: {
-                      path: "$online_taxi",
-                      preserveNullAndEmptyArrays: true
-                    }
-                  }
-                ];
-                console.log('pipeline2--->.', JSON.stringify(pipeline2));
-                let providers = await Provider.aggregate(pipeline2);
-
-                if (providers.length <= 0) {
-                  return ack({
-                    status: 440,
-                    success: false,
-                    message: "Wrong Login Token"
-                  });
-                }
-                let provider = providers[0];
-                socket.providerDetail = provider;
                 const now_date = moment().toDate();
                 const locations = data.locations.map(loc => ({
                   ...loc,
