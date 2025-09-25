@@ -56,6 +56,7 @@ async function runServer() {
         if (typeof (ack) == "function") {
 
           if (event === "authenticate") {
+
             try {
               let pipeline = [
                 {
@@ -79,6 +80,7 @@ async function runServer() {
                 }
               ];
               const providers = await Provider.aggregate(pipeline);
+
               if (providers.length <= 0) {
                 return ack({
                   status: 440,
@@ -236,6 +238,7 @@ async function runServer() {
             case "updateLocation": {
               console.log("=====Update Location =====", socket.providerDetail._id);
               try {
+
                 const now_date = moment().toDate();
                 const locations = data.locations.map(loc => ({
                   ...loc,
@@ -294,7 +297,7 @@ async function runServer() {
                         { provider_id: socket.providerDetail._id },
                         { $set: { time_estimate: estimated_time } }
                       );
-                      // console.log('track_provider-----', location_packet, track_room);
+                      console.log('track_provider-----', location_packet, track_room);
                       socket.broadcast.to(track_room).emit("track_provider", location_packet);
                     }
                     if (isRunning) {
@@ -316,7 +319,7 @@ async function runServer() {
                         { provider_id: socket.providerDetail._id },
                         { $set: { time_estimate: estimated_time } }
                       );
-                      // console.log('track_provider-----', location_packet, track_room);
+                      console.log('track_provider-----', location_packet, track_room);
                       socket.broadcast.to(track_room).emit("track_provider", location_packet);
                       if (!user_socket) {
                         console.error("Socket not found for user:");
@@ -354,7 +357,7 @@ async function runServer() {
 
                 } else {
                   // Not in ride
-                  socket.broadcast.to(track_room).emit("track_provider", location_packet);
+                  // socket.broadcast.to(track_room).emit("track_provider", location_packet);
                   return ack({
                     status: 200,
                     message: "location updated"
