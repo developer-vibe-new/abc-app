@@ -237,6 +237,7 @@ async function runServer() {
           switch (event) {
             case "updateLocation": {
               console.log("=====Update Location =====", socket.providerDetail._id);
+              console.log("=====data.login_token Location =====", data.login_token);
               try {
                 let pipeline2 = [
                   {
