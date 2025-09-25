@@ -260,7 +260,7 @@ async function runServer() {
                   }
                 ];
                 let providers = await Provider.aggregate(pipeline2);
-
+                console.log('providers--->.', providers);
                 if (providers.length <= 0) {
                   return ack({
                     status: 440,
