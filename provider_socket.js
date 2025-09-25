@@ -238,12 +238,13 @@ async function runServer() {
             case "updateLocation": {
               console.log("=====Update Location =====", socket.providerDetail._id);
               try {
+                const provider = await Provider.findOne({ _id: socket.providerDetail._id });
                 const now_date = moment().toDate();
                 const locations = data.locations.map(loc => ({
                   ...loc,
                   coordinates: [loc.coordinates[1], loc.coordinates[0]]
                 }));
-
+                socket.providerDetail = provider;
                 const locationData = {
                   bearing: data.bearing,
                   speed: data.speed,
