@@ -356,7 +356,7 @@ async function runServer() {
 
                 } else {
                   // Not in ride
-                  socket.broadcast.to(track_room).emit("track_provider", location_packet);
+                  // socket.broadcast.to(track_room).emit("track_provider", location_packet);
                   return ack({
                     status: 200,
                     message: "location updated"
