@@ -58,7 +58,7 @@ async function runServer() {
           if (event === "authenticate") {
 
             try {
-              console.log('data.login_token-------->>>>>>', data.login_token);
+              console.log('authenticate .login_token-------->>>>>>', data.login_token);
               let pipeline = [
                 {
                   $match: {
