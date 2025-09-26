@@ -58,7 +58,7 @@ async function runServer() {
           if (event === "authenticate") {
 
             try {
-              console.log('authenticate .login_token-------->>>>>>', data.login_token);
+              // console.log('authenticate .login_token-------->>>>>>', data.login_token);
               let pipeline = [
                 {
                   $match: {
@@ -239,7 +239,6 @@ async function runServer() {
           // if (socket.providerDetail !== undefined) {
           switch (event) {
             case "updateLocation": {
-              console.log("=====Update Location =====", socket.providerDetail._id);
               try {
 
                 const now_date = moment().toDate();
@@ -300,7 +299,7 @@ async function runServer() {
                         { provider_id: socket.providerDetail._id },
                         { $set: { time_estimate: estimated_time } }
                       );
-                      console.log('track_provider-----', location_packet, track_room);
+                      // console.log('track_provider-----', location_packet, track_room);
                       socket.broadcast.to(track_room).emit("track_provider", location_packet);
                     }
                     if (isRunning) {
@@ -322,7 +321,7 @@ async function runServer() {
                         { provider_id: socket.providerDetail._id },
                         { $set: { time_estimate: estimated_time } }
                       );
-                      console.log('track_provider-----', location_packet, track_room);
+                      // console.log('track_provider-----', location_packet, track_room);
                       socket.broadcast.to(track_room).emit("track_provider", location_packet);
                       if (!user_socket) {
                         console.error("Socket not found for user:");
@@ -332,7 +331,7 @@ async function runServer() {
                         });
 
                       } else {
-                        console.log('socket.ride_details.ride_id---->.>>>', socket.ride_details.ride_id);
+                        // console.log('socket.ride_details.ride_id---->.>>>', socket.ride_details.ride_id);
                         socket.to(user_socket).emit("ongoing_ride", {
                           data: locationData,
                           ride_id: socket.ride_details.ride_id,
@@ -405,7 +404,6 @@ async function runServer() {
                 const provider_detail = await Provider.findOne({
                   _id: socket.providerDetail._id
                 });
-                console.log('provider_detail', provider_detail);
                 if (!provider_detail) return ack({ status: 203, message: "Your driver not found" });
 
                 // Create Stripe merchant if missing
@@ -458,7 +456,6 @@ async function runServer() {
                   stops: ride_update.location.stops,
                   outstation: ride_update.outstation
                 };
-                console.log('ride_update', ride_update);
                 const driver_location = { latitude: data.latitude, longitude: data.longitude };
                 const customer_location = ride_update.location.source;
                 const distanceObj = await FUNC.time_estimate(driver_location, customer_location).catch(() => ({ estimated_time: 5, pickup_distance: null }));
@@ -468,13 +465,9 @@ async function runServer() {
                 await remoteJoinUserToRoom(user_socket, track_room);
                 const request_data = await FUNC.buildRideRequestData(ride_update, provider_detail, socket, data, distanceObj, now_date, estimated_time);
                 socket.to(user_socket).emit('ride_accepted', request_data);
-                console.log('ride_accepted');
                 await Location.updateOne({ provider_id: new mongoose.Types.ObjectId(socket.providerDetail._id) }, { $set: { 'time_estimate': estimated_time } });
-                console.log('updateInRide');
                 await FUNC.updateInRide(ride_update._id, ride_update.basic.user_id._id, socket.providerDetail._id, true);
-                console.log('insertPath');
                 await FUNC.insertPath(ride_update._id, "accepted", data.longitude, data.latitude);
-                console.log('PushNotifications');
                 PushNotifications({
                   receiverId: ride_update.basic.user_id._id.toString(),
                   type: "BONUS",
@@ -486,7 +479,6 @@ async function runServer() {
                 const driver_object = JSON.parse(JSON.stringify(request_data));
                 driver_object.user_name = ride_update.basic.user_id.full_name;
                 driver_object.user_mobile = ride_update.basic.user_id.mobile;
-                console.log('driver_object', driver_object);
                 ack({ status: 200, message: "Ride Accepted Successfully", data: driver_object });
 
               } catch (error) {
