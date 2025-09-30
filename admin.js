@@ -6,7 +6,6 @@ const path = require('path');
 const app = express();
 require('dotenv').config();
 const devConfig = require('./src/config/dev.config');
-const session = require('express-session');
 const connectDB = require('./src/config/db.config');
 connectDB();
 global.c = console.log.bind(console);
@@ -27,12 +26,12 @@ app.use((req, res, next) => {
 require('./src/admin/routes')(app);
 
 
-app.use(session({
-    secret: process.env.SECRET_Key,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }
-}));
+// app.use(session({
+//     secret: process.env.SECRET_Key,
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: { secure: false }
+// }));
 // set port, listen for requests
 const PORT = devConfig.ADMINPORT || 6262;
 

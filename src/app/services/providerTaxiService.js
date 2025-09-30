@@ -20,14 +20,16 @@ exports.addProviderTaxi = async (req) => {
             };
         }
         const providerData = await ProviderTaxi.create(providerTaxi);
-        await Location.create({
-            provider_id: providerTaxi.provider_id,
-            type_ids: providerTaxi.type_ids
-        });
-        await Provider.findByIdAndUpdate(providerTaxi.provider_id,
-            { providerTaxi_id: providerData._id },
-            { new: true }
-        );
+        if (providerTaxi?.provider_id) {
+            await Location.create({
+                provider_id: providerTaxi.provider_id,
+                type_ids: providerTaxi.type_ids
+            });
+            await Provider.findByIdAndUpdate(providerTaxi.provider_id,
+                { providerTaxi_id: providerData._id },
+                { new: true }
+            );
+        }
         return {
             statusCode: statusCode.OK,
             status: statusCode.OK,

@@ -43,6 +43,12 @@ exports.driverDetailsService = async (req) => {
         },
         {
           $addFields: {
+            profile_image: {
+              $concat: [
+                url,
+                "$profile_image"
+              ]
+            },
             car_details: { $arrayElemAt: ["$car_details", 0] },
             taxi_type_details: { $arrayElemAt: ["$taxi_type_details", 0] },
             taxis: {
@@ -521,7 +527,7 @@ exports.blockedDriverList = async (req) => {
 
     if (search_value) {
       pipeline.push({
-        $match: { full_name: { $regex: search_value, $options: "i" } },
+        $match: { "full_name": { $regex: search_value, $options: "i" } }
       });
     }
 
@@ -529,22 +535,22 @@ exports.blockedDriverList = async (req) => {
       if (req.query.kycStatus == "Not uploaded") {
         pipeline.push({
           $match: {
-            kycStatus: -1,
-          },
+            kycStatus: -1
+          }
         });
       }
       if (req.query.kycStatus == "Pending") {
         pipeline.push({
           $match: {
-            kycStatus: 0,
-          },
+            kycStatus: 0
+          }
         });
       }
       if (req.query.kycStatus == "Complete") {
         pipeline.push({
           $match: {
-            kycStatus: 1,
-          },
+            kycStatus: 1
+          }
         });
       }
     }
@@ -554,57 +560,66 @@ exports.blockedDriverList = async (req) => {
         $match: {
           status: "blocked",
           is_delete: false,
-          city_id: adminData.city_id,
-        },
+          city_id: adminData.city_id
+        }
       },
       {
         $lookup: {
           from: "taxi_types",
           localField: "taxi_type",
           foreignField: "_id",
-          as: "taxi_types",
-        },
+          as: "taxi_types"
+        }
       },
       {
         $unwind: {
           path: "$taxi_types",
-          preserveNullAndEmptyArrays: true,
-        },
+          preserveNullAndEmptyArrays: true
+        }
       },
       {
         $addFields: {
-          taxitype: "$taxi_types.title",
-        },
-      }
-    );
+          taxitype: "$taxi_types.title"
+        }
+      });
     if (req.query.taxitype) {
       pipeline.push({
         $match: {
-          taxitype: { $regex: req.query.taxitype, $options: "i" },
-        },
+          taxitype: { $regex: req.query.taxitype, $options: "i" }
+        }
       });
     }
-
+    pipeline.push({
+      $addFields:
+      {
+        profile_image: {
+          $concat: [
+            url,
+            "$profile_image"
+          ]
+        }
+      }
+    });
     let sortConditions = {};
 
     if (req.query.sortByName) {
-      let sortOrder = req.query.sortByName === "desc" ? -1 : 1;
+      let sortOrder = req.query.sortByName === 'desc' ? -1 : 1;
       sortConditions.first_name = sortOrder;
     }
 
     if (req.query.sortByEmail) {
-      let sortByEmail = req.query.sortByEmail === "desc" ? -1 : 1;
+      let sortByEmail = req.query.sortByEmail === 'desc' ? -1 : 1;
       sortConditions.email = sortByEmail;
     }
 
     if (req.query.sortByNo) {
-      let sortByNo = req.query.sortByNo === "desc" ? -1 : 1;
+      let sortByNo = req.query.sortByNo === 'desc' ? -1 : 1;
       sortConditions.mobile = sortByNo;
     }
 
     if (Object.keys(sortConditions).length > 0) {
       pipeline.push({
-        $sort: sortConditions,
+        $sort: sortConditions
       });
     }
 
@@ -614,25 +629,30 @@ exports.blockedDriverList = async (req) => {
     const countData = await driverModel.aggregate(countPipeline);
     const totalCount = countData.length > 0 ? countData[0].totalCount : 0;
 
-    pipeline.push({ $skip: skip }, { $limit: perPage });
+    pipeline.push(
+      { $skip: skip },
+      { $limit: perPage }
+    );
 
-    pipeline.push({
-      $project: {
-        first_name: 1,
-        last_name: 1,
-        profile_image: 1,
-        email: 1,
-        mobile: 1,
-        balance: 1,
-        is_online: 1,
-        kycStatus: 1,
-        vehicleStatus: 1,
-        status: 1,
-        pending_amount: 1,
-        new_status: "Unblock",
-        full_name: 1,
-      },
-    });
+    pipeline.push(
+      {
+        $project: {
+          first_name: 1,
+          last_name: 1,
+          profile_image: 1,
+          email: 1,
+          mobile: 1,
+          balance: 1,
+          is_online: 1,
+          kycStatus: 1,
+          vehicleStatus: 1,
+          status: 1,
+          pending_amount: 1,
+          new_status: "Unblock",
+          full_name: 1
+        }
+      }
+    );
 
     const getData = await driverModel.aggregate(pipeline);
     return {
@@ -644,8 +664,8 @@ exports.blockedDriverList = async (req) => {
         page: page,
         perPage: perPage,
         totalItems: totalCount,
-        totalPages: Math.ceil(totalCount / perPage),
-      },
+        totalPages: Math.ceil(totalCount / perPage)
+      }
     };
   } catch (error) {
     console.log(error);
@@ -737,13 +757,14 @@ exports.unblockDriver = async (req) => {
   }
 };
 
+
 exports.onlineDriverList = async (req) => {
   try {
     const adminData = await Admin.findById(req.auth._id);
     var conditions = [];
     const totalCount = await driverModel.aggregate([
       ...conditions.slice(0, -2),
-      { $count: "total" },
+      { $count: "total" }
     ]);
     var page = req.query.page || 1;
     let pagesize = req.query.pagesize || 10;
@@ -756,11 +777,11 @@ exports.onlineDriverList = async (req) => {
       conditions.push({
         $match: {
           $or: [
-            { first_name: { $regex: search_value, $options: "i" } },
-            { email: { $regex: search_value, $options: "i" } },
-            { mobile: { $regex: search_value, $options: "i" } },
-          ],
-        },
+            { "first_name": { $regex: search_value, $options: "i" } },
+            { "email": { $regex: search_value, $options: "i" } },
+            { "mobile": { $regex: search_value, $options: "i" } }
+          ]
+        }
       });
     }
 
@@ -768,104 +789,117 @@ exports.onlineDriverList = async (req) => {
       if (req.query.kycStatus == "Not uploaded") {
         conditions.push({
           $match: {
-            kycStatus: -1,
-          },
+            kycStatus: -1
+          }
         });
       }
       if (req.query.kycStatus == "Pending") {
         conditions.push({
           $match: {
-            kycStatus: 0,
-          },
+            kycStatus: 0
+          }
         });
       }
       if (req.query.kycStatus == "Complete") {
         conditions.push({
           $match: {
-            kycStatus: 1,
-          },
+            kycStatus: 1
+          }
         });
       }
     }
-    conditions.push(
-      {
-        $match: {
-          status: "Unblock",
-          is_delete: false,
-          is_online: true,
-          city_id: adminData.city_id,
-        },
-      },
+    conditions.push({
+      $match: {
+        status: "Unblock",
+        is_delete: false,
+        is_online: true,
+        city_id: adminData.city_id
+      }
+    },
       {
         $lookup: {
           from: "taxi_types",
           localField: "taxi_type",
           foreignField: "_id",
-          as: "taxi_types",
-        },
+          as: "taxi_types"
+        }
       },
       {
         $unwind: {
           path: "$taxi_types",
-          preserveNullAndEmptyArrays: true,
-        },
-      }
-    );
+          preserveNullAndEmptyArrays: true
+        }
+      },);
 
     conditions.push({
-      $addFields: {
-        taxitype: "$taxi_types.title",
-      },
+      $addFields:
+      {
+        profile_image: {
+          $concat: [
+            url,
+            "$profile_image"
+          ]
+        },
+        taxitype: "$taxi_types.title"
+
+      }
     });
     if (req.query.taxitype) {
+
       conditions.push({
         $match: {
-          taxitype: { $regex: req.query.taxitype, $options: "i" },
-        },
+          taxitype: { $regex: req.query.taxitype, $options: "i" }
+        }
       });
     }
-    conditions.push({
-      $project: {
-        first_name: 1,
-        last_name: 1,
+    conditions.push(
+      {
+        $project: {
+          first_name: 1,
+          last_name: 1,
 
-        profile_image: 1,
-        email: 1,
-        mobile: 1,
-        balance: 1,
-        is_online: 1,
-        kycStatus: 1,
-        vehicleStatus: 1,
-        status: 1,
-        pending_amount: 1,
-      },
-    });
+          profile_image: 1,
+          email: 1,
+          mobile: 1,
+          balance: 1,
+          is_online: 1,
+          kycStatus: 1,
+          vehicleStatus: 1,
+          status: 1,
+          pending_amount: 1
+        }
+      }
+    );
 
     let sortConditions = {};
 
     if (req.query.sortByName) {
-      let sortOrder = req.query.sortByName === "desc" ? -1 : 1;
+      let sortOrder = req.query.sortByName === 'desc' ? -1 : 1;
       sortConditions.first_name = sortOrder;
     }
 
     if (req.query.sortByEmail) {
-      let sortByEmail = req.query.sortByEmail === "desc" ? -1 : 1;
+      let sortByEmail = req.query.sortByEmail === 'desc' ? -1 : 1;
       sortConditions.email = sortByEmail;
     }
 
     if (req.query.sortByNo) {
-      let sortByNo = req.query.sortByNo === "desc" ? -1 : 1;
+      let sortByNo = req.query.sortByNo === 'desc' ? -1 : 1;
       sortConditions.mobile = sortByNo;
     }
 
     if (Object.keys(sortConditions).length > 0) {
       conditions.push({
-        $sort: sortConditions,
+        $sort: sortConditions
       });
     }
 
-    conditions.push({ $skip: (page - 1) * pagesize }, { $limit: pagesize });
+    conditions.push(
+      { $skip: (page - 1) * pagesize },
+      { $limit: pagesize }
+    );
     const viewAllData = await driverModel.aggregate(conditions);
+
 
     return {
       statusCode: statusCode.OK,
@@ -876,7 +910,8 @@ exports.onlineDriverList = async (req) => {
         currentPage: parseInt(page),
         totalPages: totalPages,
         totalRecords: totalRecords,
-      },
+      }
+
     };
   } catch (error) {
     console.log(error);
@@ -887,7 +922,6 @@ exports.onlineDriverList = async (req) => {
     };
   }
 };
-
 exports.updateDocumentStatus = async (req) => {
   try {
     const { id } = req.params;

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const taxiTypeModel = require('../../models/taxiTypeModel');
 const Admin = require('../../models/adminModel');
 const { statusCode, resMessage } = require('../../config/default.json');
-
+const { url } = require('../../config/dev.config');
 exports.taxiTypeList = async (req) => {
     try {
         const adminData = await Admin.findById(req.auth._id);
@@ -47,12 +47,22 @@ exports.taxiTypeList = async (req) => {
             { $skip: (page - 1) * pagesize },
             { $limit: pagesize }
         ];
-
+        conditions.push({
+            $addFields:
+            {
+                icon: {
+                    $concat: [
+                        url,
+                        "$icon"
+                    ]
+                },
+            }
+        });
         const findTaxi = await taxiTypeModel.aggregate(conditions);
 
         const totalRecords = await taxiTypeModel.countDocuments(matchConditions);
         const totalPages = Math.ceil(totalRecords / pagesize);
-
+        console.log('totalPages', totalPages);
         return {
             statusCode: statusCode.OK,
             success: true,
@@ -66,6 +76,7 @@ exports.taxiTypeList = async (req) => {
             }
         };
     } catch (error) {
+        console.log('err', error);
         return {
             success: false,
             message: resMessage.Internal_Server_Error,
@@ -79,10 +90,9 @@ exports.updateTaxiTypeList = async (req) => {
     try {
         const body = req.body;
         if (req.file) {
-            const baseUrl = process.env.BASE_URL;
-            body.icon = `${baseUrl}/taxitype/${req.file.filename}`;
+            body.icon = `taxitype/${req.file.filename}`;
         }
-        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true })
+        const editData = await taxiTypeModel.findByIdAndUpdate({ _id: req.params.id }, body, { new: true });
         if (editData) {
             return {
                 success: true,
@@ -104,12 +114,11 @@ exports.updateTaxiTypeList = async (req) => {
     }
 };
 
-exports.addTaxiType = async (req, res) => {
+exports.addTaxiType = async (req) => {
     try {
         const body = req.body;
         if (req.file) {
-            const baseUrl = process.env.BASE_URL;
-            body.icon = `${baseUrl}/${req.body.typeName}/${req.file.filename}`;
+            body.icon = `${req.body.typeName}/${req.file.filename}`;
         }
         const editData = await taxiTypeModel.create(body);
         return {
@@ -117,7 +126,7 @@ exports.addTaxiType = async (req, res) => {
             success: true,
             message: resMessage.Data_Created_Successfully,
             data: editData
-        }
+        };
     } catch (error) {
         return {
             success: false,
@@ -125,17 +134,17 @@ exports.addTaxiType = async (req, res) => {
             error: error.message || "Internal Server Error",
         };
     }
-}
+};
 
 exports.updateTaxiStatus = async (req) => {
     try {
         const updateData = await taxiTypeModel.findById(req.body.id);
-        if(!updateData) {
+        if (!updateData) {
             return {
                 status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Data_Not_Found
-            }
+            };
         }
         const updateStatus = updateData.is_active === true ? false : true;
         updateData.is_active = updateStatus;
@@ -144,7 +153,7 @@ exports.updateTaxiStatus = async (req) => {
             status: statusCode.OK,
             success: true,
             message: resMessage.Data_Updated_Successfully
-        }
+        };
     } catch (error) {
         return {
             success: false,
@@ -156,12 +165,12 @@ exports.updateTaxiStatus = async (req) => {
 exports.updateTaxiOutstationStatus = async (req) => {
     try {
         const updateData = await taxiTypeModel.findById(req.body.id);
-        if(!updateData) {
+        if (!updateData) {
             return {
                 status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Data_Not_Found
-            }
+            };
         }
         const updateStatus = updateData.outstation_status === true ? false : true;
         updateData.outstation_status = updateStatus;
@@ -170,7 +179,7 @@ exports.updateTaxiOutstationStatus = async (req) => {
             status: statusCode.OK,
             success: true,
             message: resMessage.Data_Updated_Successfully
-        }
+        };
     } catch (error) {
         return {
             success: false,
@@ -185,31 +194,31 @@ exports.editTaxiType = async (req) => {
         const { id } = req.params;
         const data = await taxiTypeModel.aggregate([
             {
-              $match: {
-                _id: new mongoose.Types.ObjectId(id)
-              }
+                $match: {
+                    _id: new mongoose.Types.ObjectId(id)
+                }
             },
             {
-              $project: {
-                title: 1,
-                time_fare: 1,
-                currency: 1,
-                distance_fare: 1,
-                airportCharge: 1,
-                outstation_distance_fare: 1,
-                outstation_two_distance_fare: 1,
-                rental_distance_fare: 1,
-                base_fare: 1,
-                icon: 1,
-              }
+                $project: {
+                    title: 1,
+                    time_fare: 1,
+                    currency: 1,
+                    distance_fare: 1,
+                    airportCharge: 1,
+                    outstation_distance_fare: 1,
+                    outstation_two_distance_fare: 1,
+                    rental_distance_fare: 1,
+                    base_fare: 1,
+                    icon: 1,
+                }
             }
         ]);
-        if(!data) {
+        if (!data) {
             return {
                 status: statusCode.BAD_REQUEST,
                 success: false,
                 message: resMessage.Data_Not_Found
-            }
+            };
         }
         return {
             status: statusCode.OK,
@@ -224,4 +233,4 @@ exports.editTaxiType = async (req) => {
             error: error.message || "Internal Server Error",
         };
     }
-}
+};

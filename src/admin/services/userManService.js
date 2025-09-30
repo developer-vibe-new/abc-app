@@ -2,7 +2,7 @@ const userModel = require('../../models/users');
 const rideHistoryModel = require('../../models/adminModel');
 const mongoose = require('mongoose');
 const { statusCode, resMessage } = require('../../config/default.json');
-
+const { url } = require('../../config/dev.config');
 exports.userListData = async (req) => {
     try {
         let pipeline = [];
@@ -12,7 +12,7 @@ exports.userListData = async (req) => {
 
         let skip = (page - 1) * limit;
 
-        if(search) {
+        if (search) {
             pipeline.push({
                 $match: {
                     $or: [
@@ -26,23 +26,23 @@ exports.userListData = async (req) => {
 
         pipeline.push({
             $project: {
-              first_name: 1,
-              last_name: 1,
-              profile_image: {
-                $concat: [
-                  "http://192.168.0.18:6161/user/",
-                  "$profile_image"
-                ]
-              },
-              email: 1,
-              mobile: 1,
-              reg_date: {
-                $dateToString: {
-                  format: "%d-%m-%Y",
-                  date: "$created"
-                }
-              },
-              is_active: 1
+                first_name: 1,
+                last_name: 1,
+                profile_image: {
+                    $concat: [
+                        url,
+                        "$profile_image"
+                    ]
+                },
+                email: 1,
+                mobile: 1,
+                reg_date: {
+                    $dateToString: {
+                        format: "%d-%m-%Y",
+                        date: "$created"
+                    }
+                },
+                is_active: 1
             }
         });
 
@@ -112,12 +112,12 @@ exports.updateUserStatus = async (req) => {
     try {
         const { id } = req.body;
         const data = await userModel.findById(id);
-        if(!data) {
+        if (!data) {
             return {
                 status: statusCode.DATA_NOT_FOUND,
                 success: false,
                 message: resMessage.Data_Not_Found
-            }
+            };
         }
         let status = data.is_active === true ? false : true;
         data.is_active = status;
@@ -126,7 +126,7 @@ exports.updateUserStatus = async (req) => {
             status: statusCode.OK,
             success: true,
             message: resMessage.Status_Updated_Successfully,
-        }
+        };
     } catch (error) {
         return {
             success: false,
