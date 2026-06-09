@@ -3,3 +3,4 @@ package-lock.json
 public
 logs
 .env
+src/config/firebase-adminsdk.json
